@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<!DOCTYPE module PUBLIC
+  "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+  "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name="Checker">
+    <!-- Configuración general para archivos de Java -->
+    <property name="fileExtensions" value="java"/>
+
+    <!-- Verifica que no haya tabulaciones, forzando el uso de espacios -->
+    <module name="FileTabCharacter"/>
+
+    <module name="TreeWalker">
+        <!-- Longitud máxima de línea -->
+        <module name="LineLength">
+            <property name="max" value="100"/>
+            <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+        </module>
+
+        <!-- Normas de Nomenclatura (Naming Conventions) -->
+        <!-- Nombres de clases e interfaces deben empezar por Mayúscula -->
+        <module name="TypeName"/>
+        <!-- Nombres de métodos en camelCase -->
+        <module name="MethodName"/>
+        <!-- Nombres de variables locales en camelCase -->
+        <module name="LocalVariableName"/>
+        <!-- Nombres de constantes en MAYÚSCULAS separadas por guión bajo -->
+        <module name="ConstantName"/>
+
+        <!-- Normas de estructura de código -->
+        <!-- Prohíbe dejar bloques catch, if o loops vacíos sin comentar -->
+        <module name="EmptyBlock"/>
+        
+        <!-- Exige que if, else, for, while siempre usen llaves {} -->
+        <module name="NeedBraces"/>
+
+        <!-- Evita importaciones redundantes o que no se usan (código limpio) -->
+        <module name="UnusedImports"/>
+        <module name="RedundantImport"/>
+
+        <!-- Validaciones de convención de diseño -->
+        <!-- Fuerza a que las variables de clase (atributos) sean privadas -->
+        <module name="VisibilityModifier">
+            <property name="packageAllowed" value="true"/>
+            <property name="protectedAllowed" value="true"/>
+        </module>
+    </module>
+</module>

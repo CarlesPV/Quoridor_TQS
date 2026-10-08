@@ -1,0 +1,33 @@
+# Archivos compilados
+*.class
+*.jar
+*.war
+*.ear
+
+# Directorios de compilación (Maven/Gradle)
+target/
+build/
+.gradle/
+
+# Archivos específicos de Eclipse
+.metadata
+.classpath
+.project
+.settings/
+bin/
+
+# Archivos del sistema operativo (Ocultos)
+.DS_Store
+Thumbs.db
+
+# Logs y volcados
+*.log
+
+# Backups de JavaFX SceneBuilder
+*.bak
+
+# Reportes de cobertura aislados
+jacoco.exec
+
+# Entornos de desarrollo adicionales (opcional)
+.vscode/
