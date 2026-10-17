@@ -1,48 +1,124 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE module PUBLIC
   "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
   "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
+<!--
+    Configuración de Checkstyle para el proyecto Quoridor_TQS (Java 21).
+    Define las normas de calidad, formato, nomenclatura y diseño que se comprueban
+    automáticamente en el pipeline de Integración Continua (CI) antes de cada merge a master.
+-->
 <module name="Checker">
-    <!-- Configuración general para archivos de Java -->
+    <!-- Codificación de caracteres estándar del proyecto -->
+    <property name="charset" value="UTF-8"/>
+
+    <!-- Cualquier incumplimiento de una regla se trata como error y detiene el build/CI -->
+    <property name="severity" value="error"/>
+
+    <!-- Analizar únicamente archivos de código fuente Java -->
     <property name="fileExtensions" value="java"/>
 
-    <!-- Verifica que no haya tabulaciones, forzando el uso de espacios -->
-    <module name="FileTabCharacter"/>
+    <!-- ========================================================================= -->
+    <!-- 1. LÍMITE DE LONGITUD DE LÍNEA (Nivel de archivo)                         -->
+    <!-- ========================================================================= -->
+    <!-- Comprueba que ninguna línea supere el tamaño máximo permitido (120 caracteres),
+         ignorando declaraciones de paquete, imports o enlaces URL largos.
+         Nota: En Checkstyle >= 8.24 debe declararse como hijo directo de Checker. -->
+    <module name="LineLength">
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+    </module>
 
+    <!-- TreeWalker analiza el árbol sintáctico (AST) de cada archivo .java -->
     <module name="TreeWalker">
-        <!-- Longitud máxima de línea -->
-        <module name="LineLength">
-            <property name="max" value="100"/>
-            <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
-        </module>
 
-        <!-- Normas de Nomenclatura (Naming Conventions) -->
-        <!-- Nombres de clases e interfaces deben empezar por Mayúscula -->
+        <!-- ===================================================================== -->
+        <!-- 2. CONVENCIONES DE NOMENCLATURA (Naming Conventions)                  -->
+        <!-- ===================================================================== -->
+
+        <!-- Los nombres de paquetes deben estar en minúsculas (ej. org.quoridor.model) -->
+        <module name="PackageName"/>
+
+        <!-- Los nombres de clases, interfaces, enums y records deben usar UpperCamelCase -->
         <module name="TypeName"/>
-        <!-- Nombres de métodos en camelCase -->
+
+        <!-- Los nombres de métodos deben empezar en minúscula y usar lowerCamelCase -->
         <module name="MethodName"/>
-        <!-- Nombres de variables locales en camelCase -->
+
+        <!-- Los parámetros de métodos y constructores deben usar lowerCamelCase -->
+        <module name="ParameterName"/>
+
+        <!-- Los atributos de instancia (no estáticos) deben usar lowerCamelCase -->
+        <module name="MemberName"/>
+
+        <!-- Las variables locales dentro de métodos deben usar lowerCamelCase -->
         <module name="LocalVariableName"/>
-        <!-- Nombres de constantes en MAYÚSCULAS separadas por guión bajo -->
+
+        <!-- Las constantes (static final) deben escribirse en MAYUSCULAS_CON_GUIONES -->
         <module name="ConstantName"/>
 
-        <!-- Normas de estructura de código -->
-        <!-- Prohíbe dejar bloques catch, if o loops vacíos sin comentar -->
+        <!-- ===================================================================== -->
+        <!-- 3. ESTRUCTURA, BLOQUES Y BUENAS PRÁCTICAS DE CODIFICACIÓN             -->
+        <!-- ===================================================================== -->
+
+        <!-- Exige que cada archivo .java contenga una única clase de primer nivel -->
+        <module name="OneTopLevelClass"/>
+
+        <!-- Prohíbe bloques de código vacíos (if, else, for, while, catch) sin contenido -->
         <module name="EmptyBlock"/>
-        
-        <!-- Exige que if, else, for, while siempre usen llaves {} -->
+
+        <!-- Detecta sentencias vacías (puntos y coma ';' sueltos innecesarios) -->
+        <module name="EmptyStatement"/>
+
+        <!-- Obliga al uso de llaves {} en todas las estructuras de control (if, else, for, while) -->
         <module name="NeedBraces"/>
 
-        <!-- Evita importaciones redundantes o que no se usan (código limpio) -->
+        <!-- Exige que si una clase sobrescribe equals(), también sobrescriba hashCode() -->
+        <module name="EqualsHashCode"/>
+
+        <!-- Evita expresiones booleanas redundantes (ej. 'if (condicion == true)') -->
+        <module name="SimplifyBooleanExpression"/>
+
+        <!-- Evita retornos booleanos innecesariamente complejos (ej. 'if (x) return true; else return false;') -->
+        <module name="SimplifyBooleanReturn"/>
+
+        <!-- ===================================================================== -->
+        <!-- 4. LIMPIEZA DE IMPORTACIONES (Imports)                                -->
+        <!-- ===================================================================== -->
+
+        <!-- Prohíbe el uso de importaciones con comodín (ej. 'import java.util.*;') -->
+        <module name="AvoidStarImport"/>
+
+        <!-- Detecta y prohíbe importaciones que no se utilizan en el archivo -->
         <module name="UnusedImports"/>
+
+        <!-- Detecta importaciones duplicadas o de java.lang (redundantes) -->
         <module name="RedundantImport"/>
 
-        <!-- Validaciones de convención de diseño -->
-        <!-- Fuerza a que las variables de clase (atributos) sean privadas -->
+        <!-- ===================================================================== -->
+        <!-- 5. LÍMITES DE TAMAÑO Y COMPLEJIDAD                                    -->
+        <!-- ===================================================================== -->
+
+        <!-- Limita la longitud máxima de un método a 80 líneas para fomentar código modular -->
+        <module name="MethodLength">
+            <property name="max" value="80"/>
+        </module>
+
+        <!-- Limita el número máximo de parámetros de un método o constructor a 7 -->
+        <module name="ParameterNumber">
+            <property name="max" value="7"/>
+        </module>
+
+        <!-- ===================================================================== -->
+        <!-- 6. DISEÑO Y ENCAPSULACIÓN                                             -->
+        <!-- ===================================================================== -->
+
+        <!-- Obliga a mantener los atributos de clase encapsulados (privados, protegidos o de paquete),
+             impidiendo exponer atributos públicos mutables directamente -->
         <module name="VisibilityModifier">
             <property name="packageAllowed" value="true"/>
             <property name="protectedAllowed" value="true"/>
         </module>
+
     </module>
 </module>

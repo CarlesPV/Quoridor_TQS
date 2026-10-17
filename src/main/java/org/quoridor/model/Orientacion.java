@@ -1,5 +1,5 @@
 package org.quoridor.model;
 
-public enum Orentacion {
+public enum Orientacion {
 	HORIZONTAL, VERTICAL
 }
