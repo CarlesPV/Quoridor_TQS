@@ -5,7 +5,7 @@
 El `QuoridorController` es el cerebro operativo. Su diseño asegura que no importe si la Vista es una aplicación de terminal, una web o JavaFX. 
 
 **Flujo paso a paso:**
-1.  **Inicialización**: En el `master`, se crea la instancia de `Partida` (Modelo). Se crea la instancia de `VentanaPrincipalJavaFX` (Vista). Se crea el `QuoridorController` pasando ambas dependencias al constructor.
+1.  **Inicialización**: En `Main.java`, se crea la instancia de `Partida` (Modelo). Se crea la instancia de `VentanaPrincipalJavaFX` (Vista). Se crea el `QuoridorController` pasando ambas dependencias al constructor.
 2.  **Suscripción**: El Controlador llama a `vista.setControlador(this)` para que la Vista sepa a quién avisar.
 3.  **Bucle de Eventos**: 
     - El usuario hace clic en la ventana. La Vista captura el evento de ratón de JavaFX (`MouseEvent`).

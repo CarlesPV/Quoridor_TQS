@@ -11,13 +11,18 @@ El desarrollo se organiza mediante ramas funcionales independientes para mantene
 - **Rama Principal (`master`)**:
   - Contiene exclusivamente código verificado y estable.
   - Está **protegida**: no se admiten commits directos. La incorporación de nuevo código se realiza únicamente mediante *Pull Requests* (PR).
-- **Ramas de Funcionalidad (`feature/<nombre>`)**:
-  - Cada clase, módulo o conjunto de métodos se implementa en una rama separada originada desde `master`.
-  - Ejemplos de nomenclatura:
-    - `feature/posicion`
-    - `feature/tablero-muros`
-    - `feature/validacion-camino-bfs`
-  - Una vez finalizada la implementación y validadas las pruebas, se solicita la integración mediante un Pull Request hacia `master`.
+- **Ramas de Desarrollo Independientes (`feature/**`, `fix/**`, `refactor/**`)**:
+  - Cada nuevo desarrollo, corrección o mejora se crea de forma independiente en una rama nueva originada desde `master` y posteriormente se fusiona en `master` mediante Pull Request:
+  - **`feature/<nombre>` (Nuevas funcionalidades y clases bajo TDD)**:
+    - Uso: Implementación de nuevas clases, módulos o métodos junto con sus pruebas.
+    - Ejemplos: `feature/posicion`, `feature/tablero-muros`, `feature/validacion-camino-bfs`.
+  - **`fix/<nombre>` (Corrección de errores o fallos detectados)**:
+    - Uso: Resolución de bugs en la lógica del juego, fallos en casos frontera o ajustes en el pipeline/configuración.
+    - Ejemplos: `fix/colision-muros-cruzados`, `fix/salto-oponente-borde`, `fix/checkstyle-warnings`.
+  - **`refactor/<nombre>` (Refactorización y mejora de calidad interna)**:
+    - Uso: Optimización de código, extracción de métodos o mejoras de diseño y estilo sin alterar el comportamiento externo, manteniendo todos los tests en verde.
+    - Ejemplos: `refactor/extraccion-validador-bfs`, `refactor/limpieza-controlador`.
+  - Una vez completado el trabajo en cualquiera de estas ramas y superadas las validaciones del CI, se fusiona hacia `master` mediante Pull Request.
 
 ---
 
@@ -70,19 +75,19 @@ void testPosicionLimiteFueraTablero() {
 
 ## 4. Pull Requests y Políticas de Integración Continua (CI)
 
-La validación de calidad está automatizada mediante pipelines de CI (GitHub Actions):
+La validación de calidad está automatizada mediante el pipeline de GitHub Actions definido en `.github/workflows/ci.yml` sobre **JavaSE-21**:
 
 1. **Disparadores del Pipeline**:
-   - El flujo de CI se ejecuta automáticamente ante cualquier `push` y en la apertura o actualización de un `Pull Request` hacia la rama `master`.
+   - El flujo de CI (`build-test-quality`) se ejecuta automáticamente ante cualquier `push` en ramas de trabajo (`feature/**`, `fix/**`, `refactor/**`, `master`) y en la apertura o sincronización de un `Pull Request` hacia la rama principal `master`.
 
 2. **Etapas de Verificación**:
-   - **Compilación**: Verificación de que el proyecto compila limpiamente.
-   - **Ejecución de Pruebas**: Ejecución completa de la suite de pruebas unitarias (`mvn test` o `gradle test`).
-   - **Análisis de Calidad y Estilo**: Inspección estática de código (mediante herramientas como Checkstyle) para asegurar el cumplimiento de estándares, tales como:
-     - Longitud máxima por línea de código.
-     - Convenciones de nomenclatura y formato.
-     - Ausencia de advertencias críticas o dependencias no resueltas.
+   - **Compilación (`mvn -B clean test-compile`)**: Verificación de que tanto el código fuente como los tests compilan sin errores bajo JDK 21.
+   - **Ejecución de Pruebas y Cobertura (`mvn -B test`)**: Ejecución completa de la suite JUnit 5 con aserciones activas (`-ea` para Programación por Contrato) y generación automática del reporte de cobertura de Caja Blanca con JaCoCo (`target/site/jacoco/`).
+   - **Análisis de Calidad y Estilo (`mvn -B checkstyle:check`)**: Inspección estática de código mediante `checkstyle.xml` (con severidad `error` y `failsOnError=true`) para validar normas preestablecidas:
+     - Longitud máxima de línea (`LineLength` máximo de 120 caracteres) y de método (`MethodLength`).
+     - Convenciones de nomenclatura (`PackageName`, `TypeName`, `MethodName`, `MemberName`, `LocalVariableName`, `ConstantName`).
+     - Reglas de estructura, uso obligatorio de llaves (`NeedBraces`), encapsulación (`VisibilityModifier`) y limpieza de importaciones (`UnusedImports`, `AvoidStarImport`).
 
-3. **Política de Merge**:
-   - Si cualquiera de los pasos anteriores falla (pruebas no superadas o infracción de normas de calidad), el Pull Request queda **bloqueado automáticamente**.
-   - No se permite fusionar (*merge*) en `master` hasta que todos los chequeos concluyan con éxito.
+3. **Política de Merge y Bloqueo en `master`**:
+   - Si cualquiera de las acciones anteriores produce un error (fallo de compilación, test fallido o infracción en Checkstyle), el job `build-test-quality` termina con código de error y el Pull Request queda **bloqueado automáticamente** mediante las *Branch Protection Rules* de GitHub sobre `master` (*Require status checks to pass before merging*).
+   - No se acepta ningún *merge* dentro de `master` hasta que todas las comprobaciones finalicen sin errores.
