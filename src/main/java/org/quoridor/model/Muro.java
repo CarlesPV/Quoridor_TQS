@@ -5,6 +5,8 @@ public class Muro {
 	private Posicion origen;
 	private Orientacion orientacion;
 	
+	public Posicion getOrigen();
+	public Orientacion getOrientacion();
 	public Muro();
 	public Muro(Posicion origen, Orientacion orientacion);
 	
