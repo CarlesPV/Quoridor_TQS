@@ -149,7 +149,7 @@ class PosicionTest {
 
 	@Test
 	void testHashCode() {
-		fail("Not yet implemented");
+		assertEquals(p1.hashCode(), p2.hashCode());
 	}
 
 }
