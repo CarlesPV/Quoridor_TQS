@@ -42,10 +42,26 @@ class PosicionTest {
 		
 	}
 
+	// Se calcula la distancia Manhattan entre dos posiciones
+	// Miarar primero dos posiciones en ambos ordenes 
+	// y luego se cambia p1 sin cambiar p2 para ver que sigue siendo correcto el calculo
+	// además se prueba la assercion
 	@Test
 	void testDistanciaManhattan() {
 		p2 = new Posicion(5,5);
 		assertEquals(10, p1.distanciaManhattan(p2));
+		
+		assertEquals(10, p2.distanciaManhattan(p1));
+		
+		p1 = new Posicion(-5,-5);
+		assertEquals(20, p1.distanciaManhattan(p2));
+		
+		try
+		{
+			assertEquals(10, p1.distanciaManhattan(null));
+			assertTrue(false);
+		}
+		catch (AssertionError e) {}
 	}
 	
 	@Test
