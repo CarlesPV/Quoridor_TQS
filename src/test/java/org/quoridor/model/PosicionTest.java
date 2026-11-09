@@ -66,7 +66,8 @@ class PosicionTest {
 	
 	@Test
 	void testEsAdyacente() {
-		fail("Not yet implemented");
+		p2 = new Posicion(0,1);
+		assertTrue(p1.esAdyacente(p2));
 	}
 
 	@Test
