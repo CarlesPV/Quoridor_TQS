@@ -97,10 +97,32 @@ class PosicionTest {
 		catch (AssertionError e) {}
 	}
 
+	// Se desplaza la posicion dx y dy casillas
+	// Mirar desplazamiento en todos los casos 
 	@Test
 	void testDesplazar() {
-		p1.desplazar(1, 0);
+		p1.desplazar(1, 0); // solo x
 		assertEquals(1, p1.getX());
+		assertEquals(0, p1.getY());
+		
+		p1.desplazar(0, 1); // solo y
+		assertEquals(1, p1.getX());
+		assertEquals(1, p1.getY());
+		
+		p1.desplazar(1, 1); // ambos
+		assertEquals(2, p1.getX());
+		assertEquals(2, p1.getY());
+		
+		p1.desplazar(-1, -1); // ambos negativo
+		assertEquals(1, p1.getX());
+		assertEquals(1, p1.getY());
+		
+		p1.desplazar(-1, 0); // solo x negativo
+		assertEquals(0, p1.getX());
+		assertEquals(1, p1.getY());
+		
+		p1.desplazar(0, -1); // solo y negativo
+		assertEquals(0, p1.getX());
 		assertEquals(0, p1.getY());
 	}
 	
