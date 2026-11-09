@@ -36,6 +36,17 @@ public class Posicion {
 		return (this.x == p.x && this.y == p.y);
 	}
 	
+	// Necesario para que los metodos de HashSet funcionen correctamente
+	@Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Posicion posicion = (Posicion) obj;
+        return x == posicion.x && y == posicion.y;
+    }
+	
+	// Necesario para poder construir camino BFS
+	@Override
 	public int hashCode()
 	{
 		return java.util.Objects.hash(x, y);
