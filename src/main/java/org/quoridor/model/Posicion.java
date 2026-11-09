@@ -3,7 +3,7 @@ package org.quoridor.model;
 public class Posicion {
 	
 	public Posicion() { x=0; y=0; }
-	public Posicion(int X, int Y) { x=X; y=Y; }
+	public Posicion(int posX, int posY) { x=posX; y=posY; }
 	
 	public int getX() { return x; }
 	public int getY() { return y; }
@@ -39,8 +39,15 @@ public class Posicion {
 	// Necesario para que los metodos de HashSet funcionen correctamente
 	@Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) 
+        {
+        	return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) 
+        {
+        	return false;
+        }
+        
         Posicion posicion = (Posicion) obj;
         return x == posicion.x && y == posicion.y;
     }
