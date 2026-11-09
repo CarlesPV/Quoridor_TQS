@@ -129,6 +129,22 @@ class PosicionTest {
 	@Test
 	void testEqualsPosicion() {
 		assertTrue(p1.equals(p2));
+		assertTrue(p2.equals(p1));
+		
+		p2 = new Posicion(1,0);
+		assertFalse(p1.equals(p2));
+		
+		p2 = new Posicion(0,1);
+		assertFalse(p1.equals(p2));
+		
+		assertFalse(p2.equals(p1));
+		
+		try
+		{
+			assertTrue(p1.equals(null));
+			assertTrue(false);
+		}
+		catch (AssertionError e) {}
 	}
 
 	@Test
