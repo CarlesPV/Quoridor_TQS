@@ -99,7 +99,9 @@ class PosicionTest {
 
 	@Test
 	void testDesplazar() {
-		fail("Not yet implemented");
+		p1.desplazar(1, 0);
+		assertEquals(1, p1.getX());
+		assertEquals(0, p1.getY());
 	}
 	
 	@Test
