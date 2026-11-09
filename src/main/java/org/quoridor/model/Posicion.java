@@ -32,8 +32,10 @@ public class Posicion {
 	
 	public boolean equals(Posicion p)
 	{
+		assert(p != null);
 		return (this.x == p.x && this.y == p.y);
 	}
+	
 	public void hashCode();
 
 	
