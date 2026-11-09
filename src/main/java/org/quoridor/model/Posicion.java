@@ -24,7 +24,11 @@ public class Posicion {
 		return this.distanciaManhattan(p) == 1;
 	}
 	
-	public void desplazar(int dx, int dy);
+	public void desplazar(int dx, int dy)
+	{
+		this.x += dx;
+	}
+	
 	public boolean equals(Posicion p);
 	public void hashCode();
 
