@@ -9,7 +9,7 @@ public class Posicion {
 	public int getY() { return y; }
 	public boolean esValida(int limiteTablero)
 	{
-		return x >= 0 && x < limiteTablero;
+		return (x >= 0 && x < limiteTablero) && (y >= 0 && y < limiteTablero);
 	}
 	
 	public int distanciaManhattan(Posicion p);
