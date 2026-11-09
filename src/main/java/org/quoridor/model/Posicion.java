@@ -30,7 +30,10 @@ public class Posicion {
 		this.y += dy;
 	}
 	
-	public boolean equals(Posicion p);
+	public boolean equals(Posicion p)
+	{
+		return (this.x == p.x && this.y == p.y);
+	}
 	public void hashCode();
 
 	
