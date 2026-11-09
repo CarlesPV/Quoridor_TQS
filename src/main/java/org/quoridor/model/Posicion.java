@@ -12,7 +12,10 @@ public class Posicion {
 		return (x >= 0 && x < limiteTablero) && (y >= 0 && y < limiteTablero);
 	}
 	
-	public int distanciaManhattan(Posicion p);
+	public int distanciaManhattan(Posicion p)
+	{
+		return Math.abs(this.x - p.x) + Math.abs(this.y - p.y);
+	}
 	public boolean esAdyacente(Posicion p);
 	public void desplazar(int dx, int dy);
 	public boolean equals(Posicion p);
