@@ -44,7 +44,8 @@ class PosicionTest {
 
 	@Test
 	void testDistanciaManhattan() {
-		fail("Not yet implemented");
+		p2 = new Posicion(5,5);
+		assertEquals(10, p1.distanciaManhattan(p2));
 	}
 	
 	@Test
