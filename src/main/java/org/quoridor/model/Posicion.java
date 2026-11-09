@@ -36,7 +36,10 @@ public class Posicion {
 		return (this.x == p.x && this.y == p.y);
 	}
 	
-	public void hashCode();
+	public int hashCode()
+	{
+		return java.util.Objects.hash(x, y);
+	}
 
 	
 	private int x, y;
