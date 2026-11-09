@@ -150,6 +150,23 @@ class PosicionTest {
 	@Test
 	void testHashCode() {
 		assertEquals(p1.hashCode(), p2.hashCode());
+		
+		Posicion p3 = new Posicion(0,0);
+		Posicion p4 = new Posicion(1,0);
+		
+		assertNotEquals(p3.hashCode(), p4.hashCode());
+		
+		p3 = new Posicion(0,0);
+		p4 = new Posicion(0,1);
+		
+		assertNotEquals(p3.hashCode(), p4.hashCode());
+		
+		Set<Posicion> posiciones = new HashSet<>();
+		posiciones.add(new Posicion(6,3));
+		assertTrue(posiciones.contains(new Posicion(6,3)));
+		
+		posiciones.add(new Posicion(2,5));	
+		assertTrue(posiciones.contains(new Posicion(5,2)));
 	}
 
 }
