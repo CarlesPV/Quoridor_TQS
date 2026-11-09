@@ -20,6 +20,7 @@ public class Posicion {
 	
 	public boolean esAdyacente(Posicion p)
 	{
+		assert(p != null);
 		return this.distanciaManhattan(p) == 1;
 	}
 	
