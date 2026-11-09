@@ -64,10 +64,37 @@ class PosicionTest {
 		catch (AssertionError e) {}
 	}
 	
+	// Se mira que 2 posiciones sean adyacentes
+	// Mirar todos los casos de adyacencia (derecha, izquierda, arriba, abajo)
+	// y despues los que no son
 	@Test
 	void testEsAdyacente() {
 		p2 = new Posicion(0,1);
-		assertTrue(p1.esAdyacente(p2));
+		assertTrue(p1.esAdyacente(p2)); // caso adyacencia derecha
+		
+		p2 = new Posicion(1,0);
+		assertTrue(p1.esAdyacente(p2)); // caso adyacencia abajo
+		
+		p2 = new Posicion(1,1);
+		
+		p1 = new Posicion(0,1);
+		assertTrue(p2.esAdyacente(p1)); // caso adyacencia arriba
+		
+		p1 = new Posicion(1,0);
+		assertTrue(p2.esAdyacente(p1)); // caso adyacencia izquierda
+		
+		p1 = new Posicion(0,0);
+		assertFalse(p1.esAdyacente(p2)); // caso límite no adyacente
+		
+		p2 = new Posicion(0,0);
+		assertFalse(p1.esAdyacente(p2)); // caso límite misma posicion
+		
+		try
+		{
+			assertEquals(10, p1.esAdyacente(null));
+			assertTrue(false);
+		}
+		catch (AssertionError e) {}
 	}
 
 	@Test
