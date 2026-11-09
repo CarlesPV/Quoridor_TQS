@@ -13,14 +13,14 @@ public class Muro {
 	
 	public Muro() {
 	}
-	public Muro(Posicion origen, Orientacion orientacion) {
-		// Pre-condiciones
-		assert(origen.getX()>=0);
-		assert(origen.getY()>=0);
-		
-		this.setOrigen(origen);
-		this.setOrientacion(orientacion);
-	}
+    public Muro(Posicion origen, Orientacion orientacion) {
+        // Pre-condiciones
+        assert origen != null : "El origen no puede ser nulo";
+        assert orientacion != null : "La orientación no puede ser nula";
+
+        this.setOrigen(origen);
+        this.setOrientacion(orientacion);
+    }
 	
 	/// 
 	/// Funciones
