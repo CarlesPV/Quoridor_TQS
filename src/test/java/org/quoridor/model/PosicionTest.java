@@ -128,7 +128,7 @@ class PosicionTest {
 	
 	@Test
 	void testEqualsPosicion() {
-		fail("Not yet implemented");
+		assertTrue(p1.equals(p2));
 	}
 
 	@Test
