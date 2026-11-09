@@ -27,6 +27,7 @@ public class Posicion {
 	public void desplazar(int dx, int dy)
 	{
 		this.x += dx;
+		this.y += dy;
 	}
 	
 	public boolean equals(Posicion p);
