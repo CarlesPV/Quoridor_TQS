@@ -18,7 +18,11 @@ public class Posicion {
 		return Math.abs(this.x - p.x) + Math.abs(this.y - p.y);
 	}
 	
-	public boolean esAdyacente(Posicion p);
+	public boolean esAdyacente(Posicion p)
+	{
+		return this.distanciaManhattan(p) == 1;
+	}
+	
 	public void desplazar(int dx, int dy);
 	public boolean equals(Posicion p);
 	public void hashCode();
