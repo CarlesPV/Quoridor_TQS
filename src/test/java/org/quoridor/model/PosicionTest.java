@@ -166,7 +166,7 @@ class PosicionTest {
 		assertTrue(posiciones.contains(new Posicion(6,3)));
 		
 		posiciones.add(new Posicion(2,5));	
-		assertTrue(posiciones.contains(new Posicion(5,2)));
+		assertFalse(posiciones.contains(new Posicion(5,2)));
 	}
 
 }
