@@ -14,8 +14,10 @@ public class Posicion {
 	
 	public int distanciaManhattan(Posicion p)
 	{
+		assert(p != null);
 		return Math.abs(this.x - p.x) + Math.abs(this.y - p.y);
 	}
+	
 	public boolean esAdyacente(Posicion p);
 	public void desplazar(int dx, int dy);
 	public boolean equals(Posicion p);
