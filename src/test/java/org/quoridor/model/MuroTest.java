@@ -54,7 +54,7 @@ class MuroTest {
 				new Muro (new Posicion(0,7),Orientacion.HORIZONTAL)
 				};
 		
-		for(int i=0; i < murosValidos.length();i++) {
+		for(int i=0; i < murosValidos.length;i++) {
 			assertTrue(murosValidos[i].esPosicionValida(LIMITE_TABLERO));
 		}
 		
@@ -72,7 +72,7 @@ class MuroTest {
 				new Muro (new Posicion(8,7),Orientacion.HORIZONTAL)
 				};
 		
-		for(int i=0; i < murosNoValidos.length();i++) {
+		for(int i=0; i < murosNoValidos.length;i++) {
 			assertFalse(murosNoValidos[i].esPosicionValida(LIMITE_TABLERO));
 		}
 	}
