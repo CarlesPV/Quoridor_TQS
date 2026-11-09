@@ -15,9 +15,31 @@ class PosicionTest {
 		p2 = new Posicion(); // (0,0)
 	}
 	
+	// Se mira que la posicion sea valida y no este fuera del tablero de juego
+	// Mirar primero casos frontera true y luego todos los falsos en entorno normal 9x9
+	// Finalmente mirar si cambiar el límite afecta las posiciones que antes aceptaba
 	@Test
 	void testEsValida() {
 		assertTrue(p1.esValida(9));
+		
+		p1 = new Posicion(8,8);
+		assertTrue(p1.esValida(9));
+		
+		p1 = new Posicion(-1,0);
+		assertFalse(p1.esValida(9));
+		
+		p1 = new Posicion(0,-1);
+		assertFalse(p1.esValida(9));
+		
+		p1 = new Posicion(9,0);
+		assertFalse(p1.esValida(9));
+		
+		p1 = new Posicion(0,9);
+		assertFalse(p1.esValida(9));
+		
+		p1 = new Posicion(8,8);
+		assertFalse(p1.esValida(8));
+		
 	}
 
 	@Test
