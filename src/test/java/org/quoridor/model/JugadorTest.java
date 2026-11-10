@@ -63,9 +63,16 @@ class JugadorTest {
 	///
 	/// Tests de funciones
 	///
+	// Se comprueba el movimiento básico del jugador a una nueva posición válida
 	@Test
 	void testMoverA() {
-		fail("Not yet implemented");
+		Posicion posInicial = new Posicion(4, 0);
+		Posicion posDestino = new Posicion(4, 1);
+		jugador = new Jugador("Jugador 1", Color.ROJO, posInicial, 8, 10);
+		
+		jugador.moverA(posDestino);
+		
+		assertEquals(posDestino, jugador.getPosicionActual());
 	}
 	
 	@Test
