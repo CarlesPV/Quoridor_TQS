@@ -63,7 +63,8 @@ class JugadorTest {
 	///
 	/// Tests de funciones
 	///
-	// Se comprueba el movimiento básico del jugador a una nueva posición válida
+
+	// Prueba de Caja Negra: Partición Equivalente y valores límite / frontera válidos
 	@Test
 	void testMoverA() {
 		Posicion posInicial = new Posicion(4, 0);
@@ -71,8 +72,44 @@ class JugadorTest {
 		jugador = new Jugador("Jugador 1", Color.ROJO, posInicial, 8, 10);
 		
 		jugador.moverA(posDestino);
-		
 		assertEquals(posDestino, jugador.getPosicionActual());
+		
+		// Partición equivalente válida: movimientos consecutivos
+		Posicion posSiguiente = new Posicion(4, 2);
+		jugador.moverA(posSiguiente);
+		assertEquals(posSiguiente, jugador.getPosicionActual());
+
+		// Valores límite y frontera válidos: esquinas del tablero (0,0), (8,8), (0,8), (8,0)
+		Posicion esquinaSupIzq = new Posicion(0, 0);
+		jugador.moverA(esquinaSupIzq);
+		assertEquals(esquinaSupIzq, jugador.getPosicionActual());
+		Posicion esquinaInfDer = new Posicion(8, 8);
+		jugador.moverA(esquinaInfDer);
+		assertEquals(esquinaInfDer, jugador.getPosicionActual());
+		Posicion esquinaSupDer = new Posicion(8, 0);
+		jugador.moverA(esquinaSupDer);
+		assertEquals(esquinaSupDer, jugador.getPosicionActual());
+		Posicion esquinaInfIzq = new Posicion(0, 8);
+		jugador.moverA(esquinaInfIzq);
+		assertEquals(esquinaInfIzq, jugador.getPosicionActual());
+
+		// Valores frontera en bordes del tablero
+		Posicion bordeSuperior = new Posicion(4, 0);
+		jugador.moverA(bordeSuperior);
+		assertEquals(bordeSuperior, jugador.getPosicionActual());
+		Posicion bordeInferior = new Posicion(4, 8);
+		jugador.moverA(bordeInferior);
+		assertEquals(bordeInferior, jugador.getPosicionActual());
+		Posicion bordeIzquierdo = new Posicion(0, 4);
+		jugador.moverA(bordeIzquierdo);
+		assertEquals(bordeIzquierdo, jugador.getPosicionActual());
+		Posicion bordeDerecho = new Posicion(8, 4);
+		jugador.moverA(bordeDerecho);
+		assertEquals(bordeDerecho, jugador.getPosicionActual());
+
+		// Movimiento a la misma posición
+		jugador.moverA(bordeDerecho);
+		assertEquals(bordeDerecho, jugador.getPosicionActual());
 	}
 	
 	@Test
