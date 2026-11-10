@@ -19,7 +19,8 @@ public class Jugador {
 		assert color != null : "El color no puede ser nulo";
 		assert posicionActual != null : "La posición actual no puede ser nula";
 		assert posicionActual.esValida(TAMANO_TABLERO) : "La posición inicial debe ser válida en el tablero";
-		assert filaObjetivo >= 0 && filaObjetivo < TAMANO_TABLERO : "La fila objetivo debe estar dentro del tablero";
+		assert filaObjetivo >= 0 && filaObjetivo < TAMANO_TABLERO
+				: "La fila objetivo debe estar dentro del tablero";
 		assert murosRestantes >= 0 : "Los muros restantes no pueden ser negativos";
 		
 		this.nombre = nombre;
@@ -43,7 +44,9 @@ public class Jugador {
 	public int getFilaObjetivo() { return this.filaObjetivo; }
 	public int getMurosRestantes() { return this.murosRestantes; }
 	
-	public void moverA(Posicion p);
+	public void moverA(Posicion p) {
+		this.posicionActual = p;
+	}
 	public void consumirMuro();
 	public boolean hasMurosRestantes();
 	public boolean haLlegadoAMeta();
