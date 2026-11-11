@@ -9,15 +9,33 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	public int calcularDistanciaMinima(Posicion inicio, int filaObjetivo, List<Muro> muros);
 	
 	// Métodos auxiliares
-	List<Posicion> obtenerVecinosValidos(Posicion actual, List<Muro> muros, int tamanoTablero);
+	List<Posicion> obtenerVecinosValidos(Posicion actual, List<Muro> muros, int tamanoTablero)
+	{
+		List<Posicion> vecinos = new ArrayList<>();
+        
+        // Movimientos posibles: Arriba, Abajo, Izquierda, Derecha
+        int[] dx = {0, 0, -1, 1};
+        int[] dy = {-1, 1, 0, 0};
+        
+        for (int i = 0; i < 4; i++) 
+        {
+            Posicion destino = new Posicion(actual.getX() + dx[i], actual.getY() + dy[i]);
+
+            vecinos.add(destino);
+        }
+
+        return vecinos;
+	}
 	
 	boolean estaBloqueadoPorMuro(Posicion origen, Posicion destino, List<Muro> muros)
 	{
 		assert(origen != null) : "La posicion origen es null";
 		assert(destino != null) : "La posicion destino es null";
 		
-		for (Muro muro : muros) {
-	        if (muro.bloqueaPaso(origen, destino)) {
+		for (Muro muro : muros) 
+		{
+	        if (muro.bloqueaPaso(origen, destino)) 
+	        {
 	            return true;
 	        }
 	    }
