@@ -11,6 +11,8 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	// Métodos auxiliares
 	List<Posicion> obtenerVecinosValidos(Posicion actual, List<Muro> muros, int tamanoTablero)
 	{
+		assert(actual != null) : "La posicion actual es null";
+		
 		List<Posicion> vecinos = new ArrayList<>();
         
         // Movimientos posibles: Arriba, Abajo, Izquierda, Derecha
@@ -20,8 +22,13 @@ public class ValidadorCaminos implements IValidadorCaminos {
         for (int i = 0; i < 4; i++) 
         {
             Posicion destino = new Posicion(actual.getX() + dx[i], actual.getY() + dy[i]);
-
-            vecinos.add(destino);
+            if (destino.esValida(tamanoTablero))
+            {
+            	if (!estaBloqueadoPorMuro(actual, destino, muros))
+            	{
+            		vecinos.add(destino);
+            	}
+            }
         }
 
         return vecinos;
