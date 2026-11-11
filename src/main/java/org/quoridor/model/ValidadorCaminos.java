@@ -6,7 +6,33 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	public boolean hayCaminoDisponible(Posicion inicio, int filaObjetivo, List<Muro> muros, int tamanoTablero);
 	
 	@Override
-	public int calcularDistanciaMinima(Posicion inicio, int filaObjetivo, List<Muro> muros);
+	public int calcularDistanciaMinima(Posicion inicio, int filaObjetivo, List<Muro> muros, int tamanoTablero)
+	{
+		Map<Posicion, Integer> distancias = new HashMap<>();
+        Queue<Posicion> cola = new LinkedList<>();
+
+        cola.add(inicio);
+        distancias.put(inicio, 0);
+
+        while (!cola.isEmpty()) {
+            Posicion actual = cola.poll();
+            int distanciaActual = distancias.get(actual);
+
+            if (actual.getY() == filaObjetivo) {
+                return distanciaActual;
+            }
+
+            for (Posicion vecino : obtenerVecinosValidos(actual, muros, tamanoTablero)) {
+                if (!distancias.containsKey(vecino)) {
+                    distancias.put(vecino, distanciaActual + 1);
+                    cola.add(vecino);
+                }
+            }
+        }
+        
+        // Si no existe camino
+        return -1;
+	}
 	
 	// Métodos auxiliares
 	List<Posicion> obtenerVecinosValidos(Posicion actual, List<Muro> muros, int tamanoTablero)
