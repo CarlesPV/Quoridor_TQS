@@ -1,4 +1,5 @@
 package org.quoridor.model;
+import java.util.*;
 
 public class ValidadorCaminos implements IValidadorCaminos {
 	@Override
@@ -9,6 +10,15 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	
 	// Métodos auxiliares
 	List<Posicion> obtenerVecinosValidos(Posicion actual, List<Muro> muros, int tamanoTablero);
-	boolean estaBloqueadoPorMuro(Posicion origen, Posicion destino, List<Muro> muros);
+	
+	boolean estaBloqueadoPorMuro(Posicion origen, Posicion destino, List<Muro> muros)
+	{
+		for (Muro muro : muros) {
+	        if (muro.bloqueaPaso(origen, destino)) {
+	            return true;
+	        }
+	    }
+		return false;
+	}
 	
 }
