@@ -58,7 +58,18 @@ public class Jugador {
 		assert verificarInvariante() : "Invariante de Jugador violada tras mover";
 	}
 	public void consumirMuro() {
+		// Pre-condiciones
+		assert this.murosRestantes > 0 : "No quedan muros disponibles para consumir";
+		
+		int murosPrevios = this.murosRestantes;
 		this.murosRestantes--;
+		
+		// Post-condición
+		assert this.murosRestantes == murosPrevios - 1
+				: "Los muros restantes deben decrementar exactamente en 1";
+		
+		// Invariante de clase
+		assert verificarInvariante() : "Invariante de Jugador violada tras consumir muro";
 	}
 	public boolean hasMurosRestantes();
 	public boolean haLlegadoAMeta();
