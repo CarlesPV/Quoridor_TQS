@@ -45,7 +45,17 @@ public class Jugador {
 	public int getMurosRestantes() { return this.murosRestantes; }
 	
 	public void moverA(Posicion p) {
+		// Pre-condiciones
+		assert p != null : "La posición de destino no puede ser nula";
+		assert p.esValida(TAMANO_TABLERO) : "La posición de destino debe ser válida en el tablero";
+		
 		this.posicionActual = p;
+		
+		// Post-condición
+		assert this.posicionActual.equals(p) : "La posición actual debe ser la posición de destino";
+		
+		// Invariante de clase
+		assert verificarInvariante() : "Invariante de Jugador violada tras mover";
 	}
 	public void consumirMuro();
 	public boolean hasMurosRestantes();
