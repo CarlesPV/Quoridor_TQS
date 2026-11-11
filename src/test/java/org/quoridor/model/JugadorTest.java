@@ -200,7 +200,13 @@ class JugadorTest {
 	
 	@Test
 	void testReiniciarEstado() {
-		fail("Not yet implemented");
+		jugador = new Jugador("Jugador 1", Color.ROJO, new Posicion(4, 5), 8, 5);
+		Posicion origen = new Posicion(4, 0);
+		
+		jugador.reiniciarEstado(origen, 10);
+		
+		assertEquals(origen, jugador.getPosicionActual());
+		assertEquals(10, jugador.getMurosRestantes());
 	}
 
 }
