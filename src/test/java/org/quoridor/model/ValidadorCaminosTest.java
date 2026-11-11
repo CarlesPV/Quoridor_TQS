@@ -45,7 +45,7 @@ class ValidadorCaminosTest {
         muros.add(new Muro(new Posicion(4, 0), Orientacion.VERTICAL));
         muros.add(new Muro(new Posicion(3, 1), Orientacion.HORIZONTAL));
         distancia = validador.calcularDistanciaMinima(inicio, filaObjetivo, muros, TAMANO_TABLERO); 
-        assertEquals(0, distancia, "La distancia mínima debe ser -1 ya que no existe el camino.");
+        assertEquals(-1, distancia, "La distancia mínima debe ser -1 ya que no existe el camino.");
         
 		// Caso posicion inicial null
 		try
