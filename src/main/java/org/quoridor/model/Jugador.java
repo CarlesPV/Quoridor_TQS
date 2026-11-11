@@ -57,7 +57,9 @@ public class Jugador {
 		// Invariante de clase
 		assert verificarInvariante() : "Invariante de Jugador violada tras mover";
 	}
-	public void consumirMuro();
+	public void consumirMuro() {
+		this.murosRestantes--;
+	}
 	public boolean hasMurosRestantes();
 	public boolean haLlegadoAMeta();
 	public void reiniciarEstado(Posicion origen, int murosIniciales);
