@@ -84,8 +84,21 @@ public class Jugador {
 	}
 
 	public void reiniciarEstado(Posicion origen, int murosIniciales) {
+		// Pre-condiciones
+		assert origen != null : "La posición de origen no puede ser nula";
+		assert origen.esValida(TAMANO_TABLERO) : "La posición de origen debe ser válida en el tablero";
+		assert murosIniciales >= 0 : "Los muros iniciales no pueden ser negativos";
+		
 		this.posicionActual = origen;
 		this.murosRestantes = murosIniciales;
+		
+		// Post-condiciones
+		assert this.posicionActual.equals(origen) : "La posición actual debe ser la posición de origen";
+		assert this.murosRestantes == murosIniciales
+				: "Los muros restantes deben coincidir con los muros iniciales";
+		
+		// Invariante de clase
+		assert verificarInvariante() : "Invariante de Jugador violada tras reiniciar estado";
 	}
 	
 }
