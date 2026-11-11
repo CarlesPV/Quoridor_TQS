@@ -13,6 +13,9 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	
 	boolean estaBloqueadoPorMuro(Posicion origen, Posicion destino, List<Muro> muros)
 	{
+		assert(origen != null) : "La posicion origen es null";
+		assert(destino != null) : "La posicion destino es null";
+		
 		for (Muro muro : muros) {
 	        if (muro.bloqueaPaso(origen, destino)) {
 	            return true;
