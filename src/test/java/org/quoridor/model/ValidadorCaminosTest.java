@@ -28,7 +28,7 @@ class ValidadorCaminosTest {
         int filaObjetivo = 8;
         List<Muro> muros = new ArrayList<>();
 
-        int distancia = validador.calcularDistanciaMinima(inicio, filaObjetivo, muros);
+        int distancia = validador.calcularDistanciaMinima(inicio, filaObjetivo, muros, TAMANO_TABLERO);
         
         assertEquals(8, distancia, "La distancia mínima en línea recta desde la fila 0 hasta la 8 debe ser 8.");
 	}
