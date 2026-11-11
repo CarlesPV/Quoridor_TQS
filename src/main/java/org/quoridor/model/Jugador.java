@@ -75,7 +75,9 @@ public class Jugador {
 		assert verificarInvariante() : "Invariante de Jugador violada en hasMurosRestantes";
 		return this.murosRestantes > 0;
 	}
-	public boolean haLlegadoAMeta();
+	public boolean haLlegadoAMeta() {
+		return this.posicionActual.getY() == this.filaObjetivo;
+	}
 	public void reiniciarEstado(Posicion origen, int murosIniciales);
 	
 }
