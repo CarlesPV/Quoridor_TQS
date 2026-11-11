@@ -8,22 +8,34 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	@Override
 	public int calcularDistanciaMinima(Posicion inicio, int filaObjetivo, List<Muro> muros, int tamanoTablero)
 	{
+		assert(inicio != null) : "La posicion inicial es null";
+		assert(filaObjetivo >= 0 && filaObjetivo < tamanoTablero) : "filaObjetivo fuera del rango del tablero";
+		
+		if (inicio.getY() == filaObjetivo) 
+		{
+			return 0;
+		}
+		
 		Map<Posicion, Integer> distancias = new HashMap<>();
         Queue<Posicion> cola = new LinkedList<>();
 
         cola.add(inicio);
         distancias.put(inicio, 0);
 
-        while (!cola.isEmpty()) {
+        while (!cola.isEmpty()) 
+        {
             Posicion actual = cola.poll();
             int distanciaActual = distancias.get(actual);
 
-            if (actual.getY() == filaObjetivo) {
+            if (actual.getY() == filaObjetivo) 
+            {
                 return distanciaActual;
             }
 
-            for (Posicion vecino : obtenerVecinosValidos(actual, muros, tamanoTablero)) {
-                if (!distancias.containsKey(vecino)) {
+            for (Posicion vecino : obtenerVecinosValidos(actual, muros, tamanoTablero)) 
+            {
+                if (!distancias.containsKey(vecino)) 
+                {
                     distancias.put(vecino, distanciaActual + 1);
                     cola.add(vecino);
                 }
