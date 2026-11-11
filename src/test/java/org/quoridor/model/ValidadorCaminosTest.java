@@ -29,7 +29,20 @@ class ValidadorCaminosTest {
 
 	@Test
 	void testObtenerVecinosValidos() {
-		fail("Not yet implemented");
+		Posicion p = new Posicion(2, 2);
+		List<Muro> muros = new ArrayList<>();
+		List<Posicion> vecinos = validador.obtenerVecinosValidos(p, muros, TAMANO_TABLERO);
+		Posicion[] esperados = {
+			    new Posicion(2, 1), // Arriba
+			    new Posicion(2, 3), // Abajo
+			    new Posicion(1, 2), // Izquierda
+			    new Posicion(3, 2)  // Derecha
+			};
+		for (int i = 0; i < vecinos.size(); i++) {
+	        assertEquals(esperados[i].getX(), vecinos.get(i).getX());
+	        assertEquals(esperados[i].getY(), vecinos.get(i).getY());
+	    }
+		
 	}
 
 	@Test
