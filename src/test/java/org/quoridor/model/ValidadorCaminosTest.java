@@ -24,7 +24,13 @@ class ValidadorCaminosTest {
 
 	@Test
 	void testCalcularDistanciaMinima() {
-		fail("Not yet implemented");
+		Posicion inicio = new Posicion(4, 0);
+        int filaObjetivo = 8;
+        List<Muro> muros = new ArrayList<>();
+
+        int distancia = validador.calcularDistanciaMinima(inicio, filaObjetivo, muros);
+        
+        assertEquals(8, distancia, "La distancia mínima en línea recta desde la fila 0 hasta la 8 debe ser 8.");
 	}
 
 	@Test
