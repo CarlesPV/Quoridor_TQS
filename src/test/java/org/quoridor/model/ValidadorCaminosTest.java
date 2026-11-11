@@ -39,6 +39,28 @@ class ValidadorCaminosTest {
 		Muro m = new Muro(new Posicion(3,0), Orientacion.HORIZONTAL);
 		List<Muro> muros = new ArrayList<>(List.of(m));
 		assertTrue(validador.estaBloqueadoPorMuro(oP, dP, muros));
+		
+		oP = new Posicion(4,1);
+		dP = new Posicion(5,1);
+		assertFalse(validador.estaBloqueadoPorMuro(oP, dP, muros));
+		
+		m = new Muro(new Posicion(4,1), Orientacion.VERTICAL);
+		muros.add(m);
+		assertTrue(validador.estaBloqueadoPorMuro(oP, dP, muros));
+		
+		try
+		{
+			validador.estaBloqueadoPorMuro(null, dP, muros);
+			assertTrue(false);
+		}
+		catch (AssertionError e) {}
+		
+		try
+		{
+			validador.estaBloqueadoPorMuro(oP, null, muros);
+			assertTrue(false);
+		}
+		catch (AssertionError e) {}
 	}
 
 }
