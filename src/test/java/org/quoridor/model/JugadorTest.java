@@ -114,7 +114,9 @@ class JugadorTest {
 	
 	@Test
 	void testConsumirMuro() {
-		fail("Not yet implemented");
+		jugador = new Jugador("Jugador 1", Color.ROJO, new Posicion(4, 0), 8, 10);
+		jugador.consumirMuro();
+		assertEquals(9, jugador.getMurosRestantes());
 	}
 	
 	@Test
