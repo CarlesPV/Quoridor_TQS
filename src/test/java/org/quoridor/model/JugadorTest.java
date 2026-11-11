@@ -112,11 +112,30 @@ class JugadorTest {
 		assertEquals(bordeDerecho, jugador.getPosicionActual());
 	}
 	
+	// Prueba de Caja Negra: Partición Equivalente y valores límite / frontera válidos
 	@Test
 	void testConsumirMuro() {
 		jugador = new Jugador("Jugador 1", Color.ROJO, new Posicion(4, 0), 8, 10);
 		jugador.consumirMuro();
 		assertEquals(9, jugador.getMurosRestantes());
+
+		// Consumos consecutivos en partición estándar (10 muros)
+		jugador.consumirMuro();
+		assertEquals(8, jugador.getMurosRestantes());
+		jugador.consumirMuro();
+		assertEquals(7, jugador.getMurosRestantes());
+
+		// Partición para 4 jugadores (5 muros iniciales por jugador)
+		Jugador jugador4P = new Jugador("Jugador 4", Color.AMARILLO, new Posicion(8, 4), 0, 5);
+		jugador4P.consumirMuro();
+		assertEquals(4, jugador4P.getMurosRestantes());
+
+		// Valor límite inferior válido: agotar todos los muros hasta quedar en 0
+		jugador4P.consumirMuro(); // quedan 3
+		jugador4P.consumirMuro(); // quedan 2
+		jugador4P.consumirMuro(); // queda 1
+		jugador4P.consumirMuro(); // quedan 0 (límite inferior)
+		assertEquals(0, jugador4P.getMurosRestantes());
 	}
 	
 	@Test
