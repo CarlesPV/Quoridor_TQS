@@ -140,7 +140,8 @@ class JugadorTest {
 	
 	@Test
 	void testHasMurosRestantes() {
-		fail("Not yet implemented");
+		jugador = new Jugador("Jugador 1", Color.ROJO, new Posicion(4, 0), 8, 10);
+		assertTrue(jugador.hasMurosRestantes());
 	}
 	
 	@Test
