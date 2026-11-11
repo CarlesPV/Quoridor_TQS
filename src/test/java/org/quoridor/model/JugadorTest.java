@@ -161,10 +161,41 @@ class JugadorTest {
 		assertFalse(jugadorSinMuros.hasMurosRestantes());
 	}
 	
+	// Prueba de Caja Negra: Partición Equivalente y valores límite / frontera válidos
 	@Test
 	void testHaLlegadoAMeta() {
 		jugador = new Jugador("Jugador 1", Color.ROJO, new Posicion(4, 8), 8, 10);
 		assertTrue(jugador.haLlegadoAMeta());
+
+		// Partición equivalente: jugador fuera de su meta (en fila de origen)
+		Jugador jugadorLejos = new Jugador("Lejos", Color.ROJO, new Posicion(4, 0), 8, 10);
+		assertFalse(jugadorLejos.haLlegadoAMeta());
+
+		// Partición para jugador con meta opuesta (fila 0)
+		Jugador jugadorMeta0 = new Jugador("Jugador 2", Color.AZUL, new Posicion(4, 0), 0, 10);
+		assertTrue(jugadorMeta0.haLlegadoAMeta());
+
+		// Valor frontera: casilla inmediatamente anterior a la meta (fila 7 para meta 8)
+		jugadorLejos.moverA(new Posicion(4, 7));
+		assertFalse(jugadorLejos.haLlegadoAMeta());
+
+		// Transición de estado: avanzar de fila 7 a la fila meta 8
+		jugadorLejos.moverA(new Posicion(4, 8));
+		assertTrue(jugadorLejos.haLlegadoAMeta());
+
+		// Valores límite: esquinas sobre la fila meta 8 (0,8) y (8,8)
+		jugadorLejos.moverA(new Posicion(0, 8));
+		assertTrue(jugadorLejos.haLlegadoAMeta());
+		jugadorLejos.moverA(new Posicion(8, 8));
+		assertTrue(jugadorLejos.haLlegadoAMeta());
+
+		// Valor frontera y límites para meta 0 (fila 1 no es meta; (0,0) y (8,0) sí lo son)
+		Jugador jugadorMeta0Aux = new Jugador("Meta0", Color.AZUL, new Posicion(4, 1), 0, 10);
+		assertFalse(jugadorMeta0Aux.haLlegadoAMeta());
+		jugadorMeta0Aux.moverA(new Posicion(0, 0));
+		assertTrue(jugadorMeta0Aux.haLlegadoAMeta());
+		jugadorMeta0Aux.moverA(new Posicion(8, 0));
+		assertTrue(jugadorMeta0Aux.haLlegadoAMeta());
 	}
 	
 	@Test
