@@ -24,13 +24,52 @@ class ValidadorCaminosTest {
 
 	@Test
 	void testCalcularDistanciaMinima() {
+		// Caso sin muros
 		Posicion inicio = new Posicion(4, 0);
         int filaObjetivo = 8;
         List<Muro> muros = new ArrayList<>();
-
         int distancia = validador.calcularDistanciaMinima(inicio, filaObjetivo, muros, TAMANO_TABLERO);
-        
         assertEquals(8, distancia, "La distancia mínima en línea recta desde la fila 0 hasta la 8 debe ser 8.");
+        
+        // Caso muro en medio
+        muros.add(new Muro(new Posicion(3, 6), Orientacion.HORIZONTAL));
+        distancia = validador.calcularDistanciaMinima(inicio, filaObjetivo, muros, TAMANO_TABLERO); 
+        assertEquals(9, distancia, "La distancia mínima en línea recta desde la fila 0 hasta la 8 con una desviación debe ser 9.");
+        
+        // Caso distancia 0
+        distancia = validador.calcularDistanciaMinima(inicio, 0, muros, TAMANO_TABLERO); 
+        assertEquals(0, distancia, "La distancia mínima para llegar a la misma fila en la que comienza debe ser 0.");
+        
+        // Caso encerrar jugador
+        muros.add(new Muro(new Posicion(3, 0), Orientacion.VERTICAL));
+        muros.add(new Muro(new Posicion(4, 0), Orientacion.VERTICAL));
+        muros.add(new Muro(new Posicion(3, 1), Orientacion.HORIZONTAL));
+        distancia = validador.calcularDistanciaMinima(inicio, filaObjetivo, muros, TAMANO_TABLERO); 
+        assertEquals(0, distancia, "La distancia mínima debe ser -1 ya que no existe el camino.");
+        
+		// Caso posicion inicial null
+		try
+		{
+			validador.calcularDistanciaMinima(null, filaObjetivo, muros, TAMANO_TABLERO);
+			assertTrue(false);
+		}
+		catch (AssertionError e) {}
+		
+		// Caso filaObjetivo más grande que tamano_tablero
+		try
+		{
+			validador.calcularDistanciaMinima(inicio, 9, muros, TAMANO_TABLERO);
+			assertTrue(false);
+		}
+		catch (AssertionError e) {}
+		
+		// Caso filaObjetivo más pequeño que 0
+		try
+		{
+			validador.calcularDistanciaMinima(inicio, -1, muros, TAMANO_TABLERO);
+			assertTrue(false);
+		}
+		catch (AssertionError e) {}
 	}
 
 	@Test
