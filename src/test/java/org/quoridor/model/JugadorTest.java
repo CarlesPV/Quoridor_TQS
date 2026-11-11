@@ -198,15 +198,38 @@ class JugadorTest {
 		assertTrue(jugadorMeta0Aux.haLlegadoAMeta());
 	}
 	
+	// Prueba de Caja Negra: Partición Equivalente y valores límite / frontera válidos
 	@Test
 	void testReiniciarEstado() {
 		jugador = new Jugador("Jugador 1", Color.ROJO, new Posicion(4, 5), 8, 5);
 		Posicion origen = new Posicion(4, 0);
 		
 		jugador.reiniciarEstado(origen, 10);
-		
 		assertEquals(origen, jugador.getPosicionActual());
 		assertEquals(10, jugador.getMurosRestantes());
+
+		// Partición para 4 jugadores (5 muros iniciales) y posición en fila 8
+		Posicion origen4P = new Posicion(4, 8);
+		jugador.reiniciarEstado(origen4P, 5);
+		assertEquals(origen4P, jugador.getPosicionActual());
+		assertEquals(5, jugador.getMurosRestantes());
+
+		// Valores límite: esquinas del tablero como origen (0,0) y (8,8)
+		Posicion esquinaSupIzq = new Posicion(0, 0);
+		jugador.reiniciarEstado(esquinaSupIzq, 10);
+		assertEquals(esquinaSupIzq, jugador.getPosicionActual());
+		assertEquals(10, jugador.getMurosRestantes());
+
+		Posicion esquinaInfDer = new Posicion(8, 8);
+		jugador.reiniciarEstado(esquinaInfDer, 5);
+		assertEquals(esquinaInfDer, jugador.getPosicionActual());
+		assertEquals(5, jugador.getMurosRestantes());
+
+		// Límite inferior válido de muros iniciales (0 muros)
+		Posicion centro = new Posicion(4, 4);
+		jugador.reiniciarEstado(centro, 0);
+		assertEquals(centro, jugador.getPosicionActual());
+		assertEquals(0, jugador.getMurosRestantes());
 	}
 
 }
