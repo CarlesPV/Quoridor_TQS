@@ -57,6 +57,7 @@ public class Jugador {
 		// Invariante de clase
 		assert verificarInvariante() : "Invariante de Jugador violada tras mover";
 	}
+	
 	public void consumirMuro() {
 		// Pre-condiciones
 		assert this.murosRestantes > 0 : "No quedan muros disponibles para consumir";
@@ -71,14 +72,20 @@ public class Jugador {
 		// Invariante de clase
 		assert verificarInvariante() : "Invariante de Jugador violada tras consumir muro";
 	}
+
 	public boolean hasMurosRestantes() {
 		assert verificarInvariante() : "Invariante de Jugador violada en hasMurosRestantes";
 		return this.murosRestantes > 0;
 	}
+
 	public boolean haLlegadoAMeta() {
 		assert verificarInvariante() : "Invariante de Jugador violada en haLlegadoAMeta";
 		return this.posicionActual.getY() == this.filaObjetivo;
 	}
-	public void reiniciarEstado(Posicion origen, int murosIniciales);
+
+	public void reiniciarEstado(Posicion origen, int murosIniciales) {
+		this.posicionActual = origen;
+		this.murosRestantes = murosIniciales;
+	}
 	
 }
