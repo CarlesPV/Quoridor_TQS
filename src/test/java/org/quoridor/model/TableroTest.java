@@ -192,7 +192,21 @@ class TableroTest {
 
 	@Test
 	void testEsColocacionMuroValida() {
-		fail("Not yet implemented");
+		Muro muroValido = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+		Muro muroFueraLimites = new Muro(new Posicion(8, 8), Orientacion.HORIZONTAL);
+
+		// Muro dentro de límites en tablero vacío
+		assertTrue(tablero.esColocacionMuroValida(muroValido),
+				"Debería ser válida la colocación de un muro dentro de los límites en tablero vacío");
+
+		// Muro con coordenadas fuera de límites
+		assertFalse(tablero.esColocacionMuroValida(muroFueraLimites),
+				"No debería ser válida la colocación de un muro fuera de los límites");
+
+		// Muro que colisiona con uno ya colocado
+		tablero.getMurosColocados().add(muroValido);
+		assertFalse(tablero.esColocacionMuroValida(muroValido),
+				"No debería ser válida la colocación de un muro que colisiona con otro existente");
 	}
 
 	@Test
