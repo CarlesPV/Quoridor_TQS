@@ -90,9 +90,10 @@ public class Tablero {
 	}
 	
 	public boolean colisionaConMurosExistentes(Muro nuevoMuro) {
-		if (nuevoMuro == null) {
-			return false;
-		}
+		// Pre-condición
+		assert nuevoMuro != null : "El nuevo muro no puede ser nulo";
+		assert verificarInvariante() : "Invariante de Tablero violada en colisionaConMurosExistentes";
+
 		for (Muro muro : this.murosColocados) {
 			if (muro.colisionaCon(nuevoMuro)) {
 				return true;
