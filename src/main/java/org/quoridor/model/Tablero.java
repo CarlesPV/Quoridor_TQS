@@ -1,7 +1,6 @@
 package org.quoridor.model;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Tablero {
 
@@ -12,12 +11,21 @@ public class Tablero {
 	public static final int TAMANO_TABLERO = 9;
 	public static final int MAX_MUROS = 20;
 	
-	public Tablero();
-	public Tablero(IValidadorCaminos validadorCaminos);
+	public Tablero() {
+		this.murosColocados = new ArrayList<>();
+		this.posicionesJugadores = new HashMap<>();
+		this.validadorCaminos = new ValidadorCaminos();
+	}
 	
-	public List<Muro> getMurosColocados();
-	public Map<Color, Posicion> getPosicionesJugadores();
-	public IValidadorCaminos getValidadorCaminos();
+	public Tablero(IValidadorCaminos validadorCaminos) {
+		this.murosColocados = new ArrayList<>();
+		this.posicionesJugadores = new HashMap<>();
+		this.validadorCaminos = validadorCaminos;
+	}
+	
+	public List<Muro> getMurosColocados() { return this.murosColocados; }
+	public Map<Color, Posicion> getPosicionesJugadores() { return this.posicionesJugadores; }
+	public IValidadorCaminos getValidadorCaminos() { return this.validadorCaminos; }
 	public Posicion getPosicionJugador(Color color);
 	public void setPosicionJugador(Color color, Posicion posicion);
 	
