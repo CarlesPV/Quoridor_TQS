@@ -271,6 +271,7 @@ class TableroTest {
 		}
 	}
 
+	// Prueba de Caja Negra: Partición Equivalente y valores límite / frontera válidos
 	@Test
 	void testColocarMuro() {
 		Muro muro1 = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
@@ -287,6 +288,35 @@ class TableroTest {
 				"El número de muros debe ser 2 tras colocar el segundo muro");
 		assertTrue(tablero.getMurosColocados().contains(muro2),
 				"La lista de muros debe contener el segundo muro colocado");
+
+		// Valores límite y frontera válidos: colocación en esquinas del tablero
+		tablero.getMurosColocados().clear();
+		Muro muroSupIzq = new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL);
+		Muro muroInfDer = new Muro(new Posicion(7, 7), Orientacion.VERTICAL);
+		Muro muroSupDer = new Muro(new Posicion(7, 0), Orientacion.HORIZONTAL);
+		Muro muroInfIzq = new Muro(new Posicion(0, 7), Orientacion.VERTICAL);
+
+		tablero.colocarMuro(muroSupIzq);
+		tablero.colocarMuro(muroInfDer);
+		tablero.colocarMuro(muroSupDer);
+		tablero.colocarMuro(muroInfIzq);
+		assertEquals(4, tablero.getMurosColocados().size());
+		assertTrue(tablero.getMurosColocados().contains(muroSupIzq));
+		assertTrue(tablero.getMurosColocados().contains(muroInfDer));
+		assertTrue(tablero.getMurosColocados().contains(muroSupDer));
+		assertTrue(tablero.getMurosColocados().contains(muroInfIzq));
+
+		// Valor límite superior: colocar muros de forma acumulativa hasta el máximo de 20
+		tablero.getMurosColocados().clear();
+		for (int x = 0; x < 8; x++) {
+			tablero.colocarMuro(new Muro(new Posicion(x, 0), Orientacion.VERTICAL));
+			tablero.colocarMuro(new Muro(new Posicion(x, 2), Orientacion.VERTICAL));
+		}
+		for (int x = 0; x < 4; x++) {
+			tablero.colocarMuro(new Muro(new Posicion(x, 4), Orientacion.VERTICAL));
+		}
+		assertEquals(Tablero.MAX_MUROS, tablero.getMurosColocados().size(),
+				"El tablero debe poder contener exactamente el máximo de 20 muros colocados");
 	}
 
 	@Test
