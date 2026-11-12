@@ -2,6 +2,7 @@ package org.quoridor.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -190,6 +191,7 @@ class TableroTest {
 				"n iteraciones con salida: Debe recorrer los 20 muros y colisionar en el último");
 	}
 
+	// Prueba de Caja Blanca: Decision/Condition Coverage y Mock de IValidadorCaminos
 	@Test
 	void testEsColocacionMuroValida() {
 		Muro muroValido = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
@@ -207,6 +209,66 @@ class TableroTest {
 		tablero.getMurosColocados().add(muroValido);
 		assertFalse(tablero.esColocacionMuroValida(muroValido),
 				"No debería ser válida la colocación de un muro que colisiona con otro existente");
+
+		// Decision & Condition Coverage: límites frontera válidos (0,0), (7,7) vertical y horizontal
+		tablero.getMurosColocados().clear();
+		assertTrue(tablero.esColocacionMuroValida(new Muro(new Posicion(0, 0), Orientacion.VERTICAL)),
+				"Límite superior izquierdo vertical debe ser válido");
+		assertTrue(tablero.esColocacionMuroValida(new Muro(new Posicion(7, 7), Orientacion.VERTICAL)),
+				"Límite inferior derecho vertical debe ser válido");
+		assertTrue(tablero.esColocacionMuroValida(new Muro(new Posicion(0, 7), Orientacion.HORIZONTAL)),
+				"Frontera esquina inferior izquierda horizontal debe ser válida");
+		assertTrue(tablero.esColocacionMuroValida(new Muro(new Posicion(7, 0), Orientacion.HORIZONTAL)),
+				"Frontera esquina superior derecha horizontal debe ser válida");
+
+		// Decision Coverage: Límite máximo de 20 muros colocados
+		for (int x = 0; x < 8; x++) {
+			tablero.getMurosColocados().add(new Muro(new Posicion(x, 0), Orientacion.VERTICAL));
+			tablero.getMurosColocados().add(new Muro(new Posicion(x, 2), Orientacion.VERTICAL));
+		}
+		for (int x = 0; x < 4; x++) {
+			tablero.getMurosColocados().add(new Muro(new Posicion(x, 4), Orientacion.VERTICAL));
+		}
+		assertEquals(Tablero.MAX_MUROS, tablero.getMurosColocados().size());
+		assertFalse(tablero.esColocacionMuroValida(new Muro(new Posicion(6, 6), Orientacion.HORIZONTAL)),
+				"No debe permitir colocar muros si ya se ha alcanzado el límite máximo de 20");
+
+		// Validación de caminos aislando con Mock Manual de IValidadorCaminos (Mock 1 de rúbrica)
+		MockValidadorCaminos mockValidador = new MockValidadorCaminos();
+		Tablero tableroConMock = new Tablero(mockValidador);
+		tableroConMock.getPosicionesJugadores().put(Color.ROJO, new Posicion(4, 0));
+		tableroConMock.getPosicionesJugadores().put(Color.AZUL, new Posicion(4, 8));
+
+		// Caso validador retorna true: camino disponible para todos
+		mockValidador.setCaminoDisponible(true);
+		assertTrue(tableroConMock.esColocacionMuroValida(muroValido),
+				"Debe permitir colocar muro si el validador confirma camino disponible");
+
+		// Caso validador retorna false: el muro encierra a algún jugador
+		mockValidador.setCaminoDisponible(false);
+		assertFalse(tableroConMock.esColocacionMuroValida(muroValido),
+				"No debe permitir colocar muro si el validador indica que bloquea el camino");
+	}
+
+	// Mock Manual de IValidadorCaminos
+	private static class MockValidadorCaminos implements IValidadorCaminos {
+		private boolean caminoDisponible = true;
+
+		public void setCaminoDisponible(boolean caminoDisponible) {
+			this.caminoDisponible = caminoDisponible;
+		}
+
+		@Override
+		public boolean hayCaminoDisponible(Posicion inicio, int filaObjetivo,
+				List<Muro> muros, int tamanoTablero) {
+			return this.caminoDisponible;
+		}
+
+		@Override
+		public int calcularDistanciaMinima(Posicion inicio, int filaObjetivo,
+				List<Muro> muros, int tamanoTablero) {
+			return this.caminoDisponible ? 5 : -1;
+		}
 	}
 
 	@Test
