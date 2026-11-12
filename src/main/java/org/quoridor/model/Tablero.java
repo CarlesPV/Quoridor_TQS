@@ -89,7 +89,17 @@ public class Tablero {
 		return false;
 	}
 	
-	public boolean colisionaConMurosExistentes(Muro nuevoMuro);
+	public boolean colisionaConMurosExistentes(Muro nuevoMuro) {
+		if (nuevoMuro == null) {
+			return false;
+		}
+		for (Muro muro : this.murosColocados) {
+			if (muro.colisionaCon(nuevoMuro)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	public boolean esColocacionMuroValida(Muro muro);
 	public void colocarMuro(Muro muro);
 	public boolean hayCaminoParaTodos(List<Jugador> jugadores);
