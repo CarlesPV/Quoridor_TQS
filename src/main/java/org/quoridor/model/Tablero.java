@@ -101,7 +101,18 @@ public class Tablero {
 		}
 		return false;
 	}
-	public boolean esColocacionMuroValida(Muro muro);
+	public boolean esColocacionMuroValida(Muro muro) {
+		if (muro == null) {
+			return false;
+		}
+		if (!muro.esPosicionValida(TAMANO_TABLERO)) {
+			return false;
+		}
+		if (colisionaConMurosExistentes(muro)) {
+			return false;
+		}
+		return true;
+	}
 	public void colocarMuro(Muro muro);
 	public boolean hayCaminoParaTodos(List<Jugador> jugadores);
 
