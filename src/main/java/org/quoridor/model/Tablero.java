@@ -153,6 +153,14 @@ public class Tablero {
 		// Invariante de clase
 		assert verificarInvariante() : "Invariante de Tablero violada tras colocar muro";
 	}
-	public boolean hayCaminoParaTodos(List<Jugador> jugadores);
+	public boolean hayCaminoParaTodos(List<Jugador> jugadores) {
+		for (Jugador jugador : jugadores) {
+			if (!this.validadorCaminos.hayCaminoDisponible(jugador.getPosicionActual(),
+					jugador.getFilaObjetivo(), this.murosColocados, TAMANO_TABLERO)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 }
