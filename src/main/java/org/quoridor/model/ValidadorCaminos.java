@@ -3,7 +3,38 @@ import java.util.*;
 
 public class ValidadorCaminos implements IValidadorCaminos {
 	@Override
-	public boolean hayCaminoDisponible(Posicion inicio, int filaObjetivo, List<Muro> muros, int tamanoTablero);
+	public boolean hayCaminoDisponible(Posicion inicio, int filaObjetivo, List<Muro> muros, int tamanoTablero)
+	{
+		Set<Posicion> visitados = new HashSet<>();
+        Queue<Posicion> cola = new LinkedList<>();
+
+        cola.add(inicio);
+        visitados.add(inicio);
+
+        while (!cola.isEmpty()) 
+        {
+            Posicion actual = cola.poll();
+
+            // ¿Llegamos a la fila objetivo?
+            if (actual.getY() == filaObjetivo) 
+            {
+                return true;
+            }
+
+            // Explorar los 4 vecinos posibles (Arriba, Abajo, Izquierda, Derecha)
+            for (Posicion vecino : obtenerVecinosValidos(actual, muros, tamanoTablero)) 
+            {
+                if (!visitados.contains(vecino)) 
+                {
+                    visitados.add(vecino);
+                    cola.add(vecino);
+                }
+            }
+        }
+
+        // Si no existe camino
+        return false;
+	}
 	
 	@Override
 	public int calcularDistanciaMinima(Posicion inicio, int filaObjetivo, List<Muro> muros, int tamanoTablero)
@@ -11,6 +42,7 @@ public class ValidadorCaminos implements IValidadorCaminos {
 		assert(inicio != null) : "La posicion inicial es null";
 		assert(filaObjetivo >= 0 && filaObjetivo < tamanoTablero) : "filaObjetivo fuera del rango del tablero";
 		
+		// Si ya estamos en la filaObjetivo
 		if (inicio.getY() == filaObjetivo) 
 		{
 			return 0;
@@ -27,11 +59,13 @@ public class ValidadorCaminos implements IValidadorCaminos {
             Posicion actual = cola.poll();
             int distanciaActual = distancias.get(actual);
 
+            // ¿Llegamos a la fila objetivo?
             if (actual.getY() == filaObjetivo) 
             {
                 return distanciaActual;
             }
-
+            
+            // Explorar los 4 vecinos posibles (Arriba, Abajo, Izquierda, Derecha)
             for (Posicion vecino : obtenerVecinosValidos(actual, muros, tamanoTablero)) 
             {
                 if (!distancias.containsKey(vecino)) 
