@@ -15,12 +15,29 @@ public class Tablero {
 		this.murosColocados = new ArrayList<>();
 		this.posicionesJugadores = new HashMap<>();
 		this.validadorCaminos = new ValidadorCaminos();
+		
+		// Invariante de clase
+		assert verificarInvariante() : "Invariante de Tablero violada tras la construcción por defecto";
 	}
 	
 	public Tablero(IValidadorCaminos validadorCaminos) {
+		// Pre-condición
+		assert validadorCaminos != null : "El validador de caminos no puede ser nulo";
+		
 		this.murosColocados = new ArrayList<>();
 		this.posicionesJugadores = new HashMap<>();
 		this.validadorCaminos = validadorCaminos;
+		
+		// Invariante de clase
+		assert verificarInvariante() : "Invariante de Tablero violada tras la construcción con inyección";
+	}
+	
+	// Invariante de clase: lista de muros y mapas no nulos, máximo 20 muros
+	private boolean verificarInvariante() {
+		return this.murosColocados != null
+				&& this.murosColocados.size() <= MAX_MUROS
+				&& this.posicionesJugadores != null
+				&& this.validadorCaminos != null;
 	}
 	
 	public List<Muro> getMurosColocados() { return this.murosColocados; }
