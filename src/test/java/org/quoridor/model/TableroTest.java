@@ -319,25 +319,62 @@ class TableroTest {
 				"El tablero debe poder contener exactamente el máximo de 20 muros colocados");
 	}
 
+	// Prueba de Caja Blanca: Loop Testing (bucle simple de jugadores: 0, 1, 2, n-1, n iteraciones)
 	@Test
 	void testHayCaminoParaTodos() {
 		List<Jugador> jugadores = new ArrayList<>();
 
-		// 0 jugadores: lista vacía
+		// 1. Caso 0 iteraciones: lista vacía de jugadores
 		assertTrue(tablero.hayCaminoParaTodos(jugadores),
-				"Una lista vacía de jugadores debe retornar true");
+				"0 iteraciones: Una lista vacía de jugadores debe retornar true");
 
-		// 1 jugador sin muros
-		Jugador j1 = new Jugador("Jugador 1", Color.ROJO, new Posicion(4, 0), 8, 10);
+		// 2. Caso 1 iteración:
+			// 1 iteración completa con camino disponible
+		Jugador j1 = new Jugador("Jugador 1", Color.ROJO, new Posicion(4, 0), 8, 5);
 		jugadores.add(j1);
 		assertTrue(tablero.hayCaminoParaTodos(jugadores),
-				"Debe haber camino disponible para un jugador en tablero despejado");
+				"1 iteración completa: Debe haber camino disponible para un jugador en tablero despejado");
 
-		// 2 jugadores sin muros
-		Jugador j2 = new Jugador("Jugador 2", Color.AZUL, new Posicion(4, 8), 0, 10);
+			// 1 iteración con salida temprana (jugador único encerrado en esquina (0,0))
+		tablero.getMurosColocados().add(new Muro(new Posicion(0, 0), Orientacion.VERTICAL));
+		tablero.getMurosColocados().add(new Muro(new Posicion(0, 1), Orientacion.HORIZONTAL));
+		Jugador jEncerrado = new Jugador("Encerrado", Color.AMARILLO, new Posicion(0, 0), 8, 5);
+		assertFalse(tablero.hayCaminoParaTodos(List.of(jEncerrado)),
+				"1 iteración con salida: Debe retornar false si el único jugador está encerrado");
+
+		// 3. Caso 2 iteraciones:
+			// 2 iteraciones completas con camino disponible para ambos
+		tablero.getMurosColocados().clear();
+		Jugador j2 = new Jugador("Jugador 2", Color.AZUL, new Posicion(4, 8), 0, 5);
 		jugadores.add(j2);
 		assertTrue(tablero.hayCaminoParaTodos(jugadores),
-				"Debe haber camino disponible para ambos jugadores en tablero despejado");
+				"2 iteraciones completas: Debe haber camino disponible para ambos jugadores");
+
+			// 2 iteraciones con salida temprana en el segundo jugador
+		tablero.getMurosColocados().add(new Muro(new Posicion(0, 0), Orientacion.VERTICAL));
+		tablero.getMurosColocados().add(new Muro(new Posicion(0, 1), Orientacion.HORIZONTAL));
+		assertFalse(tablero.hayCaminoParaTodos(List.of(j1, jEncerrado)),
+				"2 iteraciones con salida: El 1º tiene camino pero el 2º está encerrado");
+
+		// 4. Caso n-1 iteraciones (3 jugadores): 3 iteraciones completas sin muros bloqueantes
+		tablero.getMurosColocados().clear();
+		Jugador j3 = new Jugador("Jugador 3", Color.VERDE, new Posicion(8, 4), 0, 5);
+		jugadores.add(j3);
+		assertTrue(tablero.hayCaminoParaTodos(jugadores),
+				"n-1 iteraciones completas: Los 3 jugadores tienen camino disponible");
+
+		// 5. Caso n iteraciones máximas (4 jugadores):
+			// 4 iteraciones completas con camino disponible para todos
+		Jugador j4 = new Jugador("Jugador 4", Color.AMARILLO, new Posicion(0, 0), 8, 5);
+		jugadores.add(j4);
+		assertTrue(tablero.hayCaminoParaTodos(jugadores),
+				"n iteraciones completas: Los 4 jugadores tienen camino disponible");
+
+			// 4 iteraciones con salida en el último jugador (el 4º encerrado en (0,0))
+		tablero.getMurosColocados().add(new Muro(new Posicion(0, 0), Orientacion.VERTICAL));
+		tablero.getMurosColocados().add(new Muro(new Posicion(0, 1), Orientacion.HORIZONTAL));
+		assertFalse(tablero.hayCaminoParaTodos(jugadores),
+				"n iteraciones con salida: Debe recorrer los 4 jugadores y fallar en el último");
 	}
 
 }
