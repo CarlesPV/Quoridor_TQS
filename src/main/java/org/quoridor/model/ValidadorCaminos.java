@@ -5,6 +5,15 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	@Override
 	public boolean hayCaminoDisponible(Posicion inicio, int filaObjetivo, List<Muro> muros, int tamanoTablero)
 	{
+		assert(inicio != null) : "La posicion inicial es null";
+		assert(filaObjetivo >= 0 && filaObjetivo < tamanoTablero) : "filaObjetivo fuera del rango del tablero";
+		
+		// Si ya estamos en la filaObjetivo
+        if (inicio.getY() == filaObjetivo) 
+        {
+            return true;
+        }
+		
 		Set<Posicion> visitados = new HashSet<>();
         Queue<Posicion> cola = new LinkedList<>();
 
