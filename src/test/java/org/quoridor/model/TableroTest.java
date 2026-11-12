@@ -321,7 +321,23 @@ class TableroTest {
 
 	@Test
 	void testHayCaminoParaTodos() {
-		fail("Not yet implemented");
+		List<Jugador> jugadores = new ArrayList<>();
+
+		// 0 jugadores: lista vacía
+		assertTrue(tablero.hayCaminoParaTodos(jugadores),
+				"Una lista vacía de jugadores debe retornar true");
+
+		// 1 jugador sin muros
+		Jugador j1 = new Jugador("Jugador 1", Color.ROJO, new Posicion(4, 0), 8, 10);
+		jugadores.add(j1);
+		assertTrue(tablero.hayCaminoParaTodos(jugadores),
+				"Debe haber camino disponible para un jugador en tablero despejado");
+
+		// 2 jugadores sin muros
+		Jugador j2 = new Jugador("Jugador 2", Color.AZUL, new Posicion(4, 8), 0, 10);
+		jugadores.add(j2);
+		assertTrue(tablero.hayCaminoParaTodos(jugadores),
+				"Debe haber camino disponible para ambos jugadores en tablero despejado");
 	}
 
 }
