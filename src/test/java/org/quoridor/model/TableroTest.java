@@ -112,7 +112,21 @@ class TableroTest {
 
 	@Test
 	void testColisionaConMurosExistentes() {
-		fail("Not yet implemented");
+		Muro muroNuevo = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+
+		// Caso 0 iteraciones (tablero vacío): no colisiona
+		assertFalse(tablero.colisionaConMurosExistentes(muroNuevo),
+				"Un tablero sin muros no debe detectar colisiones");
+
+		// Caso 1 iteración: un muro que colisiona exactamente
+		tablero.getMurosColocados().add(new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL));
+		assertTrue(tablero.colisionaConMurosExistentes(muroNuevo),
+				"Debe detectar colisión con un muro en la misma posición y orientación");
+
+		// Caso 1 iteración: un muro alejado que no colisiona
+		Muro muroLejano = new Muro(new Posicion(5, 5), Orientacion.VERTICAL);
+		assertFalse(tablero.colisionaConMurosExistentes(muroLejano),
+				"No debe detectar colisión con un muro que no interseca");
 	}
 
 	@Test
