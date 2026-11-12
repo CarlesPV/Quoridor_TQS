@@ -1,9 +1,6 @@
 package org.quoridor.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,8 +24,13 @@ class TableroTest {
 		assertNotNull(tablero.getPosicionesJugadores(), "El mapa de posiciones no debe ser null");
 		assertTrue(tablero.getPosicionesJugadores().isEmpty(), "El mapa de posiciones debe iniciar vacío");
 		assertNotNull(tablero.getValidadorCaminos(), "El validador de caminos debe inicializarse por defecto");
+
+		// Valores constantes del tablero
+		assertEquals(9, Tablero.TAMANO_TABLERO);
+		assertEquals(20, Tablero.MAX_MUROS);
 	}
 
+	// Prueba de Caja Negra: Partición Equivalente y valores límite / frontera válidos
 	@Test
 	void testConstructorConParametros() {
 		IValidadorCaminos mockValidador = new ValidadorCaminos();
@@ -36,6 +38,10 @@ class TableroTest {
 		assertNotNull(tableroInyectado.getMurosColocados());
 		assertTrue(tableroInyectado.getMurosColocados().isEmpty());
 		assertEquals(mockValidador, tableroInyectado.getValidadorCaminos(), "Debe usar el validador inyectado");
+
+		// Prueba de Caja Negra: Partición inválida de precondición (validador nulo)
+		assertThrows(AssertionError.class, () -> new Tablero(null),
+				"Debe lanzar AssertionError si el validador inyectado es nulo");
 	}
 
 	///
