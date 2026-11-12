@@ -50,7 +50,43 @@ public class Tablero {
 		if (origen == null || destino == null) {
 			return false;
 		}
-		return origen.esAdyacente(destino);
+		if (!origen.esValida(TAMANO_TABLERO) || !destino.esValida(TAMANO_TABLERO)) {
+			return false;
+		}
+		if (origen.equals(destino)) {
+			return false;
+		}
+		if (oponente != null && destino.equals(oponente)) {
+			return false;
+		}
+
+		// Movimiento adyacente ortogonal simple
+		if (origen.esAdyacente(destino)) {
+			return !hayMuroBloqueante(origen, destino);
+		}
+
+		// Salto sobre oponente
+		if (oponente != null && origen.esAdyacente(oponente)) {
+			if (!hayMuroBloqueante(origen, oponente)) {
+				int dx = oponente.getX() - origen.getX();
+				int dy = oponente.getY() - origen.getY();
+				Posicion saltoRecto = new Posicion(oponente.getX() + dx, oponente.getY() + dy);
+				if (destino.equals(saltoRecto) && !hayMuroBloqueante(oponente, saltoRecto)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean hayMuroBloqueante(Posicion origen, Posicion destino) {
+		for (Muro muro : this.murosColocados) {
+			if (muro.bloqueaPaso(origen, destino)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public boolean colisionaConMurosExistentes(Muro nuevoMuro);
