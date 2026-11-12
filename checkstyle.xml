@@ -86,8 +86,10 @@
         <!-- 4. LIMPIEZA DE IMPORTACIONES (Imports)                                -->
         <!-- ===================================================================== -->
 
-        <!-- Prohíbe el uso de importaciones con comodín (ej. 'import java.util.*;') -->
-        <module name="AvoidStarImport"/>
+        <!-- Prohíbe el uso de importaciones con comodín, permitiendo java.util.* -->
+        <module name="AvoidStarImport">
+            <property name="excludes" value="java.util"/>
+        </module>
 
         <!-- Detecta y prohíbe importaciones que no se utilizan en el archivo -->
         <module name="UnusedImports"/>
