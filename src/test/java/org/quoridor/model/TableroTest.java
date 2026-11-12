@@ -273,7 +273,20 @@ class TableroTest {
 
 	@Test
 	void testColocarMuro() {
-		fail("Not yet implemented");
+		Muro muro1 = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+		Muro muro2 = new Muro(new Posicion(5, 5), Orientacion.VERTICAL);
+
+		tablero.colocarMuro(muro1);
+		assertEquals(1, tablero.getMurosColocados().size(),
+				"El número de muros debe ser 1 tras colocar el primer muro");
+		assertTrue(tablero.getMurosColocados().contains(muro1),
+				"La lista de muros debe contener el primer muro colocado");
+
+		tablero.colocarMuro(muro2);
+		assertEquals(2, tablero.getMurosColocados().size(),
+				"El número de muros debe ser 2 tras colocar el segundo muro");
+		assertTrue(tablero.getMurosColocados().contains(muro2),
+				"La lista de muros debe contener el segundo muro colocado");
 	}
 
 	@Test
