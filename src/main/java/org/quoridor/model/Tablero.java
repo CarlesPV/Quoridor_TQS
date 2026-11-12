@@ -135,7 +135,9 @@ public class Tablero {
 
 		return true;
 	}
-	public void colocarMuro(Muro muro);
+	public void colocarMuro(Muro muro) {
+		this.murosColocados.add(muro);
+	}
 	public boolean hayCaminoParaTodos(List<Jugador> jugadores);
 
 }
