@@ -19,13 +19,55 @@ class ValidadorCaminosTest {
 
 	@Test
 	void testHayCaminoDisponible() {
+		// Caso sin muros
 		Posicion inicio = new Posicion(4, 0);
         int filaObjetivo = 8;
         List<Muro> muros = new ArrayList<>();
-
         boolean resultado = validador.hayCaminoDisponible(inicio, filaObjetivo, muros, TAMANO_TABLERO);
-        
         assertTrue(resultado, "Debería haber camino libre si no hay muros.");
+        
+        // Caso casi encerrado
+        muros.add(new Muro(new Posicion(0, 6), Orientacion.HORIZONTAL));
+        muros.add(new Muro(new Posicion(2, 6), Orientacion.HORIZONTAL));
+        muros.add(new Muro(new Posicion(4, 6), Orientacion.HORIZONTAL));
+        muros.add(new Muro(new Posicion(6, 6), Orientacion.HORIZONTAL));
+        resultado = validador.hayCaminoDisponible(inicio, filaObjetivo, muros, TAMANO_TABLERO); 
+        assertTrue(resultado, "Debería haber camino libre por 8,6.");        
+        
+        // Caso ya esta en filaObjetivo
+        resultado = validador.hayCaminoDisponible(inicio, 0, muros, TAMANO_TABLERO); 
+        assertTrue(resultado, "Debería devolver instantaneamente true.");
+        
+        // Caso encerrado
+        muros.add(new Muro(new Posicion(3, 0), Orientacion.VERTICAL));
+        muros.add(new Muro(new Posicion(4, 0), Orientacion.VERTICAL));
+        muros.add(new Muro(new Posicion(3, 1), Orientacion.HORIZONTAL));
+        resultado = validador.hayCaminoDisponible(inicio, filaObjetivo, muros, TAMANO_TABLERO); 
+        assertFalse(resultado, "Debería devolver false al estar encerrado.");
+        
+		// Caso posicion inicial null
+		try
+		{
+			validador.hayCaminoDisponible(null, filaObjetivo, muros, TAMANO_TABLERO);
+			assertTrue(false);
+		}
+		catch (AssertionError e) {}
+		
+		// Caso filaObjetivo más grande que tamano_tablero
+		try
+		{
+			validador.hayCaminoDisponible(inicio, 9, muros, TAMANO_TABLERO);
+			assertTrue(false);
+		}
+		catch (AssertionError e) {}
+		
+		// Caso filaObjetivo más pequeño que 0
+		try
+		{
+			validador.hayCaminoDisponible(inicio, -1, muros, TAMANO_TABLERO);
+			assertTrue(false);
+		}
+		catch (AssertionError e) {}
 	}
 
 	@Test
