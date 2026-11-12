@@ -46,7 +46,13 @@ public class Tablero {
 	public Posicion getPosicionJugador(Color color);
 	public void setPosicionJugador(Color color, Posicion posicion);
 	
-	public boolean esMovimientoValido(Posicion origen, Posicion destino, Posicion oponente);
+	public boolean esMovimientoValido(Posicion origen, Posicion destino, Posicion oponente) {
+		if (origen == null || destino == null) {
+			return false;
+		}
+		return origen.esAdyacente(destino);
+	}
+	
 	public boolean colisionaConMurosExistentes(Muro nuevoMuro);
 	public boolean esColocacionMuroValida(Muro muro);
 	public void colocarMuro(Muro muro);
