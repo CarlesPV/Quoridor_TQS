@@ -19,7 +19,13 @@ class ValidadorCaminosTest {
 
 	@Test
 	void testHayCaminoDisponible() {
-		fail("Not yet implemented");
+		Posicion inicio = new Posicion(4, 0);
+        int filaObjetivo = 8;
+        List<Muro> muros = new ArrayList<>();
+
+        boolean resultado = validador.hayCaminoDisponible(inicio, filaObjetivo, muros, TAMANO_TABLERO);
+        
+        assertTrue(resultado, "Debería haber camino libre si no hay muros.");
 	}
 
 	@Test
