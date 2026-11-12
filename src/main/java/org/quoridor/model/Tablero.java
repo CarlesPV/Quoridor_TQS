@@ -154,7 +154,12 @@ public class Tablero {
 		assert verificarInvariante() : "Invariante de Tablero violada tras colocar muro";
 	}
 	public boolean hayCaminoParaTodos(List<Jugador> jugadores) {
+		// Pre-condiciones
+		assert jugadores != null : "La lista de jugadores no puede ser nula";
+		assert verificarInvariante() : "Invariante de Tablero violada en hayCaminoParaTodos";
+
 		for (Jugador jugador : jugadores) {
+			assert jugador != null : "Ningún jugador de la lista puede ser nulo";
 			if (!this.validadorCaminos.hayCaminoDisponible(jugador.getPosicionActual(),
 					jugador.getFilaObjetivo(), this.murosColocados, TAMANO_TABLERO)) {
 				return false;
