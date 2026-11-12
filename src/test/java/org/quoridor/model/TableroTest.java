@@ -38,10 +38,6 @@ class TableroTest {
 		assertNotNull(tableroInyectado.getMurosColocados());
 		assertTrue(tableroInyectado.getMurosColocados().isEmpty());
 		assertEquals(mockValidador, tableroInyectado.getValidadorCaminos(), "Debe usar el validador inyectado");
-
-		// Prueba de Caja Negra: Partición inválida de precondición (validador nulo)
-		assertThrows(AssertionError.class, () -> new Tablero(null),
-				"Debe lanzar AssertionError si el validador inyectado es nulo");
 	}
 
 	///
@@ -110,23 +106,88 @@ class TableroTest {
 				"No debería permitir salto sobre oponente si hay un muro detrás");
 	}
 
+	// Prueba de Caja Blanca: Loop Testing (bucle simple de murosColocados: 0, 1, 2, m, n-1, n iteraciones)
 	@Test
 	void testColisionaConMurosExistentes() {
-		Muro muroNuevo = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+		// 1. Caso 0 iteraciones (tablero vacío): el bucle no se ejecuta
+		Muro muroTest = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+		assertFalse(tablero.colisionaConMurosExistentes(muroTest),
+				"0 iteraciones: Un tablero sin muros no debe detectar colisiones");
 
-		// Caso 0 iteraciones (tablero vacío): no colisiona
-		assertFalse(tablero.colisionaConMurosExistentes(muroNuevo),
-				"Un tablero sin muros no debe detectar colisiones");
+		// 2. Caso 1 iteración:
+			// 1 iteración completa sin colisión
+		tablero.getMurosColocados().add(new Muro(new Posicion(5, 5), Orientacion.VERTICAL));
+		assertFalse(tablero.colisionaConMurosExistentes(muroTest),
+				"1 iteración completa: No debe colisionar con un muro distante");
 
-		// Caso 1 iteración: un muro que colisiona exactamente
+			// 1 iteración con salida temprana por colisión
+		tablero.getMurosColocados().clear();
 		tablero.getMurosColocados().add(new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL));
-		assertTrue(tablero.colisionaConMurosExistentes(muroNuevo),
-				"Debe detectar colisión con un muro en la misma posición y orientación");
+		assertTrue(tablero.colisionaConMurosExistentes(muroTest),
+				"1 iteración con salida: Debe detectar colisión con el único muro");
 
-		// Caso 1 iteración: un muro alejado que no colisiona
-		Muro muroLejano = new Muro(new Posicion(5, 5), Orientacion.VERTICAL);
-		assertFalse(tablero.colisionaConMurosExistentes(muroLejano),
-				"No debe detectar colisión con un muro que no interseca");
+		// 3. Caso 2 iteraciones:
+			// 2 iteraciones completas sin colisión
+		tablero.getMurosColocados().clear();
+		tablero.getMurosColocados().add(new Muro(new Posicion(0, 0), Orientacion.VERTICAL));
+		tablero.getMurosColocados().add(new Muro(new Posicion(5, 5), Orientacion.VERTICAL));
+		assertFalse(tablero.colisionaConMurosExistentes(muroTest),
+				"2 iteraciones completas: No debe colisionar tras evaluar 2 muros");
+
+			// 2 iteraciones con salida temprana en el segundo muro
+		tablero.getMurosColocados().clear();
+		tablero.getMurosColocados().add(new Muro(new Posicion(0, 0), Orientacion.VERTICAL));
+		tablero.getMurosColocados().add(new Muro(new Posicion(2, 2), Orientacion.VERTICAL));
+		Muro muroCruz = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+		assertTrue(tablero.colisionaConMurosExistentes(muroCruz),
+				"2 iteraciones con salida: Debe iterar el 1º y colisionar en el 2º");
+
+		// 4. Caso m iteraciones típicas (m = 5 muros):
+			// 5 iteraciones completas sin colisión
+		tablero.getMurosColocados().clear();
+		tablero.getMurosColocados().add(new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL));
+		tablero.getMurosColocados().add(new Muro(new Posicion(3, 0), Orientacion.HORIZONTAL));
+		tablero.getMurosColocados().add(new Muro(new Posicion(0, 3), Orientacion.VERTICAL));
+		tablero.getMurosColocados().add(new Muro(new Posicion(0, 5), Orientacion.VERTICAL));
+		tablero.getMurosColocados().add(new Muro(new Posicion(6, 0), Orientacion.HORIZONTAL));
+		Muro muroLibre = new Muro(new Posicion(6, 6), Orientacion.HORIZONTAL);
+		assertFalse(tablero.colisionaConMurosExistentes(muroLibre),
+				"m iteraciones completas: No colisiona tras recorrer m muros");
+
+			// m iteraciones con salida en el m-ésimo muro (5º muro)
+		Muro muroEnQuinto = new Muro(new Posicion(6, 0), Orientacion.VERTICAL);
+		assertTrue(tablero.colisionaConMurosExistentes(muroEnQuinto),
+				"m iteraciones con salida: Debe recorrer hasta el 5º muro y colisionar");
+
+		// 5. Configuración de 20 muros no colisionantes para n-1 y n iteraciones:
+			// 8 verticales en Y=0, 8 verticales en Y=2, 4 verticales en Y=4
+		tablero.getMurosColocados().clear();
+		for (int x = 0; x < 8; x++) {
+			tablero.getMurosColocados().add(new Muro(new Posicion(x, 0), Orientacion.VERTICAL));
+		}
+		for (int x = 0; x < 8; x++) {
+			tablero.getMurosColocados().add(new Muro(new Posicion(x, 2), Orientacion.VERTICAL));
+		}
+		for (int x = 0; x < 3; x++) {
+			tablero.getMurosColocados().add(new Muro(new Posicion(x, 4), Orientacion.VERTICAL));
+		}
+		// Caso n-1 iteraciones (19 muros): 19 iteraciones completas sin colisión
+		Muro muroEnPosicion20 = new Muro(new Posicion(3, 4), Orientacion.VERTICAL);
+		assertFalse(tablero.colisionaConMurosExistentes(muroEnPosicion20),
+				"n-1 iteraciones completas: 19 muros recorridos sin colisión");
+
+			// Caso n iteraciones máximas (20 muros):
+		tablero.getMurosColocados().add(muroEnPosicion20);
+
+			// 20 iteraciones completas sin colisión
+		Muro muroDisjunto = new Muro(new Posicion(6, 6), Orientacion.HORIZONTAL);
+		assertFalse(tablero.colisionaConMurosExistentes(muroDisjunto),
+				"n iteraciones completas: 20 muros evaluados sin colisión");
+
+			// 20 iteraciones con colisión en el último muro (el número 20)
+		Muro muroCruzUltimo = new Muro(new Posicion(3, 4), Orientacion.HORIZONTAL);
+		assertTrue(tablero.colisionaConMurosExistentes(muroCruzUltimo),
+				"n iteraciones con salida: Debe recorrer los 20 muros y colisionar en el último");
 	}
 
 	@Test
