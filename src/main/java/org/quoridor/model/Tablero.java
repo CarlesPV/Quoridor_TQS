@@ -43,8 +43,13 @@ public class Tablero {
 	public List<Muro> getMurosColocados() { return this.murosColocados; }
 	public Map<Color, Posicion> getPosicionesJugadores() { return this.posicionesJugadores; }
 	public IValidadorCaminos getValidadorCaminos() { return this.validadorCaminos; }
-	public Posicion getPosicionJugador(Color color);
-	public void setPosicionJugador(Color color, Posicion posicion);
+	public Posicion getPosicionJugador(Color color) {
+		return this.posicionesJugadores.get(color);
+	}
+
+	public void setPosicionJugador(Color color, Posicion posicion) {
+		this.posicionesJugadores.put(color, posicion);
+	}
 	
 	public boolean esMovimientoValido(Posicion origen, Posicion destino, Posicion oponente) {
 		if (origen == null || destino == null) {
@@ -102,7 +107,12 @@ public class Tablero {
 		return false;
 	}
 	public boolean esColocacionMuroValida(Muro muro) {
+		assert verificarInvariante() : "Invariante de Tablero violada en esColocacionMuroValida";
+
 		if (muro == null) {
+			return false;
+		}
+		if (this.murosColocados.size() >= MAX_MUROS) {
 			return false;
 		}
 		if (!muro.esPosicionValida(TAMANO_TABLERO)) {
@@ -111,6 +121,18 @@ public class Tablero {
 		if (colisionaConMurosExistentes(muro)) {
 			return false;
 		}
+
+		// Verificación de caminos para todos los jugadores
+		List<Muro> murosSimulados = new ArrayList<>(this.murosColocados);
+		murosSimulados.add(muro);
+		for (Map.Entry<Color, Posicion> entry : this.posicionesJugadores.entrySet()) {
+			int filaObjetivo = (entry.getKey() == Color.AZUL) ? 0 : (TAMANO_TABLERO - 1);
+			if (!this.validadorCaminos.hayCaminoDisponible(entry.getValue(), filaObjetivo,
+					murosSimulados, TAMANO_TABLERO)) {
+				return false;
+			}
+		}
+
 		return true;
 	}
 	public void colocarMuro(Muro muro);
