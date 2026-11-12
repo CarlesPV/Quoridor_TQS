@@ -49,7 +49,22 @@ class TableroTest {
 	///
 	@Test
 	void testEsMovimientoValido() {
-		fail("Not yet implemented");
+		Posicion origen = new Posicion(4, 4);
+		Posicion destinoValido = new Posicion(4, 5);
+		Posicion destinoLejano = new Posicion(6, 6);
+		Posicion mismoDestino = new Posicion(4, 4);
+
+		// Movimiento ortogonal simple adyacente sin muros ni oponente
+		assertTrue(tablero.esMovimientoValido(origen, destinoValido, null),
+				"Debería ser válido un movimiento a una casilla adyacente sin obstáculos");
+
+		// Movimiento no adyacente
+		assertFalse(tablero.esMovimientoValido(origen, destinoLejano, null),
+				"No debería ser válido moverse a una casilla lejana sin salto");
+
+		// Movimiento a la misma casilla
+		assertFalse(tablero.esMovimientoValido(origen, mismoDestino, null),
+				"No debería ser válido moverse a la misma casilla de origen");
 	}
 
 	@Test
