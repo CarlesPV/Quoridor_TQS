@@ -136,7 +136,22 @@ public class Tablero {
 		return true;
 	}
 	public void colocarMuro(Muro muro) {
+		// Pre-condiciones
+		assert muro != null : "El muro a colocar no puede ser nulo";
+		assert this.murosColocados.size() < MAX_MUROS : "Se ha alcanzado el límite máximo de 20 muros";
+		assert esColocacionMuroValida(muro) : "La colocación del muro debe ser válida";
+
+		int murosPrevios = this.murosColocados.size();
 		this.murosColocados.add(muro);
+
+		// Post-condiciones
+		assert this.murosColocados.size() == murosPrevios + 1
+				: "El número de muros colocados debe incrementarse en 1";
+		assert this.murosColocados.contains(muro)
+				: "La lista de muros debe contener el muro recién colocado";
+
+		// Invariante de clase
+		assert verificarInvariante() : "Invariante de Tablero violada tras colocar muro";
 	}
 	public boolean hayCaminoParaTodos(List<Jugador> jugadores);
 
