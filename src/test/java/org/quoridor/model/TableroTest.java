@@ -39,6 +39,19 @@ class TableroTest {
 		assertNotNull(tableroInyectado.getMurosColocados());
 		assertTrue(tableroInyectado.getMurosColocados().isEmpty());
 		assertEquals(mockValidador, tableroInyectado.getValidadorCaminos(), "Debe usar el validador inyectado");
+
+		assertThrows(AssertionError.class, () -> new Tablero(null),
+				"Debe lanzar AssertionError si el validador es nulo");
+	}
+
+	@Test
+	void testSetYGetPosicionJugador() {
+		assertNull(tablero.getPosicionJugador(Color.ROJO),
+				"Un color sin posición asignada debe retornar null");
+		Posicion posRojo = new Posicion(4, 0);
+		tablero.setPosicionJugador(Color.ROJO, posRojo);
+		assertEquals(posRojo, tablero.getPosicionJugador(Color.ROJO),
+				"Debe retornar la posición asignada al jugador");
 	}
 
 	///
@@ -105,6 +118,22 @@ class TableroTest {
 		tablero.getMurosColocados().add(new Muro(new Posicion(4, 5), Orientacion.HORIZONTAL));
 		assertFalse(tablero.esMovimientoValido(origen, destinoSaltoRecto, oponente),
 				"No debería permitir salto sobre oponente si hay un muro detrás");
+
+		// Decision & Condition Coverage: origen o destino nulos
+		assertFalse(tablero.esMovimientoValido(null, destinoValido, null),
+				"No debe permitir movimiento si el origen es nulo");
+		assertFalse(tablero.esMovimientoValido(origen, null, null),
+				"No debe permitir movimiento si el destino es nulo");
+
+		// Decision & Condition Coverage: oponente no nulo pero no adyacente al origen
+		tablero.getMurosColocados().clear();
+		assertFalse(tablero.esMovimientoValido(origen, destinoSaltoRecto, new Posicion(0, 0)),
+				"No debe permitir salto si el oponente no es adyacente al origen");
+
+		// Decision & Condition Coverage: muro bloqueante entre origen y oponente impide el salto
+		tablero.getMurosColocados().add(new Muro(new Posicion(4, 4), Orientacion.HORIZONTAL));
+		assertFalse(tablero.esMovimientoValido(origen, destinoSaltoRecto, oponente),
+				"No debe permitir salto si hay un muro entre el origen y el oponente");
 	}
 
 	// Prueba de Caja Blanca: Loop Testing (bucle simple de murosColocados: 0, 1, 2, m, n-1, n iteraciones)
@@ -375,6 +404,55 @@ class TableroTest {
 		tablero.getMurosColocados().add(new Muro(new Posicion(0, 1), Orientacion.HORIZONTAL));
 		assertFalse(tablero.hayCaminoParaTodos(jugadores),
 				"n iteraciones con salida: Debe recorrer los 4 jugadores y fallar en el último");
+	}
+
+	// Prueba de Caja Blanca: Cobertura de ramas nulas, precondiciones DbC e invariante de clase
+	@Test
+	void testRamasNulasPrecondicionesEInvariante() {
+		Muro muroValido = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+
+		// Muro nulo en esColocacionMuroValida
+		assertFalse(tablero.esColocacionMuroValida(null),
+				"Un muro nulo nunca debe ser una colocación válida");
+
+		// Precondiciones con argumentos nulos
+		assertThrows(AssertionError.class, () -> tablero.colisionaConMurosExistentes(null),
+				"colisionaConMurosExistentes debe rechazar muro nulo");
+		assertThrows(AssertionError.class, () -> tablero.colocarMuro(null),
+				"colocarMuro debe rechazar muro nulo");
+		assertThrows(AssertionError.class, () -> tablero.hayCaminoParaTodos(null),
+				"hayCaminoParaTodos debe rechazar lista nula");
+
+		List<Jugador> listaConNulo = new ArrayList<>();
+		listaConNulo.add(null);
+		assertThrows(AssertionError.class, () -> tablero.hayCaminoParaTodos(listaConNulo),
+				"hayCaminoParaTodos debe rechazar jugadores nulos en la lista");
+
+		// Precondición de colocarMuro con muro inválido (< 20 muros)
+		Muro muroFueraLimites = new Muro(new Posicion(8, 8), Orientacion.HORIZONTAL);
+		assertThrows(AssertionError.class, () -> tablero.colocarMuro(muroFueraLimites),
+				"colocarMuro debe rechazar un muro inválido");
+
+		// Precondición de colocarMuro cuando ya hay MAX_MUROS (20)
+		for (int x = 0; x < 8; x++) {
+			tablero.colocarMuro(new Muro(new Posicion(x, 0), Orientacion.VERTICAL));
+			tablero.colocarMuro(new Muro(new Posicion(x, 2), Orientacion.VERTICAL));
+		}
+		for (int x = 0; x < 4; x++) {
+			tablero.colocarMuro(new Muro(new Posicion(x, 4), Orientacion.VERTICAL));
+		}
+		Muro muroExtra = new Muro(new Posicion(6, 6), Orientacion.HORIZONTAL);
+		assertThrows(AssertionError.class, () -> tablero.colocarMuro(muroExtra),
+				"colocarMuro debe lanzar AssertionError al superar el máximo de 20 muros");
+
+		// Violación de invariante (21 muros forzados en la lista)
+		tablero.getMurosColocados().add(muroExtra);
+		assertThrows(AssertionError.class, () -> tablero.colisionaConMurosExistentes(muroValido),
+				"colisionaConMurosExistentes debe detectar invariante violada");
+		assertThrows(AssertionError.class, () -> tablero.esColocacionMuroValida(muroValido),
+				"esColocacionMuroValida debe detectar invariante violada");
+		assertThrows(AssertionError.class, () -> tablero.hayCaminoParaTodos(List.of()),
+				"hayCaminoParaTodos debe detectar invariante violada");
 	}
 
 }

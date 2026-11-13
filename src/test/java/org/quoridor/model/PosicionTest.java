@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 
 import java.util.*;
 class PosicionTest {
@@ -39,6 +41,9 @@ class PosicionTest {
 		
 		p1 = new Posicion(8,8);
 		assertFalse(p1.esValida(8));
+
+		assertFalse(new Posicion(0, 0).esValida(0));
+		assertFalse(new Posicion(0, 0).esValida(-1));
 		
 	}
 
@@ -167,6 +172,25 @@ class PosicionTest {
 		
 		posiciones.add(new Posicion(2,5));	
 		assertFalse(posiciones.contains(new Posicion(5,2)));
+	}
+
+	@Test
+	void testEqualsObject() {
+		Object mismaRef = p1;
+		assertTrue(p1.equals(mismaRef));
+		assertFalse(p1.equals((Object) null));
+		assertFalse(p1.equals("no es posicion"));
+		assertTrue(p1.equals((Object) new Posicion(0, 0)));
+		assertFalse(p1.equals((Object) new Posicion(1, 0)));
+		assertFalse(p1.equals((Object) new Posicion(0, 1)));
+	}
+
+	@ParameterizedTest
+	@CsvFileSource(resources = "/data/movimientos_test.csv", numLinesToSkip = 1)
+	void testEsAdyacenteDataDriven(int oX, int oY, int dX, int dY, boolean esperado) {
+		Posicion origen = new Posicion(oX, oY);
+		Posicion destino = new Posicion(dX, dY);
+		assertEquals(esperado, origen.esAdyacente(destino));
 	}
 
 }

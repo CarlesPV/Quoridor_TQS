@@ -69,7 +69,11 @@ class MuroTest {
 				new Muro (new Posicion(0,-1),Orientacion.VERTICAL),
 				new Muro (new Posicion(0,-1),Orientacion.HORIZONTAL),
 				new Muro (new Posicion(8,7),Orientacion.VERTICAL),
-				new Muro (new Posicion(8,7),Orientacion.HORIZONTAL)
+				new Muro (new Posicion(8,7),Orientacion.HORIZONTAL),
+				new Muro (new Posicion(0,8),Orientacion.VERTICAL),
+				new Muro (new Posicion(0,8),Orientacion.HORIZONTAL),
+				new Muro (new Posicion(7,8),Orientacion.HORIZONTAL),
+				new Muro (new Posicion(8,0),Orientacion.VERTICAL)
 				};
 		
 		for(int i=0; i < murosNoValidos.length;i++) {
@@ -154,7 +158,11 @@ class MuroTest {
         "4, 4, VERTICAL,   5, 4, 5, 5, false",
         
         // --- CASO DESCONECTADO (Paso lejano) ---
-        "4, 4, HORIZONTAL, 0, 0, 0, 1, false"
+        "4, 4, HORIZONTAL, 0, 0, 0, 1, false",
+
+        // --- DISTANCIA MAYOR A 1 EN MISMO EJE (Salto de 2 casillas) ---
+        "4, 4, HORIZONTAL, 4, 4, 4, 6, false",
+        "4, 4, VERTICAL,   4, 4, 6, 4, false"
     })
     
     @DisplayName("Data-Driven: Verificación de bloqueo de paso para muros")
@@ -166,5 +174,30 @@ class MuroTest {
         Posicion destino = new Posicion(dX, dY);
 
         assertEquals(esperado, muro.bloqueaPaso(origen, destino));
+	}
+
+	@Test
+	void testPrecondicionesMuro() {
+		Posicion pos = new Posicion(2, 2);
+		Muro muroValido = new Muro(pos, Orientacion.HORIZONTAL);
+		Muro muroVacio = new Muro();
+
+		// Constructor
+		assertThrows(AssertionError.class, () -> new Muro(null, Orientacion.HORIZONTAL));
+		assertThrows(AssertionError.class, () -> new Muro(pos, null));
+
+		// esPosicionValida
+		assertThrows(AssertionError.class, () -> muroValido.esPosicionValida(1));
+		assertThrows(AssertionError.class, () -> muroVacio.esPosicionValida(LIMITE_TABLERO));
+
+		// colisionaCon
+		assertThrows(AssertionError.class, () -> muroValido.colisionaCon(null));
+		assertThrows(AssertionError.class, () -> muroValido.colisionaCon(muroVacio));
+		assertThrows(AssertionError.class, () -> muroVacio.colisionaCon(muroValido));
+
+		// bloqueaPaso
+		assertThrows(AssertionError.class, () -> muroValido.bloqueaPaso(null, pos));
+		assertThrows(AssertionError.class, () -> muroValido.bloqueaPaso(pos, null));
+		assertThrows(AssertionError.class, () -> muroVacio.bloqueaPaso(pos, new Posicion(2, 3)));
 	}
 }

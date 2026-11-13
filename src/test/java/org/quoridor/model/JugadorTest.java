@@ -232,4 +232,38 @@ class JugadorTest {
 		assertEquals(0, jugador.getMurosRestantes());
 	}
 
+	@Test
+	void testPrecondicionesEInvariante() {
+		Posicion posValida = new Posicion(4, 0);
+		Posicion posInvalida = new Posicion(-1, 0);
+
+		// Precondiciones del constructor
+		assertThrows(AssertionError.class, () -> new Jugador(null, Color.ROJO, posValida, 8, 10));
+		assertThrows(AssertionError.class, () -> new Jugador("   ", Color.ROJO, posValida, 8, 10));
+		assertThrows(AssertionError.class, () -> new Jugador("J1", null, posValida, 8, 10));
+		assertThrows(AssertionError.class, () -> new Jugador("J1", Color.ROJO, null, 8, 10));
+		assertThrows(AssertionError.class, () -> new Jugador("J1", Color.ROJO, posInvalida, 8, 10));
+		assertThrows(AssertionError.class, () -> new Jugador("J1", Color.ROJO, posValida, -1, 10));
+		assertThrows(AssertionError.class, () -> new Jugador("J1", Color.ROJO, posValida, 9, 10));
+		assertThrows(AssertionError.class, () -> new Jugador("J1", Color.ROJO, posValida, 8, -1));
+
+		// Precondiciones de moverA
+		jugador = new Jugador("J1", Color.ROJO, posValida, 8, 0);
+		assertThrows(AssertionError.class, () -> jugador.moverA(null));
+		assertThrows(AssertionError.class, () -> jugador.moverA(new Posicion(9, 0)));
+
+		// Precondición de consumirMuro sin muros
+		assertThrows(AssertionError.class, () -> jugador.consumirMuro());
+
+		// Precondiciones de reiniciarEstado
+		assertThrows(AssertionError.class, () -> jugador.reiniciarEstado(null, 5));
+		assertThrows(AssertionError.class, () -> jugador.reiniciarEstado(posInvalida, 5));
+		assertThrows(AssertionError.class, () -> jugador.reiniciarEstado(posValida, -1));
+
+		// Invariante con jugador sin inicializar (posicionActual == null)
+		Jugador jugadorVacio = new Jugador();
+		assertThrows(AssertionError.class, () -> jugadorVacio.hasMurosRestantes());
+		assertThrows(AssertionError.class, () -> jugadorVacio.haLlegadoAMeta());
+	}
+
 }
