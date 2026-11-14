@@ -46,8 +46,10 @@ class PartidaTest {
         // Configuramos comportamientos básicos si es necesario para los mocks
         when(jugador1Mock.getColor()).thenReturn(Color.ROJO);
         when(jugador2Mock.getColor()).thenReturn(Color.AZUL);
-        when(jugador1Mock.getNombre()).thenReturn("Jugador 1");
-        when(jugador2Mock.getNombre()).thenReturn("Jugador 2");
+        when(jugador1Mock.getNombre()).thenReturn("J1");
+        when(jugador2Mock.getNombre()).thenReturn("J2");
+        when(jugador1Mock.getPosicionActual()).thenReturn(new Posicion(4,0));
+        when(jugador2Mock.getPosicionActual()).thenReturn(new Posicion(4,8));
 
         // Instanciamos el objeto Partida
         partida = new Partida(tableroMock, sorteadorMock);
