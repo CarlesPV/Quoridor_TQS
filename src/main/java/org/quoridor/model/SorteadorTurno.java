@@ -3,5 +3,9 @@ import java.util.*;
 
 public class SorteadorTurno implements ISorteadorTurno {
 	@Override
-	int sortear(List<Jugador> jugadores);
+	public int sortear(List<Jugador> jugadores)
+	{
+        Random random = new Random();
+        return random.nextInt(1);
+    }
 }
