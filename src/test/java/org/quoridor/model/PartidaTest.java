@@ -42,14 +42,22 @@ class PartidaTest {
         tableroMock = mock(Tablero.class);
         jugador1Mock = mock(Jugador.class);
         jugador2Mock = mock(Jugador.class);
+        
+        // Configuramos comportamientos básicos si es necesario para los mocks
+        when(jugador1Mock.getColor()).thenReturn(Color.ROJO);
+        when(jugador2Mock.getColor()).thenReturn(Color.AZUL);
+        when(jugador1Mock.getNombre()).thenReturn("Jugador 1");
+        when(jugador2Mock.getNombre()).thenReturn("Jugador 2");
 
         // Instanciamos el objeto Partida
-        partida = new Partida(tableroMock, sorteadorMock, jugador1Mock, jugador2Mock);
+        partida = new Partida(tableroMock, sorteadorMock);
+        
+        // Configuramos el objeto Partida con los jugadores mock
+        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
 	}
 
 	@Test
 	void testIniciarPartida() {
-		partida.configurarPartida();
         partida.iniciarPartida();
         
         assertFalse(partida.isTerminada(), "La partida no debe estar terminada al iniciar.");
