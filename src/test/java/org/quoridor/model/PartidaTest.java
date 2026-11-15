@@ -4,7 +4,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import java.util.*;
 
 //Mock manual para controlar exactamente quién empieza en los tests
@@ -363,6 +366,111 @@ class PartidaTest {
 		assertThrows(UnsupportedOperationException.class, () -> partidaReal.getMurosColocados().clear());
 		assertThrows(UnsupportedOperationException.class,
 				() -> partidaReal.getMurosRestantesPorJugador().put(Color.ROJO, 99));
+	}
+
+	// Prueba de Caja Negra (Pairwise Testing) y Automatización (Data-Driven con @CsvSource):
+	// Caso: 6 combinaciones que cubren todos los pares de (numJugadores={2,4}, tamano={7,9}, muros={5,10}, sorteo={true,false}).
+	@ParameterizedTest(name = "[{index}] jugadores={0}, tablero={1}, muros={2}, sorteoAleatorio={3}")
+	@CsvSource({
+		"2, 7, 5,  true",
+		"2, 9, 10, false",
+		"4, 7, 10, false",
+		"4, 9, 5,  true",
+		"2, 7, 10, true",
+		"4, 9, 10, false"
+	})
+	@DisplayName("Pairwise Testing: Configuración de partida (2/4 jugadores, tablero 7/9, muros 5/10, sorteo)")
+	void testConfigurarPartidaPairwise(int numJugadores, int tamanoTablero,
+			int murosPorJugador, boolean sorteoAleatorio) {
+		Partida partidaReal = new Partida();
+		partidaReal.configurarPartida(numJugadores, tamanoTablero, murosPorJugador, sorteoAleatorio);
+
+		assertTrue(partidaReal.isTerminada(), "Antes de iniciarPartida la partida debe estar en pausa/terminada");
+		assertEquals(numJugadores, partidaReal.getJugadores().size());
+		assertEquals(tamanoTablero, partidaReal.getTablero().getTamanoTablero());
+		assertTrue(partidaReal.getMurosColocados().isEmpty());
+
+		int centro = tamanoTablero / 2;
+		assertEquals(new Posicion(centro, 0), partidaReal.getPosicionesJugadores().get(Color.ROJO));
+		assertEquals(new Posicion(centro, tamanoTablero - 1), partidaReal.getPosicionesJugadores().get(Color.AZUL));
+
+		if (numJugadores == 4) {
+			assertEquals(new Posicion(0, centro), partidaReal.getPosicionesJugadores().get(Color.VERDE));
+			assertEquals(new Posicion(tamanoTablero - 1, centro),
+					partidaReal.getPosicionesJugadores().get(Color.AMARILLO));
+		}
+
+		for (Jugador j : partidaReal.getJugadores()) {
+			assertEquals(murosPorJugador, j.getMurosRestantes());
+			assertEquals(murosPorJugador, partidaReal.getMurosRestantesPorJugador().get(j.getColor()));
+		}
+
+		partidaReal.iniciarPartida();
+		assertFalse(partidaReal.isTerminada());
+		if (!sorteoAleatorio) {
+			assertEquals(Color.ROJO, partidaReal.getJugadorActual().getColor(),
+					"Sin sorteo aleatorio debe comenzar siempre el primer jugador (ROJO)");
+		}
+	}
+
+	// Prueba de Caja Negra (Valores Frontera / Inválidos) y Programación por Contrato (DbC):
+	// Caso: frontera válida inferior (5x5, 0 muros) y argumentos fuera de dominio (1/3 jugadores, tamaño 0/4/8, muros -1/21).
+	@Test
+	void testConfigurarPartidaCasosInvalidosYFrontera() {
+		Partida partidaReal = new Partida();
+
+		// Frontera válida inferior: 0 muros por jugador y tablero mínimo impar (5x5)
+		partidaReal.configurarPartida(2, 5, 0, false);
+		assertEquals(5, partidaReal.getTablero().getTamanoTablero());
+		assertEquals(0, partidaReal.getMurosRestantesPorJugador().get(Color.ROJO));
+
+		// Casos inválidos: número de jugadores distinto de 2 o 4
+		assertThrows(AssertionError.class, () -> partidaReal.configurarPartida(1, 9, 10, true));
+		assertThrows(AssertionError.class, () -> partidaReal.configurarPartida(3, 9, 10, true));
+
+		// Casos inválidos: tamaño de tablero no positivo, menor que 5 o par
+		assertThrows(AssertionError.class, () -> partidaReal.configurarPartida(2, 0, 10, true));
+		assertThrows(AssertionError.class, () -> partidaReal.configurarPartida(2, 4, 10, true));
+		assertThrows(AssertionError.class, () -> partidaReal.configurarPartida(2, 8, 10, true));
+
+		// Casos inválidos: muros negativos o superiores al máximo permitido
+		assertThrows(AssertionError.class, () -> partidaReal.configurarPartida(2, 9, -1, true));
+		assertThrows(AssertionError.class, () -> partidaReal.configurarPartida(2, 9, 21, true));
+	}
+
+	// Prueba de Caja Negra (Partición Equivalente) y Caja Blanca (gestión de múltiples oponentes en realizarMovimiento):
+	// Caso: rotación completa entre 4 jugadores, bloqueo de casillas ocupadas por cualquier oponente y salto sobre oponente adyacente.
+	@Test
+	void testRealizarMovimientoCuatroJugadores() {
+		Partida partida4P = new Partida();
+		partida4P.configurarPartida(4, 9, 5, false);
+		partida4P.iniciarPartida();
+
+		assertEquals(Color.ROJO, partida4P.getJugadorActual().getColor());
+		assertTrue(partida4P.realizarMovimiento(new Posicion(4, 1)));
+		assertEquals(Color.AZUL, partida4P.getJugadorActual().getColor());
+		assertTrue(partida4P.realizarMovimiento(new Posicion(4, 7)));
+		assertEquals(Color.VERDE, partida4P.getJugadorActual().getColor());
+		assertTrue(partida4P.realizarMovimiento(new Posicion(1, 4)));
+		assertEquals(Color.AMARILLO, partida4P.getJugadorActual().getColor());
+		assertTrue(partida4P.realizarMovimiento(new Posicion(7, 4)));
+		assertEquals(Color.ROJO, partida4P.getJugadorActual().getColor());
+
+		// No puede moverse a la casilla ocupada por otro jugador cualquiera de los 4
+		Jugador j1 = new Jugador("J1", Color.ROJO, new Posicion(4, 4), 8, 5);
+		Jugador j2 = new Jugador("J2", Color.AZUL, new Posicion(4, 5), 0, 5);
+		Jugador j3 = new Jugador("J3", Color.VERDE, new Posicion(5, 4), 8, 5);
+		Jugador j4 = new Jugador("J4", Color.AMARILLO, new Posicion(8, 4), 0, 5);
+		Partida partidaSaltoFija = new Partida(new Tablero(), new SorteadorTurnoFijoMock(0));
+		partidaSaltoFija.configurarPartida(List.of(j1, j2, j3, j4));
+		partidaSaltoFija.iniciarPartida();
+
+		assertFalse(partidaSaltoFija.realizarMovimiento(new Posicion(4, 5)),
+				"No debe poder moverse encima de J2");
+		assertFalse(partidaSaltoFija.realizarMovimiento(new Posicion(5, 4)),
+				"No debe poder moverse encima de J3");
+		assertTrue(partidaSaltoFija.realizarMovimiento(new Posicion(4, 6)),
+				"Debe poder saltar sobre J2 aunque J3 también sea adyacente");
 	}
 
 }
