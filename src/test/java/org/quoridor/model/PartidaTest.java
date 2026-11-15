@@ -63,7 +63,7 @@ class PartidaTest {
         partida.iniciarPartida();
         
         assertFalse(partida.isTerminada(), "La partida no debe estar terminada al iniciar.");
-        assertEquals("Jugador 1", partida.getJugadorActual().getNombre(), "Debe empezar el Jugador 1 según el sorteador fijo.");
+        assertEquals("J1", partida.getJugadorActual().getNombre(), "Debe empezar el Jugador 1 según el sorteador fijo.");
     }
 
 	@Test
