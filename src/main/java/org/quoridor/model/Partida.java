@@ -75,7 +75,30 @@ public class Partida {
         assert verificarInvariante() : "Invariante de Partida violada tras iniciarPartida";
 	}
 	
-	public void realizarMovimiento(Posicion p);
+	public boolean realizarMovimiento(Posicion p)
+	{
+		Jugador jugadorActual = getJugadorActual();
+        Posicion origen = jugadorActual.getPosicionActual();
+        Posicion oponentePos = null;
+        // Obtener posicion del jugador oponente
+        for (Jugador j : jugadores) {
+            if (!j.getColor().equals(jugadorActual.getColor())) {
+            	oponentePos = j.getPosicionActual();
+            }
+        }
+
+        boolean movimientoValido = tablero.esMovimientoValido(origen, p, oponentePos);
+
+        if (movimientoValido) {
+            jugadorActual.moverA(p);
+            tablero.setPosicionJugador(jugadorActual.getColor(), p);
+            
+            indiceJugadorActual = (indiceJugadorActual + 1) % jugadores.size();
+            return true;
+        }
+        
+        return false;
+	}
 	public boolean colocarMuro(Muro m);
 	boolean comprobarVictoria();
 	
