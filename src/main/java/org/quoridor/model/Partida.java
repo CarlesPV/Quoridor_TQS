@@ -126,14 +126,39 @@ public class Partida {
 	
 	public boolean colocarMuro(Muro m)
 	{
+        // Pre-condiciones
+        assert m != null : "El muro a colocar no puede ser null";
+        assert verificarInvariante() : "Invariante de Partida violada al inicio de colocarMuro";
+		
+        if (terminada) 
+        {
+            return false;
+        }
+        
 		Jugador jugadorActual = getJugadorActual();
+		
+        if (!jugadorActual.hasMurosRestantes()) 
+        {
+            return false;
+        }
 		
 		if (tablero.esColocacionMuroValida(m)) 
 		{
+            int murosPreviosJugador = jugadorActual.getMurosRestantes();
+            int murosPreviosTablero = tablero.getMurosColocados().size();
+            int turnoAnterior = indiceJugadorActual;
+			
             tablero.colocarMuro(m);
             jugadorActual.consumirMuro();     
             indiceJugadorActual = (indiceJugadorActual + 1) % jugadores.size();
             
+            // Post-condiciones
+            assert jugadorActual.getMurosRestantes() == murosPreviosJugador - 1 : "Los muros del jugador deben decrementar en 1";
+            assert tablero.getMurosColocados().size() == murosPreviosTablero + 1 : "Los muros del tablero deben aumentar en 1";
+            assert indiceJugadorActual != turnoAnterior : "El turno debe avanzar tras colocar muro";
+            
+            // Invariante de clase tras éxito
+            assert verificarInvariante() : "Invariante de Partida violada tras colocarMuro exitoso";
             return true;
 		}
 		return false;
