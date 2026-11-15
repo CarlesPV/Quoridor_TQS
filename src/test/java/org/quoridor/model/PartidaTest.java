@@ -190,7 +190,26 @@ class PartidaTest {
 
 	@Test
 	void testColocarMuro() {
-		fail("Not yet implemented");
+		// Caso jugador 1 coloca muro
+		partida.iniciarPartida(); // Turno del Jugador 1
+
+        Muro muroPrueba = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+        
+        // El jugador mock tiene muros disponibles
+        when(jugador1Mock.hasMurosRestantes()).thenReturn(true);
+        when(jugador1Mock.getMurosRestantes()).thenReturn(10);
+        // El tablero acepta el muro
+        when(tableroMock.esColocacionMuroValida(eq(muroPrueba))).thenReturn(true);
+        
+        boolean colocado = partida.colocarMuro(muroPrueba);
+        assertTrue(colocado, "El muro debería colocarse con éxito.");
+        
+        // Verificamos que se ejecutó el método consumirMuro() en el mock del jugador
+        verify(jugador1Mock, times(1)).consumirMuro();
+        
+        // Verificamos que se colocó en el tablero y cambió el turno
+        verify(tableroMock, times(1)).colocarMuro(eq(muroPrueba));
+        assertEquals("J2", partida.getJugadorActual().getNombre(), "El turno debe cambiar al siguiente jugador.");
 	}
 
 	@Test
