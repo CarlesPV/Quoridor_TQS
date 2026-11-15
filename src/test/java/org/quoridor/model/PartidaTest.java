@@ -97,23 +97,15 @@ class PartidaTest {
         sorteadorMock = new SorteadorTurnoFijoMock(2);
         partida = new Partida(tableroMock, sorteadorMock);
         partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
-        try 
-        {
-        	partida.iniciarPartida();
-        	assertTrue(false);
-        }
-        catch (AssertionError e) {}
+        assertThrows(AssertionError.class, () -> partida.iniciarPartida(),
+                "Debe lanzar AssertionError si el índice sorteado supera el rango.");
         
         // Caso inicializar sorteador fuera de rango inferior
         sorteadorMock = new SorteadorTurnoFijoMock(-1);
         partida = new Partida(tableroMock, sorteadorMock);
         partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
-        try 
-        {
-        	partida.iniciarPartida();
-        	assertTrue(false);
-        }
-        catch (AssertionError e) {}
+        assertThrows(AssertionError.class, () -> partida.iniciarPartida(),
+                "Debe lanzar AssertionError si el índice sorteado es negativo.");
         
         
     }
@@ -189,13 +181,8 @@ class PartidaTest {
         
         // Caso destino null
         partida.iniciarPartida();
-        
-        try
-        {
-        	partida.realizarMovimiento(null);
-        	assertTrue(false);
-        }
-        catch (AssertionError e) {}
+        assertThrows(AssertionError.class, () -> partida.realizarMovimiento(null),
+                "Debe lanzar AssertionError si el destino es null.");
         
         
         // Caso partida sin inicializar o ya terminada
@@ -305,13 +292,8 @@ class PartidaTest {
         
         // Caso muro null
         partida.iniciarPartida();
-        
-        try
-        {
-        	partida.colocarMuro(null);
-        	assertTrue(false);
-        }
-        catch (AssertionError e) {}
+        assertThrows(AssertionError.class, () -> partida.colocarMuro(null),
+                "Debe lanzar AssertionError si el muro es null.");
 	}
 
 	@Test

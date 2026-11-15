@@ -22,21 +22,13 @@ class SorteadorTurnoTest {
 	    
 	    // Caso 0 jugadores
 	    List<Jugador> jugadores0 = new ArrayList<>();
-	    // Verificamos que al llamar a sortear con una lista vacía, lanza una excepción
-	    try
-	    {
-	    	sorteador.sortear(jugadores0);
-	    	assertTrue(false);
-	    }
-	    catch (AssertionError e) {}
+	    // Verificamos que al llamar a sortear con una lista vacía, lanza AssertionError
+	    assertThrows(AssertionError.class, () -> sorteador.sortear(jugadores0),
+	        "Debe lanzar AssertionError si la lista de jugadores está vacía.");
 	    
 	    // Caso lista null
-	    try
-	    {
-	    	sorteador.sortear(null);
-	    	assertTrue(false);
-	    }
-	    catch (AssertionError e) {}
+	    assertThrows(AssertionError.class, () -> sorteador.sortear(null),
+	        "Debe lanzar AssertionError si la lista de jugadores es null.");
 	}
 
 }
