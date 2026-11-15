@@ -210,6 +210,56 @@ class PartidaTest {
         // Verificamos que se colocó en el tablero y cambió el turno
         verify(tableroMock, times(1)).colocarMuro(eq(muroPrueba));
         assertEquals("J2", partida.getJugadorActual().getNombre(), "El turno debe cambiar al siguiente jugador.");
+        
+        
+        // Caso jugador 1 sin muros
+        partida.iniciarPartida();
+
+        // Configuramos el mock para que devuelva false en muros restantes
+        when(jugador1Mock.hasMurosRestantes()).thenReturn(false);
+
+        muroPrueba = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+
+        colocado = partida.colocarMuro(muroPrueba);
+
+        assertFalse(colocado, "No se puede colocar muro si el jugador no tiene.");
+        
+        // Verificamos que nunca se intentó consumir muro ni validar en el tablero
+        // times(1) ya que viene del anterior test
+        verify(jugador1Mock, times(1)).consumirMuro();
+        verify(tableroMock, times(1)).esColocacionMuroValida(any());
+        
+        
+        // Caso muro no válido 
+        partida.iniciarPartida();
+        
+        // Configuramos el mock para que devuelva false en muros restantes
+        when(tableroMock.esColocacionMuroValida(any(Muro.class))).thenReturn(false);
+
+        muroPrueba = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+        
+        colocado = partida.colocarMuro(muroPrueba);
+        
+        assertFalse(colocado, "Posicion del muro inválido.");
+        // Verificamos que nunca se intentó consumir muro
+        verify(jugador1Mock, times(1)).consumirMuro();
+        
+        // Caso partida sin inicializar o ya terminada
+        muroPrueba = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+        colocado = partida.colocarMuro(muroPrueba);
+
+        assertFalse(colocado, "No se puede colocar muros si la partida está terminada.");
+        
+        
+        // Caso muro null
+        partida.iniciarPartida();
+        
+        try
+        {
+        	partida.colocarMuro(null);
+        	assertTrue(false);
+        }
+        catch (AssertionError e) {}
 	}
 
 	@Test
