@@ -59,8 +59,20 @@ public class Partida {
 	
 	public void iniciarPartida()
 	{
+		// Pre-condiciones
+        assert(jugadores != null && !jugadores.isEmpty()) : "Debe configurar los jugadores antes de iniciar la partida";
+        assert verificarInvariante() : "Invariante de Partida violada al inicio de iniciarPartida";
+        
 		this.indiceJugadorActual = sorteadorTurno.sortear(jugadores);
         this.terminada = false;
+        
+        // Post-condiciones y verificaciones
+        assert(!this.terminada) : "La partida debe marcarse como no terminada al iniciar";
+        assert(this.indiceJugadorActual >= 0 && this.indiceJugadorActual < jugadores.size())
+                : "El índice del jugador actual tras el sorteo está fuera de rango";
+
+        // Invariante de clase
+        assert verificarInvariante() : "Invariante de Partida violada tras iniciarPartida";
 	}
 	
 	public void realizarMovimiento(Posicion p);
