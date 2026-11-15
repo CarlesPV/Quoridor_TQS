@@ -11,6 +11,7 @@ public class Partida {
 		this.sorteadorTurno = new SorteadorTurno();
 		this.indiceJugadorActual = 0;
 		this.terminada = true;
+		this.sorteoAleatorio = true;
 
 		// Invariante de clase
 		assert verificarInvariante() : "Invariante de Partida violada tras la construcción por defecto";
@@ -27,6 +28,7 @@ public class Partida {
 		this.sorteadorTurno = s;
 		this.indiceJugadorActual = 0;
 		this.terminada = true;
+		this.sorteoAleatorio = true;
 
 		// Invariante de clase
 		assert verificarInvariante() : "Invariante de Partida violada tras la construcción con inyección";
@@ -63,6 +65,27 @@ public class Partida {
         assert(!jugadores.isEmpty()) : "La lista de jugadores no debe estar vacía";
         assert verificarInvariante() : "Invariante de Partida violada tras configurarPartida";
 	}
+
+	public void configurarPartida(int numJugadores, int tamanoTablero,
+			int murosPorJugador, boolean sorteoAleatorio) {
+		// Versión inicial mínima para partida estándar de 2 jugadores en tablero 9x9
+		List<Jugador> listaBase = new ArrayList<>();
+		listaBase.add(new Jugador("Jugador 1", Color.ROJO,
+				new Posicion(4, 0), 8, murosPorJugador));
+		listaBase.add(new Jugador("Jugador 2", Color.AZUL,
+				new Posicion(4, 8), 0, murosPorJugador));
+
+		this.jugadores = listaBase;
+		this.indiceJugadorActual = 0;
+		this.terminada = true;
+		this.sorteoAleatorio = sorteoAleatorio;
+
+		for (Jugador j : this.jugadores) {
+			this.tablero.setPosicionJugador(j.getColor(), j.getPosicionActual());
+		}
+
+		assert verificarInvariante() : "Invariante de Partida violada tras configurarPartida";
+	}
 	
 	public void iniciarPartida()
 	{
@@ -70,7 +93,11 @@ public class Partida {
         assert(jugadores != null && !jugadores.isEmpty()) : "Debe configurar los jugadores antes de iniciar la partida";
         assert verificarInvariante() : "Invariante de Partida violada al inicio de iniciarPartida";
         
-		this.indiceJugadorActual = sorteadorTurno.sortear(jugadores);
+		if (this.sorteoAleatorio) {
+			this.indiceJugadorActual = sorteadorTurno.sortear(jugadores);
+		} else {
+			this.indiceJugadorActual = 0;
+		}
         this.terminada = false;
         
         // Post-condiciones y verificaciones
@@ -194,7 +221,7 @@ public class Partida {
         return null; // Nadie ha ganado todavía
 	}
 	
-	Jugador getJugadorActual()
+	public Jugador getJugadorActual()
 	{
 		assert(jugadores != null && !jugadores.isEmpty()) : "No hay jugadores en la partida";
         assert(indiceJugadorActual >= 0 && indiceJugadorActual < jugadores.size()) : 
@@ -202,9 +229,38 @@ public class Partida {
         return jugadores.get(indiceJugadorActual);
 	}
 	
-	boolean isTerminada()
+	public boolean isTerminada()
 	{
 		return terminada;
+	}
+
+	public List<Jugador> getJugadores() {
+		assert verificarInvariante() : "Invariante de Partida violada en getJugadores";
+		return Collections.unmodifiableList(this.jugadores);
+	}
+
+	public Tablero getTablero() {
+		assert verificarInvariante() : "Invariante de Partida violada en getTablero";
+		return this.tablero;
+	}
+
+	public Map<Color, Posicion> getPosicionesJugadores() {
+		assert verificarInvariante() : "Invariante de Partida violada en getPosicionesJugadores";
+		return Collections.unmodifiableMap(this.tablero.getPosicionesJugadores());
+	}
+
+	public List<Muro> getMurosColocados() {
+		assert verificarInvariante() : "Invariante de Partida violada en getMurosColocados";
+		return Collections.unmodifiableList(this.tablero.getMurosColocados());
+	}
+
+	public Map<Color, Integer> getMurosRestantesPorJugador() {
+		assert verificarInvariante() : "Invariante de Partida violada en getMurosRestantesPorJugador";
+		Map<Color, Integer> muros = new LinkedHashMap<>();
+		for (Jugador j : this.jugadores) {
+			muros.put(j.getColor(), j.getMurosRestantes());
+		}
+		return Collections.unmodifiableMap(muros);
 	}
 	
 	private Tablero tablero;
@@ -212,4 +268,5 @@ public class Partida {
 	private ISorteadorTurno sorteadorTurno;
 	private int indiceJugadorActual;
 	private boolean terminada;
+	private boolean sorteoAleatorio;
 }
