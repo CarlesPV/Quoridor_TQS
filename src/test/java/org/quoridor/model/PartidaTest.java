@@ -60,10 +60,42 @@ class PartidaTest {
 
 	@Test
 	void testIniciarPartida() {
+		// Caso J1 empieza
         partida.iniciarPartida();
-        
         assertFalse(partida.isTerminada(), "La partida no debe estar terminada al iniciar.");
         assertEquals("J1", partida.getJugadorActual().getNombre(), "Debe empezar el Jugador 1 según el sorteador fijo.");
+        
+        // Caso J2 empieza
+        sorteadorMock = new SorteadorTurnoFijoMock(1);
+        partida = new Partida(tableroMock, sorteadorMock);
+        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+        partida.iniciarPartida();
+        assertFalse(partida.isTerminada(), "La partida no debe estar terminada al iniciar.");
+        assertEquals("J2", partida.getJugadorActual().getNombre(), "Debe empezar el Jugador 2 según el sorteador fijo.");
+        
+        // Caso inicializar sorteador fuera de rango superior
+        sorteadorMock = new SorteadorTurnoFijoMock(2);
+        partida = new Partida(tableroMock, sorteadorMock);
+        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+        try 
+        {
+        	partida.iniciarPartida();
+        	assertTrue(false);
+        }
+        catch (AssertionError e) {}
+        
+        // Caso inicializar sorteador fuera de rango inferior
+        sorteadorMock = new SorteadorTurnoFijoMock(-1);
+        partida = new Partida(tableroMock, sorteadorMock);
+        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+        try 
+        {
+        	partida.iniciarPartida();
+        	assertTrue(false);
+        }
+        catch (AssertionError e) {}
+        
+        
     }
 
 	@Test
