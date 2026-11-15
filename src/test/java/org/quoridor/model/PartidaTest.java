@@ -333,4 +333,36 @@ class PartidaTest {
         assertFalse(partida.isTerminada(), "La partida no debe terminar si nadie ha ganado.");
 	}
 
+	// Prueba de Caja Negra y Contrato:
+	// Caso: partida estándar 2P (9x9, 10 muros, sin sorteo) y colocación de 1 muro.
+	@Test
+	void testGettersPublicos() {
+		Partida partidaReal = new Partida();
+		partidaReal.configurarPartida(2, 9, 10, false);
+		partidaReal.iniciarPartida();
+
+		assertFalse(partidaReal.isTerminada());
+		assertEquals(2, partidaReal.getJugadores().size());
+		assertNotNull(partidaReal.getTablero());
+		assertEquals(new Posicion(4, 0), partidaReal.getPosicionesJugadores().get(Color.ROJO));
+		assertEquals(new Posicion(4, 8), partidaReal.getPosicionesJugadores().get(Color.AZUL));
+		assertTrue(partidaReal.getMurosColocados().isEmpty());
+		assertEquals(10, partidaReal.getMurosRestantesPorJugador().get(Color.ROJO));
+		assertEquals(10, partidaReal.getMurosRestantesPorJugador().get(Color.AZUL));
+
+		// Colocar un muro actualiza la fachada de muros colocados y restantes
+		assertTrue(partidaReal.colocarMuro(new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL)));
+		assertEquals(1, partidaReal.getMurosColocados().size());
+		assertEquals(9, partidaReal.getMurosRestantesPorJugador().get(Color.ROJO));
+		assertEquals(10, partidaReal.getMurosRestantesPorJugador().get(Color.AZUL));
+
+		// Las colecciones devueltas son de solo lectura
+		assertThrows(UnsupportedOperationException.class, () -> partidaReal.getJugadores().clear());
+		assertThrows(UnsupportedOperationException.class,
+				() -> partidaReal.getPosicionesJugadores().put(Color.ROJO, new Posicion(0, 0)));
+		assertThrows(UnsupportedOperationException.class, () -> partidaReal.getMurosColocados().clear());
+		assertThrows(UnsupportedOperationException.class,
+				() -> partidaReal.getMurosRestantesPorJugador().put(Color.ROJO, 99));
+	}
+
 }
