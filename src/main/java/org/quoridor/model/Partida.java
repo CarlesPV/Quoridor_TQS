@@ -6,11 +6,14 @@ public class Partida {
 	// Constructores
 	public Partida()
 	{
-		this.tablero = null;
-		this.jugadores = null;
-		this.sorteadorTurno = null;
+		this.tablero = new Tablero();
+		this.jugadores = new ArrayList<>();
+		this.sorteadorTurno = new SorteadorTurno();
 		this.indiceJugadorActual = 0;
 		this.terminada = true;
+
+		// Invariante de clase
+		assert verificarInvariante() : "Invariante de Partida violada tras la construcción por defecto";
 	}
 	
 	public Partida(Tablero t, ISorteadorTurno s) 
@@ -24,6 +27,9 @@ public class Partida {
 		this.sorteadorTurno = s;
 		this.indiceJugadorActual = 0;
 		this.terminada = true;
+
+		// Invariante de clase
+		assert verificarInvariante() : "Invariante de Partida violada tras la construcción con inyección";
 	}
 	
 	
@@ -44,6 +50,7 @@ public class Partida {
 	{
 		// Pre-condiciones e invariante
         assert(jugadoresPersonalizados != null) : "La lista de jugadores no puede ser null";
+        assert(!jugadoresPersonalizados.isEmpty()) : "La lista de jugadores no puede estar vacía";
         assert verificarInvariante() : "Invariante de Partida violada al inicio de configurarPartida";
 
         this.jugadores = new ArrayList<>(jugadoresPersonalizados);
