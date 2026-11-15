@@ -81,7 +81,8 @@ public class Partida {
         assert(p != null) : "La posición de destino no puede ser null";
         assert verificarInvariante() : "Invariante de Partida violada al inicio de realizarMovimiento";
 
-        if (terminada) {
+        if (terminada) 
+        {
             return false;
         }
 		
@@ -89,8 +90,10 @@ public class Partida {
         Posicion origen = jugadorActual.getPosicionActual();
         Posicion oponentePos = null;
         // Obtener posicion del jugador oponente
-        for (Jugador j : jugadores) {
-            if (!j.getColor().equals(jugadorActual.getColor())) {
+        for (Jugador j : jugadores) 
+        {
+            if (!j.getColor().equals(jugadorActual.getColor())) 
+            {
             	oponentePos = j.getPosicionActual();
             }
         }
@@ -120,7 +123,22 @@ public class Partida {
         
         return false;
 	}
-	public boolean colocarMuro(Muro m);
+	
+	public boolean colocarMuro(Muro m)
+	{
+		Jugador jugadorActual = getJugadorActual();
+		
+		if (tablero.esColocacionMuroValida(m)) 
+		{
+            tablero.colocarMuro(m);
+            jugadorActual.consumirMuro();     
+            indiceJugadorActual = (indiceJugadorActual + 1) % jugadores.size();
+            
+            return true;
+		}
+		return false;
+	}
+	
 	boolean comprobarVictoria();
 	
 	Jugador getJugadorActual()
