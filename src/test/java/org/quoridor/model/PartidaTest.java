@@ -100,7 +100,19 @@ class PartidaTest {
 
 	@Test
 	void testRealizarMovimiento() {
-		fail("Not yet implemented");
+		// Caso J1 se mueve y cambia de turno
+        partida.iniciarPartida();
+        
+        Posicion destinoValido = new Posicion(4, 7);
+        // Simulamos que el Tablero aprueba el movimiento
+        when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoValido), any(Posicion.class)))
+            .thenReturn(true);
+        
+        boolean resultado = partida.realizarMovimiento(destinoValido);
+        
+        assertTrue(resultado, "El movimiento debería realizarse con éxito.");
+        // Verificamos que el turno avanzó automáticamente a J2
+        assertEquals("J2", partida.getJugadorActual().getNombre(), "El turno debe cambiar al siguiente jugador.");
 	}
 
 	@Test
