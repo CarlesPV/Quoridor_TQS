@@ -190,6 +190,9 @@ class PartidaTest {
 
 	@Test
 	void testColocarMuro() {
+		int[] murosJ = {10};
+		int[] murosT = {0};
+		
 		// Caso jugador 1 coloca muro
 		partida.iniciarPartida(); // Turno del Jugador 1
 
@@ -197,9 +200,33 @@ class PartidaTest {
         
         // El jugador mock tiene muros disponibles
         when(jugador1Mock.hasMurosRestantes()).thenReturn(true);
-        when(jugador1Mock.getMurosRestantes()).thenReturn(10);
+        // Se tiene que decrementar en uno cada vez que se consume un muro
+        when(jugador1Mock.getMurosRestantes()).thenAnswer(inv -> murosJ[0]);
+        doAnswer(inv -> {
+            murosJ[0]--;
+            return null;
+        }).when(jugador1Mock).consumirMuro();
+        
         // El tablero acepta el muro
         when(tableroMock.esColocacionMuroValida(eq(muroPrueba))).thenReturn(true);
+        // Mockeamos getMurosColocados() para que devuelva una lista 
+        // cuyo tamaño dependa de nuestra variable 'murosT[0]'
+        when(tableroMock.getMurosColocados()).thenAnswer(inv -> {
+            List<Muro> listaSimulada = new ArrayList<>();
+            // Añadimos tantos elementos falsos como indique murosT[0]
+            for (int i = 0; i < murosT[0]; i++) 
+            {
+                listaSimulada.add(new Muro(new Posicion(0, i), Orientacion.HORIZONTAL));
+            }
+            return listaSimulada;
+        });
+
+        // Cuando se ejecute tableroMock.colocarMuro(...), incrementamos el contador
+        doAnswer(inv -> {
+            murosT[0]++;
+            return null;
+        }).when(tableroMock).colocarMuro(any(Muro.class));
+        
         
         boolean colocado = partida.colocarMuro(muroPrueba);
         assertTrue(colocado, "El muro debería colocarse con éxito.");
