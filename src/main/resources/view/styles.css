@@ -1,0 +1,172 @@
+.root-pane {
+    -fx-background-color: #1e222b;
+    -fx-font-family: "Segoe UI", "System", sans-serif;
+}
+
+.header-bar {
+    -fx-background-color: #262b36;
+    -fx-border-color: #343b4a;
+    -fx-border-width: 0 0 1 0;
+}
+
+.app-title {
+    -fx-text-fill: #f0f3f8;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.turn-badge {
+    -fx-background-color: #1a1e26;
+    -fx-background-radius: 20px;
+    -fx-padding: 6px 14px;
+    -fx-border-color: #3a4254;
+    -fx-border-radius: 20px;
+}
+
+.turn-label {
+    -fx-text-fill: #e6ebf5;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.indicador-turno {
+    -fx-fill: #7f8c9f;
+    -fx-stroke: #ffffff;
+    -fx-stroke-width: 1.5;
+}
+
+.board-container {
+    -fx-background-color: #1e222b;
+}
+
+.tablero-grid {
+    -fx-background-color: #3a2b20;
+    -fx-padding: 12px;
+    -fx-background-radius: 10px;
+    -fx-border-color: #5c4433;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+}
+
+.casilla {
+    -fx-background-color: #d8c3a5;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+}
+
+.casilla:hover {
+    -fx-background-color: #e6d5bc;
+}
+
+.ranura-muro {
+    -fx-background-color: #4d392b;
+    -fx-background-radius: 2px;
+    -fx-cursor: hand;
+}
+
+.ranura-muro:hover {
+    -fx-background-color: #c89f68;
+}
+
+.interseccion-muro {
+    -fx-background-color: #3a2b20;
+}
+
+.muro-colocado {
+    -fx-background-color: #e09f3e;
+}
+
+.muro-colocado:hover {
+    -fx-background-color: #e09f3e;
+}
+
+.peon {
+    -fx-stroke: #1b1b1b;
+    -fx-stroke-width: 2;
+}
+
+.peon-rojo {
+    -fx-fill: #e63946;
+}
+
+.peon-azul {
+    -fx-fill: #3a86ff;
+}
+
+.peon-verde {
+    -fx-fill: #2a9d8f;
+}
+
+.peon-amarillo {
+    -fx-fill: #ffbe0b;
+}
+
+.info-panel {
+    -fx-background-color: #262b36;
+    -fx-border-color: #343b4a;
+    -fx-border-width: 0 0 0 1;
+}
+
+.panel-title {
+    -fx-text-fill: #f0f3f8;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.section-title {
+    -fx-text-fill: #b8c2d1;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.muros-lista {
+    -fx-background-color: #1e222b;
+    -fx-background-radius: 8px;
+    -fx-padding: 10px;
+}
+
+.muro-item-label {
+    -fx-text-fill: #e6ebf5;
+    -fx-font-size: 13px;
+}
+
+.legend-text {
+    -fx-text-fill: #9aa5b8;
+    -fx-font-size: 12px;
+}
+
+.restart-button {
+    -fx-background-color: #3a86ff;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 16px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.restart-button:hover {
+    -fx-background-color: #5698ff;
+}
+
+.status-bar {
+    -fx-background-color: #20252f;
+    -fx-border-color: #343b4a;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-message {
+    -fx-text-fill: #c6d0df;
+    -fx-font-size: 13px;
+}
+
+.mensaje-error {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-weight: bold;
+}
+
+.mensaje-victoria {
+    -fx-text-fill: #51cf66;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
