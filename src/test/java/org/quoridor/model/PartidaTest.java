@@ -102,8 +102,7 @@ class PartidaTest {
 	void testRealizarMovimiento() {
 		// Caso J1 se mueve y cambia de turno
         partida.iniciarPartida();
-        
-        Posicion destinoValido = new Posicion(4, 7);
+        Posicion destinoValido = new Posicion(4, 1);
         // Simulamos que el Tablero aprueba el movimiento
         when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoValido), any(Posicion.class)))
             .thenReturn(true);
@@ -113,6 +112,80 @@ class PartidaTest {
         assertTrue(resultado, "El movimiento debería realizarse con éxito.");
         // Verificamos que el turno avanzó automáticamente a J2
         assertEquals("J2", partida.getJugadorActual().getNombre(), "El turno debe cambiar al siguiente jugador.");
+        
+        
+        // Caso J2 se mueve y cambia de turno
+        sorteadorMock = new SorteadorTurnoFijoMock(1);
+        partida = new Partida(tableroMock, sorteadorMock);
+        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+        partida.iniciarPartida();
+        
+        destinoValido = new Posicion(4, 7);
+        // Simulamos que el Tablero aprueba el movimiento
+        when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoValido), any(Posicion.class)))
+            .thenReturn(true);
+        
+        resultado = partida.realizarMovimiento(destinoValido);
+        
+        assertTrue(resultado, "El movimiento debería realizarse con éxito.");
+        // Verificamos que el turno avanzó automáticamente a J1
+        assertEquals("J1", partida.getJugadorActual().getNombre(), "El turno debe cambiar al siguiente jugador.");
+        
+        
+        // Caso movimiento invalido
+        sorteadorMock = new SorteadorTurnoFijoMock(0);
+        partida = new Partida(tableroMock, sorteadorMock);
+        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+        partida.iniciarPartida(); // Turno actual: Jugador 1
+        Posicion destinoInvalido = new Posicion(0, 0); // Lejos o bloqueado
+
+        // Simulamos que el Tablero rechaza el movimiento
+        when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoInvalido), any(Posicion.class)))
+            .thenReturn(false);
+
+        resultado = partida.realizarMovimiento(destinoInvalido);
+        assertFalse(resultado, "El movimiento inválido debe ser rechazado.");
+        // Verificamos que el turno NO avanzó (sigue siendo el Jugador 1)
+        assertEquals("J1", partida.getJugadorActual().getNombre(), "El turno no debe cambiar si el movimiento falla.");
+        
+        
+        // Caso se llega a la victoria
+        partida.iniciarPartida(); // Turno del Jugador 1
+        // Para el Jugador 1 (abajo), su fila objetivo (meta) es 8.
+        Posicion destinoMeta = new Posicion(3, 8);
+        
+        // Simulamos que el Tablero aprueba el movimiento
+        when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoMeta), any(Posicion.class)))
+            .thenReturn(true);
+        
+        // Simulamos que jugador 1 llega a la meta
+        when(jugador1Mock.haLlegadoAMeta()).thenReturn(true);
+        resultado = partida.realizarMovimiento(destinoMeta);
+
+        assertTrue(resultado);
+        // Verificamos que la partida se marcó como terminada al llegar a la meta
+        assertTrue(partida.isTerminada(), "La partida debería terminar cuando el jugador alcanza su fila objetivo.");
+        
+        
+        // Caso destino null
+        partida.iniciarPartida();
+        
+        try
+        {
+        	partida.realizarMovimiento(null);
+        	assertTrue(false);
+        }
+        catch (AssertionError e) {}
+        
+        
+        // Caso partida sin inicializar o ya terminada
+        sorteadorMock = new SorteadorTurnoFijoMock(0);
+        partida = new Partida(tableroMock, sorteadorMock);
+        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+        Posicion destinoCualquiera = new Posicion(4, 7);
+        resultado = partida.realizarMovimiento(destinoCualquiera);
+
+        assertFalse(resultado, "No se puede mover si la partida está terminada.");
 	}
 
 	@Test
