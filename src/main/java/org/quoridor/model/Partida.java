@@ -10,7 +10,7 @@ public class Partida {
 		this.jugadores = null;
 		this.sorteadorTurno = null;
 		this.indiceJugadorActual = 0;
-		this.terminada = false;
+		this.terminada = true;
 	}
 	
 	public Partida(Tablero t, ISorteadorTurno s) 
@@ -23,7 +23,7 @@ public class Partida {
 		this.jugadores = new ArrayList<>();
 		this.sorteadorTurno = s;
 		this.indiceJugadorActual = 0;
-		this.terminada = false;
+		this.terminada = true;
 	}
 	
 	
@@ -77,6 +77,14 @@ public class Partida {
 	
 	public boolean realizarMovimiento(Posicion p)
 	{
+		// Pre-condiciones
+        assert(p != null) : "La posición de destino no puede ser null";
+        assert verificarInvariante() : "Invariante de Partida violada al inicio de realizarMovimiento";
+
+        if (terminada) {
+            return false;
+        }
+		
 		Jugador jugadorActual = getJugadorActual();
         Posicion origen = jugadorActual.getPosicionActual();
         Posicion oponentePos = null;
@@ -90,10 +98,23 @@ public class Partida {
         boolean movimientoValido = tablero.esMovimientoValido(origen, p, oponentePos);
 
         if (movimientoValido) {
+        	int turnoAnterior = indiceJugadorActual;
             jugadorActual.moverA(p);
             tablero.setPosicionJugador(jugadorActual.getColor(), p);
             
-            indiceJugadorActual = (indiceJugadorActual + 1) % jugadores.size();
+            if (jugadorActual.haLlegadoAMeta()) 
+            {
+                this.terminada = true;
+            } 
+            else 
+            {
+            	indiceJugadorActual = (indiceJugadorActual + 1) % jugadores.size();
+                // Post-condición de cambio de turno
+                assert(indiceJugadorActual != turnoAnterior) : "El turno debe avanzar a otro jugador";
+            }
+            
+            // Invariante de clase tras éxito
+            assert verificarInvariante() : "Invariante de Partida violada tras realizarMovimiento exitoso";
             return true;
         }
         
