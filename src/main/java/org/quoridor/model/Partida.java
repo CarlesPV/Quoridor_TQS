@@ -164,14 +164,20 @@ public class Partida {
 		return false;
 	}
 	
-	Jugador comprobarVictoria()
+	public Jugador comprobarVictoria()
 	{
+		assert verificarInvariante() : "Invariante de Partida violada al inicio de comprobarVictoria";
+
 		// Comprobamos si alguno de los jugadores ha llegado a su meta
         for (Jugador j : jugadores) 
         {
             if (j.haLlegadoAMeta()) 
             {
                 this.terminada = true;
+                
+                // Post-condiciones
+                assert(this.terminada) : "La partida debe marcarse como terminada al haber un ganador";
+                assert verificarInvariante() : "Invariante de Partida violada tras detectar victoria";
                 return j;
             }
         }
