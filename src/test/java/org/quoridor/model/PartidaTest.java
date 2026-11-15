@@ -272,6 +272,9 @@ class PartidaTest {
         verify(jugador1Mock, times(1)).consumirMuro();
         
         // Caso partida sin inicializar o ya terminada
+        sorteadorMock = new SorteadorTurnoFijoMock(0);
+        partida = new Partida(tableroMock, sorteadorMock);
+        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
         muroPrueba = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
         colocado = partida.colocarMuro(muroPrueba);
 
@@ -301,6 +304,16 @@ class PartidaTest {
         Jugador ganador = partida.comprobarVictoria();
         assertNotNull(ganador, "Debe haber un ganador.");
         assertEquals("J1", ganador.getNombre(), "El ganador debe ser el Jugador 1.");
+        
+        
+        // Caso seguir partida 
+        partida.iniciarPartida();
+        // Simulamos que al mover, el jugador mock no cumple la condición de victoria
+        when(jugador1Mock.haLlegadoAMeta()).thenReturn(false);
+        
+        // Comprobamos que comprobarVictoria() devuelve null al no haber ganador
+        ganador = partida.comprobarVictoria();
+        assertNull(ganador, "No debe de haber ganador.");
 	}
 
 }
