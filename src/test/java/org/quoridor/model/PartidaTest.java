@@ -291,7 +291,16 @@ class PartidaTest {
 
 	@Test
 	void testComprobarVictoria() {
-		fail("Not yet implemented");
+		// Caso jugador 1 gana
+		partida.iniciarPartida();
+		
+        // Simulamos que al mover a la meta, el jugador mock cumple la condición de victoria
+        when(jugador1Mock.haLlegadoAMeta()).thenReturn(true);
+        
+        // Comprobamos que comprobarVictoria() identifica correctamente al ganador
+        Jugador ganador = partida.comprobarVictoria();
+        assertNotNull(ganador, "Debe haber un ganador.");
+        assertEquals("J1", ganador.getNombre(), "El ganador debe ser el Jugador 1.");
 	}
 
 }
