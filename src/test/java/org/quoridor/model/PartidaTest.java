@@ -1,13 +1,11 @@
 package org.quoridor.model;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.*;
-import org.mockito.Mockito;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 //Mock manual para controlar exactamente quién empieza en los tests
 class SorteadorTurnoFijoMock implements ISorteadorTurno {
@@ -56,6 +54,28 @@ class PartidaTest {
         
         // Configuramos el objeto Partida con los jugadores mock
         partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+	}
+
+	@Test
+	void testConstructor() {
+		assertDoesNotThrow(() -> {
+			Partida partidaPorDefecto = new Partida();
+			assertTrue(partidaPorDefecto.isTerminada(), "Una partida recién creada debe estar terminada.");
+			assertNull(partidaPorDefecto.comprobarVictoria(), "Sin jugadores no debe haber ganador.");
+		});
+
+		assertThrows(AssertionError.class, () -> new Partida(null, sorteadorMock),
+				"Debe lanzar AssertionError si el tablero es null.");
+		assertThrows(AssertionError.class, () -> new Partida(tableroMock, null),
+				"Debe lanzar AssertionError si el sorteador es null.");
+	}
+
+	@Test
+	void testConfigurarPartida() {
+		assertThrows(AssertionError.class, () -> partida.configurarPartida(null),
+				"Debe lanzar AssertionError si la lista de jugadores es null.");
+		assertThrows(AssertionError.class, () -> partida.configurarPartida(List.of()),
+				"Debe lanzar AssertionError si la lista de jugadores está vacía.");
 	}
 
 	@Test
@@ -260,7 +280,8 @@ class PartidaTest {
         // Caso muro no válido 
         partida.iniciarPartida();
         
-        // Configuramos el mock para que devuelva false en muros restantes
+        // El jugador sí tiene muros, pero el tablero rechaza la posición
+        when(jugador1Mock.hasMurosRestantes()).thenReturn(true);
         when(tableroMock.esColocacionMuroValida(any(Muro.class))).thenReturn(false);
 
         muroPrueba = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
@@ -268,7 +289,8 @@ class PartidaTest {
         colocado = partida.colocarMuro(muroPrueba);
         
         assertFalse(colocado, "Posicion del muro inválido.");
-        // Verificamos que nunca se intentó consumir muro
+        // Verificamos que sí se consultó al tablero y no se consumió muro
+        verify(tableroMock, times(2)).esColocacionMuroValida(any());
         verify(jugador1Mock, times(1)).consumirMuro();
         
         // Caso partida sin inicializar o ya terminada
@@ -304,16 +326,29 @@ class PartidaTest {
         Jugador ganador = partida.comprobarVictoria();
         assertNotNull(ganador, "Debe haber un ganador.");
         assertEquals("J1", ganador.getNombre(), "El ganador debe ser el Jugador 1.");
+        assertTrue(partida.isTerminada(), "La partida debe marcarse como terminada tras la victoria.");
+
+        // Caso jugador 2 gana
+        partida.iniciarPartida();
+        when(jugador1Mock.haLlegadoAMeta()).thenReturn(false);
+        when(jugador2Mock.haLlegadoAMeta()).thenReturn(true);
+
+        ganador = partida.comprobarVictoria();
+        assertNotNull(ganador, "Debe haber un ganador.");
+        assertEquals("J2", ganador.getNombre(), "El ganador debe ser el Jugador 2.");
+        assertTrue(partida.isTerminada(), "La partida debe marcarse como terminada tras la victoria.");
         
         
         // Caso seguir partida 
         partida.iniciarPartida();
         // Simulamos que al mover, el jugador mock no cumple la condición de victoria
         when(jugador1Mock.haLlegadoAMeta()).thenReturn(false);
+        when(jugador2Mock.haLlegadoAMeta()).thenReturn(false);
         
         // Comprobamos que comprobarVictoria() devuelve null al no haber ganador
         ganador = partida.comprobarVictoria();
         assertNull(ganador, "No debe de haber ganador.");
+        assertFalse(partida.isTerminada(), "La partida no debe terminar si nadie ha ganado.");
 	}
 
 }
