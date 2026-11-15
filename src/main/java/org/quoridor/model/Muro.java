@@ -20,35 +20,40 @@ public class Muro {
 
         this.setOrigen(origen);
         this.setOrientacion(orientacion);
+
+        // Invariante de clase
+        assert verificarInvariante() : "Invariante de Muro violada tras la construcción";
     }
-	
-	/// 
-	/// Funciones
-	/// 
-	public boolean esPosicionValida(int limiteTablero) {
-		// Pre-condiciones
-		assert(limiteTablero>=TAMANO_MURO);
-		assert(this.getOrigen()!=null);
-		assert(this.getOrientacion()!=null);
-		
-		
-		Posicion pos = this.getOrigen();
-		
-		if (pos.getX() >= 0 && pos.getY() >= 0
-				&& pos.getX() <= (limiteTablero-TAMANO_MURO) 
-				&& pos.getY() <= (limiteTablero-TAMANO_MURO)) {
-			 return true;
-        }
-        return false;
+
+	// Invariante de clase: un muro válido debe tener origen y orientación no nulos
+	private boolean verificarInvariante() {
+		return this.origen != null && this.orientacion != null;
 	}
-	
+
+	///
+	/// Funciones
+	///
+	public boolean esPosicionValida(int limiteTablero) {
+		// Pre-condiciones e invariante
+		assert limiteTablero >= TAMANO_MURO : "El límite del tablero debe ser al menos el tamaño del muro";
+		assert verificarInvariante() : "Invariante de Muro violada en esPosicionValida";
+
+		Posicion pos = this.getOrigen();
+		boolean valida = pos.getX() >= 0 && pos.getY() >= 0
+				&& pos.getX() <= (limiteTablero - TAMANO_MURO)
+				&& pos.getY() <= (limiteTablero - TAMANO_MURO);
+
+		// Post-condición
+		assert !valida || pos.esValida(limiteTablero)
+				: "El origen de un muro válido debe estar dentro del tablero";
+		return valida;
+	}
+
     public boolean colisionaCon(Muro otroMuro) {
-        // Pre-condiciones
-    	assert (otroMuro!=null);
-    	assert (otroMuro.getOrigen()!=null);
-        assert (otroMuro.getOrientacion()!=null);
-        assert (this.getOrigen()!=null);
-        assert (this.getOrientacion()!=null);
+        // Pre-condiciones e invariante
+        assert otroMuro != null : "El otro muro no puede ser nulo";
+        assert otroMuro.verificarInvariante() : "El otro muro debe cumplir su invariante";
+        assert verificarInvariante() : "Invariante de Muro violada en colisionaCon";
 
         int x1 = this.getOrigen().getX();
         int y1 = this.getOrigen().getY();
@@ -72,37 +77,40 @@ public class Muro {
 
         return false;
     }
-	
+
 	public boolean bloqueaPaso(Posicion origen, Posicion destino) {
-		// Pre-condiciones
-		assert (origen != null);
-		assert (destino!=null);
-		assert (this.getOrigen()!=null);
-		assert (this.getOrientacion()!=null);
-        
-        int oX = origen.getX();
-        int oY = origen.getY();
-        int dX = destino.getX();
-        int dY = destino.getY();
-        int mX = this.getOrigen().getX();
-        int mY = this.getOrigen().getY();
-        
-        if (this.orientacion == Orientacion.HORIZONTAL) {
-        	 // Un muro horizontal bloquea el paso entre filas mY y mY+1
-            if (oX == dX && Math.abs(oY - dY) == 1) {
-                if (Math.min(oY, dY) == mY && oX >= mX && oX < mX + TAMANO_MURO) {
-                    return true;
-                }
-            }
-        }
-        else {
-        	// Un muro vertical bloquea el paso entre columnas mX y mX+1
-            if (oY == dY && Math.abs(oX - dX) == 1) {
-                if (Math.min(oX, dX) == mX && oY >= mY && oY < mY + TAMANO_MURO) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+		// Pre-condiciones e invariante
+		assert origen != null : "La posición de origen no puede ser nula";
+		assert destino != null : "La posición de destino no puede ser nula";
+		assert verificarInvariante() : "Invariante de Muro violada en bloqueaPaso";
+
+		int oX = origen.getX();
+		int oY = origen.getY();
+		int dX = destino.getX();
+		int dY = destino.getY();
+		int mX = this.getOrigen().getX();
+		int mY = this.getOrigen().getY();
+		boolean bloquea = false;
+
+		if (this.orientacion == Orientacion.HORIZONTAL) {
+			// Un muro horizontal bloquea el paso entre filas mY y mY+1
+			if (oX == dX && Math.abs(oY - dY) == 1) {
+				if (Math.min(oY, dY) == mY && oX >= mX && oX < mX + TAMANO_MURO) {
+					bloquea = true;
+				}
+			}
+		} else {
+			// Un muro vertical bloquea el paso entre columnas mX y mX+1
+			if (oY == dY && Math.abs(oX - dX) == 1) {
+				if (Math.min(oX, dX) == mX && oY >= mY && oY < mY + TAMANO_MURO) {
+					bloquea = true;
+				}
+			}
+		}
+
+		// Post-condición: solo puede bloquear el paso entre casillas adyacentes
+		assert !bloquea || origen.esAdyacente(destino)
+				: "Un muro solo puede bloquear el paso entre casillas adyacentes";
+		return bloquea;
+	}
 }

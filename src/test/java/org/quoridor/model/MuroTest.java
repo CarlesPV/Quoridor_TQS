@@ -200,4 +200,23 @@ class MuroTest {
 		assertThrows(AssertionError.class, () -> muroValido.bloqueaPaso(pos, null));
 		assertThrows(AssertionError.class, () -> muroVacio.bloqueaPaso(pos, new Posicion(2, 3)));
 	}
+
+	// Prueba de Programación por Contrato: verifica invariante y postcondiciones de Muro
+	@Test
+	void testContratosDbCMuro() {
+		Muro muroHoriz = new Muro(new Posicion(3, 3), Orientacion.HORIZONTAL);
+		Muro muroVert = new Muro(new Posicion(5, 5), Orientacion.VERTICAL);
+		Muro muroIncompleto = new Muro();
+
+		// Un muro válido cumple el invariante en todas sus operaciones
+		assertTrue(muroHoriz.esPosicionValida(LIMITE_TABLERO));
+		assertFalse(muroHoriz.colisionaCon(muroVert));
+		assertTrue(muroHoriz.bloqueaPaso(new Posicion(3, 3), new Posicion(3, 4)));
+		assertFalse(muroHoriz.bloqueaPaso(new Posicion(3, 3), new Posicion(4, 3)));
+
+		// El otro muro en colisionaCon también debe cumplir su invariante
+		assertThrows(AssertionError.class, () -> muroHoriz.colisionaCon(muroIncompleto));
+		assertThrows(AssertionError.class, () -> muroIncompleto.esPosicionValida(LIMITE_TABLERO));
+		assertThrows(AssertionError.class, () -> muroIncompleto.bloqueaPaso(new Posicion(0, 0), new Posicion(0, 1)));
+	}
 }

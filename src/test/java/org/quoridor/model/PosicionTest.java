@@ -193,4 +193,33 @@ class PosicionTest {
 		assertEquals(esperado, origen.esAdyacente(destino));
 	}
 
+	// Prueba de Programación por Contrato: verifica precondiciones, postcondiciones e invariante de Posicion
+	@Test
+	void testContratosDbCPosicion() {
+		// Construcción por defecto y parametrizada mantienen estado consistente
+		Posicion origen = new Posicion();
+		Posicion destino = new Posicion(3, 4);
+
+		// Postcondición de distanciaManhattan (>= 0) y simetría
+		int dist = origen.distanciaManhattan(destino);
+		assertTrue(dist >= 0, "La distancia Manhattan debe cumplir la postcondición >= 0");
+		assertEquals(7, dist);
+		assertEquals(0, origen.distanciaManhattan(origen));
+
+		// Postcondición de desplazar: coordenadas finales == prev + delta
+		int prevX = destino.getX();
+		int prevY = destino.getY();
+		destino.desplazar(-2, 3);
+		assertEquals(prevX - 2, destino.getX());
+		assertEquals(prevY + 3, destino.getY());
+
+		// Postcondición de esAdyacente: una posición no es adyacente a sí misma
+		assertFalse(destino.esAdyacente(destino));
+
+		// Precondiciones con argumento nulo deben lanzar AssertionError
+		assertThrows(AssertionError.class, () -> origen.distanciaManhattan(null));
+		assertThrows(AssertionError.class, () -> origen.esAdyacente(null));
+		assertThrows(AssertionError.class, () -> origen.equals((Posicion) null));
+	}
+
 }
