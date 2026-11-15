@@ -153,8 +153,10 @@ public class Partida {
             indiceJugadorActual = (indiceJugadorActual + 1) % jugadores.size();
             
             // Post-condiciones
-            assert(jugadorActual.getMurosRestantes() == murosPreviosJugador - 1) : "Los muros del jugador deben decrementar en 1";
-            assert(tablero.getMurosColocados().size() == murosPreviosTablero + 1) : "Los muros del tablero deben aumentar en 1";
+            assert(jugadorActual.getMurosRestantes() == murosPreviosJugador - 1) :
+            	"Los muros del jugador deben decrementar en 1";
+            assert(tablero.getMurosColocados().size() == murosPreviosTablero + 1) :
+            	"Los muros del tablero deben aumentar en 1";
             assert(indiceJugadorActual != turnoAnterior) : "El turno debe avanzar tras colocar muro";
             
             // Invariante de clase tras éxito
@@ -188,7 +190,8 @@ public class Partida {
 	Jugador getJugadorActual()
 	{
 		assert(jugadores != null && !jugadores.isEmpty()) : "No hay jugadores en la partida";
-        assert(indiceJugadorActual >= 0 && indiceJugadorActual < jugadores.size()) : "Índice de jugador actual inválido";
+        assert(indiceJugadorActual >= 0 && indiceJugadorActual < jugadores.size()) : 
+        	"Índice de jugador actual inválido";
         return jugadores.get(indiceJugadorActual);
 	}
 	
