@@ -6,43 +6,81 @@ public class Tablero {
 
 	private List<Muro> murosColocados;
 	private Map<Color, Posicion> posicionesJugadores;
+	private Map<Color, Integer> filasObjetivo;
+	private int tamanoTablero;
 	private IValidadorCaminos validadorCaminos;
-	
+
 	public static final int TAMANO_TABLERO = 9;
 	public static final int MAX_MUROS = 20;
-	
+
 	public Tablero() {
 		this.murosColocados = new ArrayList<>();
 		this.posicionesJugadores = new HashMap<>();
+		this.filasObjetivo = new HashMap<>();
+		this.tamanoTablero = TAMANO_TABLERO;
 		this.validadorCaminos = new ValidadorCaminos();
-		
+
 		// Invariante de clase
 		assert verificarInvariante() : "Invariante de Tablero violada tras la construcción por defecto";
 	}
-	
+
 	public Tablero(IValidadorCaminos validadorCaminos) {
 		// Pre-condición
 		assert validadorCaminos != null : "El validador de caminos no puede ser nulo";
-		
+
 		this.murosColocados = new ArrayList<>();
 		this.posicionesJugadores = new HashMap<>();
+		this.filasObjetivo = new HashMap<>();
+		this.tamanoTablero = TAMANO_TABLERO;
 		this.validadorCaminos = validadorCaminos;
-		
+
 		// Invariante de clase
 		assert verificarInvariante() : "Invariante de Tablero violada tras la construcción con inyección";
 	}
-	
-	// Invariante de clase: lista de muros y mapas no nulos, máximo 20 muros
+
+	// Invariante de clase: colecciones no nulas, tamaño válido y máximo 20 muros
 	private boolean verificarInvariante() {
 		return this.murosColocados != null
 				&& this.murosColocados.size() <= MAX_MUROS
 				&& this.posicionesJugadores != null
+				&& this.filasObjetivo != null
+				&& this.tamanoTablero >= 5
 				&& this.validadorCaminos != null;
 	}
-	
+
 	public List<Muro> getMurosColocados() { return this.murosColocados; }
 	public Map<Color, Posicion> getPosicionesJugadores() { return this.posicionesJugadores; }
 	public IValidadorCaminos getValidadorCaminos() { return this.validadorCaminos; }
+	public int getTamanoTablero() { return this.tamanoTablero; }
+
+	public void setTamanoTablero(int tamanoTablero) {
+		assert tamanoTablero >= 5 && tamanoTablero % 2 == 1
+				: "El tamaño del tablero debe ser impar >= 5";
+		this.tamanoTablero = tamanoTablero;
+		assert verificarInvariante() : "Invariante de Tablero violada tras cambiar el tamaño";
+	}
+
+	public void setFilaObjetivo(Color color, int filaObjetivo) {
+		assert color != null : "El color no puede ser nulo";
+		assert filaObjetivo >= 0 && filaObjetivo < this.tamanoTablero
+				: "La fila objetivo debe estar dentro del tablero";
+		this.filasObjetivo.put(color, filaObjetivo);
+	}
+
+	public int getFilaObjetivo(Color color) {
+		assert color != null : "El color no puede ser nulo";
+		int filaPorDefecto = (color == Color.AZUL) ? 0 : (this.tamanoTablero - 1);
+		return this.filasObjetivo.getOrDefault(color, filaPorDefecto);
+	}
+
+	public void reiniciar() {
+		assert verificarInvariante() : "Invariante de Tablero violada al reiniciar";
+		this.murosColocados.clear();
+		this.posicionesJugadores.clear();
+		this.filasObjetivo.clear();
+		assert verificarInvariante() : "Invariante de Tablero violada tras reiniciar";
+	}
+
 	public Posicion getPosicionJugador(Color color) {
 		return this.posicionesJugadores.get(color);
 	}
@@ -50,12 +88,12 @@ public class Tablero {
 	public void setPosicionJugador(Color color, Posicion posicion) {
 		this.posicionesJugadores.put(color, posicion);
 	}
-	
+
 	public boolean esMovimientoValido(Posicion origen, Posicion destino, Posicion oponente) {
 		if (origen == null || destino == null) {
 			return false;
 		}
-		if (!origen.esValida(TAMANO_TABLERO) || !destino.esValida(TAMANO_TABLERO)) {
+		if (!origen.esValida(this.tamanoTablero) || !destino.esValida(this.tamanoTablero)) {
 			return false;
 		}
 		if (origen.equals(destino)) {
@@ -115,20 +153,20 @@ public class Tablero {
 		if (this.murosColocados.size() >= MAX_MUROS) {
 			return false;
 		}
-		if (!muro.esPosicionValida(TAMANO_TABLERO)) {
+		if (!muro.esPosicionValida(this.tamanoTablero)) {
 			return false;
 		}
 		if (colisionaConMurosExistentes(muro)) {
 			return false;
 		}
 
-		// Verificación de caminos para todos los jugadores
+		// Verificación de caminos para todos los jugadores usando su fila objetivo configurada
 		List<Muro> murosSimulados = new ArrayList<>(this.murosColocados);
 		murosSimulados.add(muro);
 		for (Map.Entry<Color, Posicion> entry : this.posicionesJugadores.entrySet()) {
-			int filaObjetivo = (entry.getKey() == Color.AZUL) ? 0 : (TAMANO_TABLERO - 1);
+			int filaObjetivo = getFilaObjetivo(entry.getKey());
 			if (!this.validadorCaminos.hayCaminoDisponible(entry.getValue(), filaObjetivo,
-					murosSimulados, TAMANO_TABLERO)) {
+					murosSimulados, this.tamanoTablero)) {
 				return false;
 			}
 		}
@@ -161,7 +199,7 @@ public class Tablero {
 		for (Jugador jugador : jugadores) {
 			assert jugador != null : "Ningún jugador de la lista puede ser nulo";
 			if (!this.validadorCaminos.hayCaminoDisponible(jugador.getPosicionActual(),
-					jugador.getFilaObjetivo(), this.murosColocados, TAMANO_TABLERO)) {
+					jugador.getFilaObjetivo(), this.murosColocados, this.tamanoTablero)) {
 				return false;
 			}
 		}

@@ -455,4 +455,44 @@ class TableroTest {
 				"hayCaminoParaTodos debe detectar invariante violada");
 	}
 
+	// Prueba de Caja Negra (Partición Equivalente y Valores Límite) y Contrato (DbC):
+	// Caso: tablero configurable 7x7/9x9, filas objetivo personalizadas, reinicio e invariantes/precondiciones inválidas.
+	@Test
+	void testTamanoConfigurableFilasObjetivoYReinicio() {
+		assertEquals(9, tablero.getTamanoTablero());
+
+		// Configurar tablero 7x7 válido y filas objetivo personalizadas
+		tablero.setTamanoTablero(7);
+		assertEquals(7, tablero.getTamanoTablero());
+
+		tablero.setPosicionJugador(Color.ROJO, new Posicion(3, 0));
+		tablero.setFilaObjetivo(Color.ROJO, 6);
+		tablero.setPosicionJugador(Color.VERDE, new Posicion(0, 3));
+		tablero.setFilaObjetivo(Color.VERDE, 6);
+
+		assertEquals(6, tablero.getFilaObjetivo(Color.ROJO));
+		assertEquals(0, tablero.getFilaObjetivo(Color.AZUL));
+
+		// Movimiento válido en 7x7 frente a límite fuera de rango en 7x7
+		assertTrue(tablero.esMovimientoValido(new Posicion(3, 0), new Posicion(3, 1), null));
+		assertFalse(tablero.esMovimientoValido(new Posicion(6, 6), new Posicion(7, 6), null));
+
+		// Muro válido en 7x7 (límite 5) frente a muro fuera de 7x7 (en 6,4)
+		assertTrue(tablero.esColocacionMuroValida(new Muro(new Posicion(5, 4), Orientacion.HORIZONTAL)));
+		assertFalse(tablero.esColocacionMuroValida(new Muro(new Posicion(6, 4), Orientacion.HORIZONTAL)));
+
+		// Reinicio limpia muros, posiciones y filas objetivo
+		tablero.colocarMuro(new Muro(new Posicion(2, 2), Orientacion.VERTICAL));
+		tablero.reiniciar();
+		assertTrue(tablero.getMurosColocados().isEmpty());
+		assertTrue(tablero.getPosicionesJugadores().isEmpty());
+		assertNull(tablero.getPosicionJugador(Color.ROJO));
+
+		// Precondiciones inválidas de tamaño y fila objetivo
+		assertThrows(AssertionError.class, () -> tablero.setTamanoTablero(0));
+		assertThrows(AssertionError.class, () -> tablero.setTamanoTablero(6));
+		assertThrows(AssertionError.class, () -> tablero.setFilaObjetivo(null, 0));
+		assertThrows(AssertionError.class, () -> tablero.setFilaObjetivo(Color.ROJO, 7));
+	}
+
 }
