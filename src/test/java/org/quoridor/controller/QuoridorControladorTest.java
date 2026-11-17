@@ -215,4 +215,82 @@ class QuoridorControladorTest {
         verify(vistaMock, times(2)).actualizarMurosRestantes(any());
         verify(vistaMock, times(2)).mostrarTurno(any(), any());
     }
+
+    /**
+     * Prueba de Caja Blanca / Camino de Partida Terminada:
+     * Verifica que si la partida ha finalizado, al intentar colocar un muro la vista muestre
+     * un mensaje de error indicando que la partida ya terminó.
+     */
+    @Test
+    @DisplayName("onInterseccionClic rechaza colocación de muros si la partida ya ha finalizado")
+    void testOnInterseccionClicPartidaTerminada() {
+        // Partida recién instanciada sin iniciar → isTerminada() == true
+        assertTrue(modelo.isTerminada());
+
+        controlador.onInterseccionClic(2, 2, Orientacion.HORIZONTAL);
+        verify(vistaMock).mostrarError("La partida ya ha terminado. Pulsa Reiniciar.");
+    }
+
+    /**
+     * Prueba de Caja Negra (Valores Inválidos / Nulos):
+     * Verifica que si se pasa una orientación nula, el controlador informe del error
+     * en la vista en lugar de lanzar una excepción al crear el Muro.
+     */
+    @Test
+    @DisplayName("onInterseccionClic muestra error cuando la orientación es nula")
+    void testOnInterseccionClicOrientacionNula() {
+        controlador.iniciarJuego();
+
+        controlador.onInterseccionClic(3, 3, null);
+        verify(vistaMock).mostrarError(
+                "No se puede colocar el muro en esa posición o no te quedan muros.");
+    }
+
+    /**
+     * Prueba de Caja Negra (Partición Inválida / Valor Frontera):
+     * Verifica que si las coordenadas del muro provocan un rechazo del modelo
+     * (posición fuera del rango válido para muros), la vista muestre el error correspondiente.
+     */
+    @Test
+    @DisplayName("onInterseccionClic muestra error al intentar colocar un muro en posición inválida")
+    void testOnInterseccionClicMuroInvalido() {
+        controlador.iniciarJuego();
+
+        // Coordenada x=8 en tablero 9x9 → no hay espacio para muro horizontal de 2 celdas
+        controlador.onInterseccionClic(8, 4, Orientacion.HORIZONTAL);
+        verify(vistaMock).mostrarError(
+                "No se puede colocar el muro en esa posición o no te quedan muros.");
+    }
+
+    /**
+     * Prueba de Caja Negra (Valor Límite: 0 muros restantes):
+     * Verifica que cuando un jugador ha consumido todos sus muros, el controlador muestre
+     * un error descriptivo al intentar colocar uno más.
+     */
+    @Test
+    @DisplayName("onInterseccionClic muestra error cuando el jugador no tiene muros restantes")
+    void testOnInterseccionClicSinMurosRestantes() {
+        // Configurar partida con solo 1 muro por jugador para agotar rápidamente
+        ISorteadorTurno sorteadorFijo = mock(ISorteadorTurno.class);
+        when(sorteadorFijo.sortear(any())).thenReturn(0);
+
+        Partida partidaLimitada = new Partida(new Tablero(), sorteadorFijo);
+        partidaLimitada.configurarPartida(2, Tablero.TAMANO_TABLERO, 1, true);
+        partidaLimitada.iniciarPartida();
+
+        QuoridorControlador ctrlLimitado = new QuoridorControlador(partidaLimitada, vistaMock);
+
+        // Colocar el único muro disponible (turno del jugador 1)
+        ctrlLimitado.onInterseccionClic(2, 2, Orientacion.HORIZONTAL);
+        assertEquals(1, partidaLimitada.getMurosColocados().size());
+
+        // Ahora es turno del jugador 2: colocar su único muro
+        ctrlLimitado.onInterseccionClic(5, 5, Orientacion.VERTICAL);
+        assertEquals(2, partidaLimitada.getMurosColocados().size());
+
+        // Vuelve al jugador 1: ya no tiene muros → debe fallar
+        ctrlLimitado.onInterseccionClic(3, 3, Orientacion.HORIZONTAL);
+        verify(vistaMock).mostrarError(
+                "No se puede colocar el muro en esa posición o no te quedan muros.");
+    }
 }
