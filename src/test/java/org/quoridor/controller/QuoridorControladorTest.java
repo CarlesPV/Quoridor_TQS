@@ -1,6 +1,9 @@
 package org.quoridor.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -8,6 +11,8 @@ import static org.mockito.Mockito.verify;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.quoridor.model.Color;
+import org.quoridor.model.Jugador;
 import org.quoridor.model.Partida;
 import org.quoridor.view.IQuoridorVista;
 
@@ -43,5 +48,46 @@ class QuoridorControladorTest {
         assertFalse(modelo.isTerminada(), "La partida debe estar en curso tras iniciarJuego.");
         verify(vistaMock).actualizarTablero(any(), any());
         verify(vistaMock).mostrarTurno(any(), any());
+    }
+
+    /**
+     * Prueba de Programación por Contrato (DbC) / Valores Inválidos:
+     * Verifica que el constructor rechace referencias nulas lanzando AssertionError tanto para
+     * el modelo como para la vista.
+     */
+    @Test
+    @DisplayName("Constructor rechaza parámetros nulos mediante aserciones DbC")
+    void testConstructorPrecondicionesNulas() {
+        assertThrows(AssertionError.class, () -> new QuoridorControlador(null, vistaMock),
+                "Debe lanzar AssertionError si el modelo es nulo.");
+        assertThrows(AssertionError.class, () -> new QuoridorControlador(modelo, null),
+                "Debe lanzar AssertionError si la vista es nula.");
+    }
+
+    /**
+     * Prueba de Caja Blanca / Interacción Completa con Mock:
+     * Verifica que iniciarJuego sincronice detalladamente todos los componentes visuales:
+     * tablero inicial con 2 peones y 0 muros, turno del jugador activo, 10 muros por jugador y limpieza de mensajes.
+     */
+    @Test
+    @DisplayName("iniciarJuego sincroniza exhaustivamente tablero, turno, muros restantes y mensajes")
+    void testIniciarJuegoSincronizacionCompleta() {
+        controlador.iniciarJuego();
+
+        // Verificamos estado del modelo tras iniciarJuego
+        assertFalse(modelo.isTerminada());
+        assertEquals(2, modelo.getJugadores().size());
+        assertTrue(modelo.getMurosColocados().isEmpty());
+
+        Jugador actual = modelo.getJugadorActual();
+
+        // Verificamos interacción completa con la vista pasiva
+        verify(vistaMock).actualizarTablero(modelo.getPosicionesJugadores(), modelo.getMurosColocados());
+        verify(vistaMock).mostrarTurno(actual.getNombre(), actual.getColor());
+        verify(vistaMock).actualizarMurosRestantes(modelo.getMurosRestantesPorJugador());
+        verify(vistaMock).limpiarMensajes();
+
+        assertEquals(10, modelo.getMurosRestantesPorJugador().get(Color.ROJO));
+        assertEquals(10, modelo.getMurosRestantesPorJugador().get(Color.AZUL));
     }
 }
