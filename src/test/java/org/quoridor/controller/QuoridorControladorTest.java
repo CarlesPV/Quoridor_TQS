@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -115,5 +116,71 @@ class QuoridorControladorTest {
                 "El peón debe actualizar su posición en el modelo tras un movimiento válido.");
         verify(vistaMock, times(2)).actualizarTablero(any(), any());
         verify(vistaMock, times(2)).limpiarMensajes();
+    }
+
+    /**
+     * Prueba de Caja Negra (Valores Límite y Frontera):
+     * Verifica que si el usuario pulsa coordenadas fuera del rango del tablero (0 a 8),
+     * el controlador no invoque al modelo y muestre un error descriptivo en la vista.
+     */
+    @Test
+    @DisplayName("onCasillaClic muestra error al pulsar fuera de los límites del tablero")
+    void testOnCasillaClicCasillaFueraDelTablero() {
+        controlador.iniciarJuego();
+
+        controlador.onCasillaClic(-1, 4);
+        verify(vistaMock).mostrarError("Casilla fuera del tablero.");
+
+        controlador.onCasillaClic(9, 4);
+        verify(vistaMock, times(2)).mostrarError("Casilla fuera del tablero.");
+    }
+
+    /**
+     * Prueba de Caja Negra (Partición Inválida):
+     * Verifica que si el movimiento no es legal (ej. casilla no adyacente),
+     * la vista informe de que el movimiento no es válido.
+     */
+    @Test
+    @DisplayName("onCasillaClic muestra error ante un movimiento inválido según las reglas")
+    void testOnCasillaClicMovimientoInvalido() {
+        controlador.iniciarJuego();
+
+        // (0, 4) no es adyacente a la casilla de inicio (4, 0) o (4, 8)
+        controlador.onCasillaClic(0, 4);
+        verify(vistaMock).mostrarError("Movimiento no válido.");
+    }
+
+    /**
+     * Prueba de Caja Blanca / Camino de Partida Terminada:
+     * Verifica que si se intenta mover con la partida terminada, la vista muestre un mensaje
+     * indicando que ha concluido y debe pulsarse reiniciar.
+     */
+    @Test
+    @DisplayName("onCasillaClic rechaza jugadas si la partida ya ha finalizado")
+    void testOnCasillaClicPartidaTerminada() {
+        // Una partida recién instanciada sin iniciar está terminada
+        assertTrue(modelo.isTerminada());
+
+        controlador.onCasillaClic(4, 1);
+        verify(vistaMock).mostrarError("La partida ya ha terminado. Pulsa Reiniciar.");
+    }
+
+    /**
+     * Prueba de Caja Blanca / Camino de Victoria:
+     * Verifica que cuando un peón alcanza su fila objetivo, se comprueba la victoria
+     * y la vista anuncia al ganador en lugar de avanzar al siguiente turno.
+     */
+    @Test
+    @DisplayName("onCasillaClic anuncia la victoria del jugador al alcanzar la fila meta")
+    void testOnCasillaClicVictoria() {
+        Jugador j1 = new Jugador("Ganador", Color.ROJO, new Posicion(4, 7), 8, 10);
+        Jugador j2 = new Jugador("Otro", Color.AZUL, new Posicion(0, 0), 0, 10);
+        modelo.configurarPartida(List.of(j1, j2));
+        modelo.iniciarPartida();
+
+        controlador.onCasillaClic(4, 8);
+
+        assertTrue(modelo.isTerminada(), "La partida debe finalizar tras alcanzar la meta.");
+        verify(vistaMock).mostrarVictoria("Ganador");
     }
 }
