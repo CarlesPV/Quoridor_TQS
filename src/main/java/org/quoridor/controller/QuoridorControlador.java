@@ -9,7 +9,7 @@ import org.quoridor.view.IQuoridorVista;
 
 /**
  * Controlador de Quoridor que conecta el Modelo (Partida) con la Vista pasiva (IQuoridorVista).
- * Implementa el contrato IQuoridorControlador para responder a eventos de la interfaz de usuario.
+ * Implementa el contrato IQuoridorControlador y valida contratos DbC (precondiciones e invariante).
  */
 public class QuoridorControlador implements IQuoridorControlador {
 
@@ -21,22 +21,44 @@ public class QuoridorControlador implements IQuoridorControlador {
     /**
      * Construye un nuevo controlador asociando el modelo y la vista pasiva.
      *
-     * @param modelo Instancia de la partida en curso.
-     * @param vista Interfaz pasiva desacoplada del motor visual.
+     * @param modelo Instancia de la partida en curso (no nula).
+     * @param vista Interfaz pasiva desacoplada del motor visual (no nula).
      */
     public QuoridorControlador(Partida modelo, IQuoridorVista vista) {
+        // Precondiciones DbC
+        assert modelo != null : "El modelo no puede ser nulo";
+        assert vista != null : "La vista no puede ser nula";
+
         this.modelo = modelo;
         this.vista = vista;
         this.vista.setControlador(this);
+
+        // Invariante de clase
+        assert verificarInvariante() : "Invariante violada tras construcción de QuoridorControlador";
+    }
+
+    /**
+     * Comprueba la invariante de clase garantizando que las referencias esenciales sigan existiendo.
+     *
+     * @return true si el estado interno es consistente; false en caso contrario.
+     */
+    private boolean verificarInvariante() {
+        return this.modelo != null && this.vista != null;
     }
 
     /**
      * Inicia una nueva partida con la configuración estándar de 2 jugadores.
      */
     public void iniciarJuego() {
+        assert verificarInvariante() : "Invariante violada al inicio de iniciarJuego";
+
         this.modelo.configurarPartida(2, Tablero.TAMANO_TABLERO, MUROS_INICIALES_ESTANDAR, true);
         this.modelo.iniciarPartida();
         actualizarVistaCompleta();
+
+        // Postcondición e invariante
+        assert !this.modelo.isTerminada() : "La partida debe estar en curso tras iniciarJuego";
+        assert verificarInvariante() : "Invariante violada al finalizar iniciarJuego";
     }
 
     /**
