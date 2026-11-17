@@ -113,15 +113,29 @@ public class QuoridorControlador implements IQuoridorControlador {
     public void onInterseccionClic(int x, int y, Orientacion orientacion) {
         assert verificarInvariante() : "Invariante violada al inicio de onInterseccionClic";
 
+        if (this.modelo.isTerminada()) {
+            this.vista.mostrarError("La partida ya ha terminado. Pulsa Reiniciar.");
+            return;
+        }
+
+        if (orientacion == null || x < 0 || x >= Tablero.TAMANO_TABLERO - 1 || y < 0 || y >= Tablero.TAMANO_TABLERO - 1) {
+            this.vista.mostrarError("No se puede colocar el muro en esa posición o no te quedan muros.");
+            return;
+        }
+        
         Muro muro = new Muro(new Posicion(x, y), orientacion);
         boolean exito = this.modelo.colocarMuro(muro);
-        if (exito) {
-            this.vista.limpiarMensajes();
-            this.vista.actualizarTablero(this.modelo.getPosicionesJugadores(), this.modelo.getMurosColocados());
-            this.vista.actualizarMurosRestantes(this.modelo.getMurosRestantesPorJugador());
-            Jugador actual = this.modelo.getJugadorActual();
-            this.vista.mostrarTurno(actual.getNombre(), actual.getColor());
+        
+        if (!exito) {
+            this.vista.mostrarError("No se puede colocar el muro en esa posición o no te quedan muros.");
+            return;
         }
+        
+        this.vista.limpiarMensajes();
+        this.vista.actualizarTablero(this.modelo.getPosicionesJugadores(), this.modelo.getMurosColocados());
+        this.vista.actualizarMurosRestantes(this.modelo.getMurosRestantesPorJugador());
+        Jugador actual = this.modelo.getJugadorActual();
+        this.vista.mostrarTurno(actual.getNombre(), actual.getColor());
 
         assert verificarInvariante() : "Invariante violada al finalizar onInterseccionClic";
     }
