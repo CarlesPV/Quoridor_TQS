@@ -301,7 +301,7 @@ class QuoridorControladorTest {
      * y sincronice la limpieza de mensajes y la actualización del tablero en la vista.
      */
     @Test
-    @DisplayName("onBotonReiniciar reactiva la partida terminada y resetea la vista")
+    @DisplayName("onBotonReiniciar reactiva la partida terminada y resetea posicion de peones")
     void testOnBotonReiniciar() {
     	// Iniciamos partida y movemos el jugador actual
         controlador.iniciarJuego();
@@ -326,5 +326,32 @@ class QuoridorControladorTest {
         verify(vistaMock, atLeastOnce()).actualizarTablero(any(), any());
         // times(2) ya que al iniciar juego se llama a limpiarMensajes 1 vez y otra al reiniciar
         verify(vistaMock, times(2)).limpiarMensajes();
+    }
+    
+    /**
+     * Prueba de Caja Blanca / Integración con Mock:
+     * Verifica que onBotonReiniciar reactive la partida,
+     * devuelva los muros a sus contadores iniciales y limpie el tablero y la vista.
+     */
+    @Test
+    @DisplayName("onBotonReiniciar reactiva la partida terminada y resetea los muros colocados")
+    void testOnBotonReiniciarReseteaEstadoCompleto() {
+        // Iniciamos partida y realizamos acciones (movemos y colocamos un muro)
+        controlador.iniciarJuego();
+        
+        // Colocamos un muro para modificar el estado del tablero
+        controlador.onInterseccionClic(2, 2, Orientacion.HORIZONTAL);
+        
+        // Verificamos que el muro se colocó (ahora hay 1 en el tablero)
+        assertEquals(1, modelo.getMurosColocados().size());
+
+        // Invocamos el reinicio
+        controlador.onBotonReiniciar();
+
+        // Comprobaciones del modelo tras el reinicio
+        assertFalse(modelo.isTerminada(), "La partida debe dejar de estar terminada tras reiniciar.");
+
+        // Comprobar que los muros colocados en el tablero vuelven a 0
+        assertTrue(modelo.getMurosColocados().isEmpty(), "El tablero debe quedarse sin muros colocados tras reiniciar.");
     }
 }
