@@ -3,6 +3,7 @@ package org.quoridor.controller;
 import org.quoridor.model.Jugador;
 import org.quoridor.model.Orientacion;
 import org.quoridor.model.Partida;
+import org.quoridor.model.Posicion;
 import org.quoridor.model.Tablero;
 import org.quoridor.view.IQuoridorControlador;
 import org.quoridor.view.IQuoridorVista;
@@ -74,7 +75,18 @@ public class QuoridorControlador implements IQuoridorControlador {
 
     @Override
     public void onCasillaClic(int x, int y) {
-        // Pendiente de implementar en paso 2
+        assert verificarInvariante() : "Invariante violada al inicio de onCasillaClic";
+
+        Posicion destino = new Posicion(x, y);
+        boolean exito = this.modelo.realizarMovimiento(destino);
+        if (exito) {
+            this.vista.limpiarMensajes();
+            this.vista.actualizarTablero(this.modelo.getPosicionesJugadores(), this.modelo.getMurosColocados());
+            Jugador actual = this.modelo.getJugadorActual();
+            this.vista.mostrarTurno(actual.getNombre(), actual.getColor());
+        }
+
+        assert verificarInvariante() : "Invariante violada al finalizar onCasillaClic";
     }
 
     @Override
