@@ -1,6 +1,7 @@
 package org.quoridor.controller;
 
 import org.quoridor.model.Jugador;
+import org.quoridor.model.Muro;
 import org.quoridor.model.Orientacion;
 import org.quoridor.model.Partida;
 import org.quoridor.model.Posicion;
@@ -110,7 +111,19 @@ public class QuoridorControlador implements IQuoridorControlador {
 
     @Override
     public void onInterseccionClic(int x, int y, Orientacion orientacion) {
-        // Pendiente de implementar en paso 3
+        assert verificarInvariante() : "Invariante violada al inicio de onInterseccionClic";
+
+        Muro muro = new Muro(new Posicion(x, y), orientacion);
+        boolean exito = this.modelo.colocarMuro(muro);
+        if (exito) {
+            this.vista.limpiarMensajes();
+            this.vista.actualizarTablero(this.modelo.getPosicionesJugadores(), this.modelo.getMurosColocados());
+            this.vista.actualizarMurosRestantes(this.modelo.getMurosRestantesPorJugador());
+            Jugador actual = this.modelo.getJugadorActual();
+            this.vista.mostrarTurno(actual.getNombre(), actual.getColor());
+        }
+
+        assert verificarInvariante() : "Invariante violada al finalizar onInterseccionClic";
     }
 
     @Override

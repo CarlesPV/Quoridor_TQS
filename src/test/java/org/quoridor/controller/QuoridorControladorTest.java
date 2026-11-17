@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.quoridor.model.Color;
 import org.quoridor.model.ISorteadorTurno;
 import org.quoridor.model.Jugador;
-import org.quoridor.model.Muro;
 import org.quoridor.model.Orientacion;
 import org.quoridor.model.Partida;
 import org.quoridor.model.Posicion;
@@ -208,7 +207,8 @@ class QuoridorControladorTest {
 
         assertEquals(1, modelo.getMurosColocados().size(),
                 "Debe haber 1 muro colocado en el modelo tras colocarlo válidamente.");
-        assertEquals(new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL), modelo.getMurosColocados().get(0));
+        assertEquals(new Posicion(2, 2), modelo.getMurosColocados().get(0).getOrigen());
+        assertEquals(Orientacion.HORIZONTAL, modelo.getMurosColocados().get(0).getOrientacion());
 
         // 1 al iniciar + 1 al colocar muro = 2 invocaciones
         verify(vistaMock, times(2)).actualizarTablero(any(), any());
