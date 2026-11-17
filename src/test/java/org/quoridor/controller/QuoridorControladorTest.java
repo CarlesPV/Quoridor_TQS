@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.atLeastOnce;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -292,5 +293,38 @@ class QuoridorControladorTest {
         ctrlLimitado.onInterseccionClic(3, 3, Orientacion.HORIZONTAL);
         verify(vistaMock).mostrarError(
                 "No se puede colocar el muro en esa posición o no te quedan muros.");
+    }
+    
+    /**
+     * Prueba de Caja Blanca / Integración con Mock:
+     * Verifica que onBotonReiniciar reinicie la partida (dejándola activa) 
+     * y sincronice la limpieza de mensajes y la actualización del tablero en la vista.
+     */
+    @Test
+    @DisplayName("onBotonReiniciar reactiva la partida terminada y resetea la vista")
+    void testOnBotonReiniciar() {
+    	// Iniciamos partida y movemos el jugador actual
+        controlador.iniciarJuego();
+        
+        // Guardamos cuál era su posición inicial antes de mover
+        Posicion posicionInicialJugador1 = modelo.getJugadores().get(0).getPosicionActual();
+        
+        // Realizamos un movimiento para cambiarlo de sitio
+        controlador.onCasillaClic(4, 1);
+
+        // Invocamos el reinicio
+        controlador.onBotonReiniciar();
+
+        // Verificamos que la partida ya no está terminada
+        assertFalse(modelo.isTerminada(), "La partida debe dejar de estar terminada tras reiniciar.");
+        
+        // Verificamos que el jugador 1 ha vuelto exactamente a su posición inicial
+        Posicion posicionTrasReiniciar = modelo.getJugadores().get(0).getPosicionActual();
+        assertEquals(posicionInicialJugador1, posicionTrasReiniciar, "El peón del jugador debe volver a su posición de inicio tras el reinicio.");
+
+        // Verificaciones de la vista
+        verify(vistaMock, atLeastOnce()).actualizarTablero(any(), any());
+        // times(2) ya que al iniciar juego se llama a limpiarMensajes 1 vez y otra al reiniciar
+        verify(vistaMock, times(2)).limpiarMensajes();
     }
 }
