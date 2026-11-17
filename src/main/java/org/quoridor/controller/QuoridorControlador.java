@@ -142,6 +142,10 @@ public class QuoridorControlador implements IQuoridorControlador {
 
     @Override
     public void onBotonReiniciar() {
+    	assert verificarInvariante() : "Invariante violada al inicio de onBotonReiniciar";
+    	
     	iniciarJuego();
+    	
+    	assert verificarInvariante() : "Invariante violada al inicio de onBotonReiniciar";
     }
 }
