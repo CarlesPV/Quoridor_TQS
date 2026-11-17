@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.quoridor.model.Color;
 import org.quoridor.model.ISorteadorTurno;
 import org.quoridor.model.Jugador;
+import org.quoridor.model.Muro;
+import org.quoridor.model.Orientacion;
 import org.quoridor.model.Partida;
 import org.quoridor.model.Posicion;
 import org.quoridor.model.Tablero;
@@ -190,5 +192,27 @@ class QuoridorControladorTest {
 
         assertTrue(partidaVictoria.isTerminada(), "La partida debe finalizar tras alcanzar la meta.");
         verify(vistaMock).mostrarVictoria("Ganador");
+    }
+
+    /**
+     * Prueba de Caja Negra (Partición Válida) e Interacción con Mock:
+     * Verifica que colocar un muro válido lo registre en el modelo, actualice el tablero,
+     * decremente los muros restantes y avance el turno en la interfaz visual.
+     */
+    @Test
+    @DisplayName("onInterseccionClic coloca muro válido, actualiza tablero, muros restantes y turno")
+    void testOnInterseccionClicColocacionValida() {
+        controlador.iniciarJuego();
+
+        controlador.onInterseccionClic(2, 2, Orientacion.HORIZONTAL);
+
+        assertEquals(1, modelo.getMurosColocados().size(),
+                "Debe haber 1 muro colocado en el modelo tras colocarlo válidamente.");
+        assertEquals(new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL), modelo.getMurosColocados().get(0));
+
+        // 1 al iniciar + 1 al colocar muro = 2 invocaciones
+        verify(vistaMock, times(2)).actualizarTablero(any(), any());
+        verify(vistaMock, times(2)).actualizarMurosRestantes(any());
+        verify(vistaMock, times(2)).mostrarTurno(any(), any());
     }
 }
