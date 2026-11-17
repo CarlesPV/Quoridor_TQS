@@ -142,6 +142,6 @@ public class QuoridorControlador implements IQuoridorControlador {
 
     @Override
     public void onBotonReiniciar() {
-        // Pendiente de implementar en paso 4
+    	iniciarJuego();
     }
 }
