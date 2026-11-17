@@ -302,30 +302,37 @@ class QuoridorControladorTest {
      */
     @Test
     @DisplayName("onBotonReiniciar reactiva la partida terminada y resetea posicion de peones")
-    void testOnBotonReiniciar() {
-    	// Iniciamos partida y movemos el jugador actual
-        controlador.iniciarJuego();
+    void testOnBotonReiniciarReseteaPosiciones() {
+        // Configurar partida para que siempre empiece jugador 1
+        ISorteadorTurno sorteadorFijo = mock(ISorteadorTurno.class);
+        when(sorteadorFijo.sortear(any())).thenReturn(0);
+
+        Partida partidaLimitada = new Partida(new Tablero(), sorteadorFijo);
+        partidaLimitada.configurarPartida(2, Tablero.TAMANO_TABLERO, 10, true);
+        partidaLimitada.iniciarPartida();
+
+        QuoridorControlador ctrlLimitado = new QuoridorControlador(partidaLimitada, vistaMock);
         
         // Guardamos cuál era su posición inicial antes de mover
-        Posicion posicionInicialJugador1 = modelo.getJugadores().get(0).getPosicionActual();
+        Posicion posicionInicialJugador1 = partidaLimitada.getJugadores().get(0).getPosicionActual();
         
         // Realizamos un movimiento para cambiarlo de sitio
-        controlador.onCasillaClic(4, 1);
+        ctrlLimitado.onCasillaClic(4, 1);
 
         // Invocamos el reinicio
-        controlador.onBotonReiniciar();
+        ctrlLimitado.onBotonReiniciar();
 
         // Verificamos que la partida ya no está terminada
-        assertFalse(modelo.isTerminada(), "La partida debe dejar de estar terminada tras reiniciar.");
+        assertFalse(partidaLimitada.isTerminada(), "La partida debe dejar de estar terminada tras reiniciar.");
         
         // Verificamos que el jugador 1 ha vuelto exactamente a su posición inicial
-        Posicion posicionTrasReiniciar = modelo.getJugadores().get(0).getPosicionActual();
+        Posicion posicionTrasReiniciar = partidaLimitada.getJugadores().get(0).getPosicionActual();
         assertEquals(posicionInicialJugador1, posicionTrasReiniciar, "El peón del jugador debe volver a su posición de inicio tras el reinicio.");
 
         // Verificaciones de la vista
         verify(vistaMock, atLeastOnce()).actualizarTablero(any(), any());
-        // times(3) ya que al iniciar juego y onCassilaClic se llama a limpiarMensajes 2 vez y otra al reiniciar
-        verify(vistaMock, times(3)).limpiarMensajes();
+        // times(2) ya que se ejecuta limpiarMensajes en onCasillaClic y al reiniciar
+        verify(vistaMock, times(2)).limpiarMensajes();
     }
     
     /**
@@ -335,7 +342,7 @@ class QuoridorControladorTest {
      */
     @Test
     @DisplayName("onBotonReiniciar reactiva la partida terminada y resetea los muros colocados")
-    void testOnBotonReiniciarReseteaEstadoCompleto() {
+    void testOnBotonReiniciarReseteaMuros() {
         // Iniciamos partida y realizamos acciones (movemos y colocamos un muro)
         controlador.iniciarJuego();
         
