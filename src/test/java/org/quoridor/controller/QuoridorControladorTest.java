@@ -324,8 +324,8 @@ class QuoridorControladorTest {
 
         // Verificaciones de la vista
         verify(vistaMock, atLeastOnce()).actualizarTablero(any(), any());
-        // times(2) ya que al iniciar juego se llama a limpiarMensajes 1 vez y otra al reiniciar
-        verify(vistaMock, times(2)).limpiarMensajes();
+        // times(3) ya que al iniciar juego y onCassilaClic se llama a limpiarMensajes 2 vez y otra al reiniciar
+        verify(vistaMock, times(3)).limpiarMensajes();
     }
     
     /**
