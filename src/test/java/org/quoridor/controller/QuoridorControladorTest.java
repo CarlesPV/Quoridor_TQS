@@ -8,15 +8,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.quoridor.model.Color;
+import org.quoridor.model.ISorteadorTurno;
 import org.quoridor.model.Jugador;
 import org.quoridor.model.Partida;
 import org.quoridor.model.Posicion;
+import org.quoridor.model.Tablero;
 import org.quoridor.view.IQuoridorVista;
 
 /**
@@ -173,14 +176,19 @@ class QuoridorControladorTest {
     @Test
     @DisplayName("onCasillaClic anuncia la victoria del jugador al alcanzar la fila meta")
     void testOnCasillaClicVictoria() {
+        ISorteadorTurno sorteadorMock = mock(ISorteadorTurno.class);
+        when(sorteadorMock.sortear(any())).thenReturn(0);
+
+        Partida partidaVictoria = new Partida(new Tablero(), sorteadorMock);
         Jugador j1 = new Jugador("Ganador", Color.ROJO, new Posicion(4, 7), 8, 10);
         Jugador j2 = new Jugador("Otro", Color.AZUL, new Posicion(0, 0), 0, 10);
-        modelo.configurarPartida(List.of(j1, j2));
-        modelo.iniciarPartida();
+        partidaVictoria.configurarPartida(List.of(j1, j2));
+        partidaVictoria.iniciarPartida();
 
-        controlador.onCasillaClic(4, 8);
+        QuoridorControlador ctrlVictoria = new QuoridorControlador(partidaVictoria, vistaMock);
+        ctrlVictoria.onCasillaClic(4, 8);
 
-        assertTrue(modelo.isTerminada(), "La partida debe finalizar tras alcanzar la meta.");
+        assertTrue(partidaVictoria.isTerminada(), "La partida debe finalizar tras alcanzar la meta.");
         verify(vistaMock).mostrarVictoria("Ganador");
     }
 }

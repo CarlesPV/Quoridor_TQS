@@ -77,11 +77,30 @@ public class QuoridorControlador implements IQuoridorControlador {
     public void onCasillaClic(int x, int y) {
         assert verificarInvariante() : "Invariante violada al inicio de onCasillaClic";
 
+        if (this.modelo.isTerminada()) {
+            this.vista.mostrarError("La partida ya ha terminado. Pulsa Reiniciar.");
+            return;
+        }
+
+        if (x < 0 || x >= Tablero.TAMANO_TABLERO || y < 0 || y >= Tablero.TAMANO_TABLERO) {
+            this.vista.mostrarError("Casilla fuera del tablero.");
+            return;
+        }
+
         Posicion destino = new Posicion(x, y);
         boolean exito = this.modelo.realizarMovimiento(destino);
-        if (exito) {
-            this.vista.limpiarMensajes();
-            this.vista.actualizarTablero(this.modelo.getPosicionesJugadores(), this.modelo.getMurosColocados());
+        if (!exito) {
+            this.vista.mostrarError("Movimiento no válido.");
+            return;
+        }
+
+        this.vista.limpiarMensajes();
+        this.vista.actualizarTablero(this.modelo.getPosicionesJugadores(), this.modelo.getMurosColocados());
+
+        Jugador ganador = this.modelo.comprobarVictoria();
+        if (ganador != null) {
+            this.vista.mostrarVictoria(ganador.getNombre());
+        } else {
             Jugador actual = this.modelo.getJugadorActual();
             this.vista.mostrarTurno(actual.getNombre(), actual.getColor());
         }
