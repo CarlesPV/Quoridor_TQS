@@ -118,7 +118,8 @@ public class QuoridorControlador implements IQuoridorControlador {
             return;
         }
 
-        if (orientacion == null || x < 0 || x >= Tablero.TAMANO_TABLERO - 1 || y < 0 || y >= Tablero.TAMANO_TABLERO - 1) {
+        if (orientacion == null || (x < 0 || x >= Tablero.TAMANO_TABLERO - 1) || 
+        		(y < 0 || y >= Tablero.TAMANO_TABLERO - 1)) {
             this.vista.mostrarError("No se puede colocar el muro en esa posición o no te quedan muros.");
             return;
         }
