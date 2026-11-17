@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.quoridor.model.Color;
 import org.quoridor.model.Jugador;
 import org.quoridor.model.Partida;
+import org.quoridor.model.Posicion;
 import org.quoridor.view.IQuoridorVista;
 
 /**
@@ -89,5 +91,29 @@ class QuoridorControladorTest {
 
         assertEquals(10, modelo.getMurosRestantesPorJugador().get(Color.ROJO));
         assertEquals(10, modelo.getMurosRestantesPorJugador().get(Color.AZUL));
+    }
+
+    /**
+     * Prueba de Caja Negra (Partición Equivalente: Movimiento Válido) e Interacción con Mock:
+     * Verifica que al pulsar una casilla adyacente válida, el modelo desplace al peón del jugador activo,
+     * la vista actualice el tablero con la nueva posición, avance el turno y limpie mensajes previos.
+     */
+    @Test
+    @DisplayName("onCasillaClic realiza movimiento válido, actualiza tablero y cambia de turno")
+    void testOnCasillaClicMovimientoValido() {
+        controlador.iniciarJuego();
+
+        Jugador inicial = modelo.getJugadorActual();
+        Posicion origen = inicial.getPosicionActual();
+        int pasoY = (inicial.getColor() == Color.ROJO) ? 1 : -1;
+        int destinoX = origen.getX();
+        int destinoY = origen.getY() + pasoY;
+
+        controlador.onCasillaClic(destinoX, destinoY);
+
+        assertEquals(new Posicion(destinoX, destinoY), modelo.getPosicionesJugadores().get(inicial.getColor()),
+                "El peón debe actualizar su posición en el modelo tras un movimiento válido.");
+        verify(vistaMock, times(2)).actualizarTablero(any(), any());
+        verify(vistaMock, times(2)).limpiarMensajes();
     }
 }
