@@ -11,6 +11,8 @@ on:
       - 'feature/**'
       - 'fix/**'
       - 'refactor/**'
+      - 'test/**'
+      - 'docs/**'
   # Se activa al abrir o actualizar un Pull Request dirigido a la rama principal master
   pull_request:
     branches:

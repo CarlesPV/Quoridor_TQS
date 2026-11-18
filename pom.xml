@@ -12,7 +12,6 @@
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <argLine></argLine>
     </properties>
 
     <dependencies>
@@ -76,7 +75,7 @@
                 <version>3.2.5</version>
                 <configuration>
                     <failIfNoTests>false</failIfNoTests>
-                    <argLine>${argLine} -ea</argLine>
+                    <argLine>@{argLine} -ea</argLine>
                 </configuration>
             </plugin>
 
@@ -94,7 +93,7 @@
                 </dependencies>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
-                    <encoding>UTF-8</encoding>
+                    <inputEncoding>UTF-8</inputEncoding>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
                     <violationSeverity>error</violationSeverity>
