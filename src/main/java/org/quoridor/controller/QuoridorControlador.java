@@ -83,7 +83,8 @@ public class QuoridorControlador implements IQuoridorControlador {
             return;
         }
 
-        if (x < 0 || x >= Tablero.TAMANO_TABLERO || y < 0 || y >= Tablero.TAMANO_TABLERO) {
+        int tamanoTablero = this.modelo.getTablero().getTamanoTablero();
+        if (x < 0 || x >= tamanoTablero || y < 0 || y >= tamanoTablero) {
             this.vista.mostrarError("Casilla fuera del tablero.");
             return;
         }
@@ -118,20 +119,20 @@ public class QuoridorControlador implements IQuoridorControlador {
             return;
         }
 
-        if (orientacion == null || (x < 0 || x >= Tablero.TAMANO_TABLERO - 1) || 
-        		(y < 0 || y >= Tablero.TAMANO_TABLERO - 1)) {
+        int limiteMuro = this.modelo.getTablero().getTamanoTablero() - 1;
+        if (orientacion == null || x < 0 || x >= limiteMuro || y < 0 || y >= limiteMuro) {
             this.vista.mostrarError("No se puede colocar el muro en esa posición o no te quedan muros.");
             return;
         }
-        
+
         Muro muro = new Muro(new Posicion(x, y), orientacion);
         boolean exito = this.modelo.colocarMuro(muro);
-        
+
         if (!exito) {
             this.vista.mostrarError("No se puede colocar el muro en esa posición o no te quedan muros.");
             return;
         }
-        
+
         this.vista.limpiarMensajes();
         this.vista.actualizarTablero(this.modelo.getPosicionesJugadores(), this.modelo.getMurosColocados());
         this.vista.actualizarMurosRestantes(this.modelo.getMurosRestantesPorJugador());
@@ -143,10 +144,10 @@ public class QuoridorControlador implements IQuoridorControlador {
 
     @Override
     public void onBotonReiniciar() {
-    	assert verificarInvariante() : "Invariante violada al inicio de onBotonReiniciar";
-    	
-    	iniciarJuego();
-    	
-    	assert verificarInvariante() : "Invariante violada al inicio de onBotonReiniciar";
+        assert verificarInvariante() : "Invariante violada al inicio de onBotonReiniciar";
+
+        iniciarJuego();
+
+        assert verificarInvariante() : "Invariante violada al finalizar onBotonReiniciar";
     }
 }
