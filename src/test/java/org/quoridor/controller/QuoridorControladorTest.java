@@ -124,19 +124,41 @@ class QuoridorControladorTest {
     }
 
     /**
-     * Prueba de Caja Negra (Valores Límite y Frontera):
-     * Verifica que si el usuario pulsa coordenadas fuera del rango del tablero (0 a 8),
+     * Prueba de Caja Negra (Valores Límite y Frontera / Condition Coverage):
+     * Verifica que si el usuario pulsa coordenadas fuera del rango del tablero en ambos ejes (X e Y),
      * el controlador no invoque al modelo y muestre un error descriptivo en la vista.
      */
     @Test
-    @DisplayName("onCasillaClic muestra error al pulsar fuera de los límites del tablero")
+    @DisplayName("onCasillaClic muestra error al pulsar fuera de los límites del tablero en X e Y")
     void testOnCasillaClicCasillaFueraDelTablero() {
         controlador.iniciarJuego();
 
         controlador.onCasillaClic(-1, 4);
-        verify(vistaMock).mostrarError("Casilla fuera del tablero.");
-
         controlador.onCasillaClic(9, 4);
+        controlador.onCasillaClic(4, -1);
+        controlador.onCasillaClic(4, 9);
+
+        verify(vistaMock, times(4)).mostrarError("Casilla fuera del tablero.");
+        // Solo la llamada inicial de iniciarJuego
+        verify(vistaMock, times(1)).actualizarTablero(any(), any());
+    }
+
+    /**
+     * Prueba de Caja Negra (Valor Límite Dinámico - Tablero 7x7):
+     * Verifica que onCasillaClic respete el tamaño configurado en el tablero del modelo (7x7)
+     * en lugar de asumir siempre 9x9.
+     */
+    @Test
+    @DisplayName("onCasillaClic valida límites dinámicamente para tableros de tamaño 7x7")
+    void testOnCasillaClicLimitesTablero7x7() {
+        Partida partida7x7 = new Partida();
+        partida7x7.configurarPartida(2, 7, 5, false);
+        partida7x7.iniciarPartida();
+        QuoridorControlador ctrl7x7 = new QuoridorControlador(partida7x7, vistaMock);
+
+        ctrl7x7.onCasillaClic(7, 3);
+        ctrl7x7.onCasillaClic(3, 7);
+
         verify(vistaMock, times(2)).mostrarError("Casilla fuera del tablero.");
     }
 
@@ -248,19 +270,49 @@ class QuoridorControladorTest {
     }
 
     /**
-     * Prueba de Caja Negra (Partición Inválida / Valor Frontera):
-     * Verifica que si las coordenadas del muro provocan un rechazo del modelo
-     * (posición fuera del rango válido para muros), la vista muestre el error correspondiente.
+     * Prueba de Caja Negra (Partición Inválida / Valor Frontera / Condition Coverage):
+     * Verifica que si las coordenadas del muro salen del rango válido en X o Y (0..7 en 9x9),
+     * la vista muestre el error correspondiente.
      */
     @Test
-    @DisplayName("onInterseccionClic muestra error al intentar colocar un muro en posición inválida")
+    @DisplayName("onInterseccionClic muestra error al intentar colocar un muro fuera de límites en X e Y")
     void testOnInterseccionClicMuroInvalido() {
         controlador.iniciarJuego();
 
-        // Coordenada x=8 en tablero 9x9 → no hay espacio para muro horizontal de 2 celdas
+        controlador.onInterseccionClic(-1, 4, Orientacion.HORIZONTAL);
+        // Coordenada x=8 en tablero 9x9 -> no hay espacio para muro horizontal de 2 celdas
         controlador.onInterseccionClic(8, 4, Orientacion.HORIZONTAL);
+        controlador.onInterseccionClic(4, -1, Orientacion.VERTICAL);
+        // Coordenada y=8 en tablero 9x9 -> no hay espacio para muro vertical de 2 celdas
+        controlador.onInterseccionClic(4, 8, Orientacion.VERTICAL);
+
+        verify(vistaMock, times(4)).mostrarError(
+                "No se puede colocar el muro en esa posición o no te quedan muros.");
+        assertTrue(modelo.getMurosColocados().isEmpty());
+    }
+
+    /**
+     * Prueba de Caja Negra (Partición Inválida: Colisión de Muros):
+     * Verifica que si el modelo rechaza el muro por colisionar con otro existente,
+     * el controlador muestre el error en la vista y no cambie el turno ni los muros.
+     */
+    @Test
+    @DisplayName("onInterseccionClic muestra error cuando el muro colisiona con uno existente")
+    void testOnInterseccionClicMuroColisiona() {
+        controlador.iniciarJuego();
+        Jugador jugadorInicial = modelo.getJugadorActual();
+
+        controlador.onInterseccionClic(2, 2, Orientacion.HORIZONTAL);
+        Jugador segundoJugador = modelo.getJugadorActual();
+
+        // Intento de cruce en el mismo origen (2, 2)
+        controlador.onInterseccionClic(2, 2, Orientacion.VERTICAL);
+
         verify(vistaMock).mostrarError(
                 "No se puede colocar el muro en esa posición o no te quedan muros.");
+        assertEquals(1, modelo.getMurosColocados().size());
+        assertEquals(segundoJugador, modelo.getJugadorActual());
+        assertEquals(9, jugadorInicial.getMurosRestantes());
     }
 
     /**
@@ -289,19 +341,19 @@ class QuoridorControladorTest {
         ctrlLimitado.onInterseccionClic(5, 5, Orientacion.VERTICAL);
         assertEquals(2, partidaLimitada.getMurosColocados().size());
 
-        // Vuelve al jugador 1: ya no tiene muros → debe fallar
+        // Vuelve al jugador 1: ya no tiene muros -> debe fallar
         ctrlLimitado.onInterseccionClic(3, 3, Orientacion.HORIZONTAL);
         verify(vistaMock).mostrarError(
                 "No se puede colocar el muro en esa posición o no te quedan muros.");
     }
-    
+
     /**
      * Prueba de Caja Blanca / Integración con Mock:
-     * Verifica que onBotonReiniciar reinicie la partida (dejándola activa) 
-     * y sincronice la limpieza de mensajes y la actualización del tablero en la vista.
+     * Verifica que onBotonReiniciar devuelva los peones a sus posiciones iniciales
+     * tras haber realizado movimientos y sincronice la vista.
      */
     @Test
-    @DisplayName("onBotonReiniciar reactiva la partida terminada y resetea posicion de peones")
+    @DisplayName("onBotonReiniciar resetea la posición de los peones tras realizar movimientos")
     void testOnBotonReiniciarReseteaPosiciones() {
         // Configurar partida para que siempre empiece jugador 1
         ISorteadorTurno sorteadorFijo = mock(ISorteadorTurno.class);
@@ -312,53 +364,94 @@ class QuoridorControladorTest {
         partidaLimitada.iniciarPartida();
 
         QuoridorControlador ctrlLimitado = new QuoridorControlador(partidaLimitada, vistaMock);
-        
+
         // Guardamos cuál era su posición inicial antes de mover
         Posicion posicionInicialJugador1 = partidaLimitada.getJugadores().get(0).getPosicionActual();
-        
-        // Realizamos un movimiento para cambiarlo de sitio
+
+        // Realizamos un movimiento y comprobamos que el peón realmente se movió
         ctrlLimitado.onCasillaClic(4, 1);
+        assertEquals(new Posicion(4, 1), partidaLimitada.getJugadores().get(0).getPosicionActual(),
+                "El peón debe haberse desplazado a (4, 1) antes de reiniciar.");
 
         // Invocamos el reinicio
         ctrlLimitado.onBotonReiniciar();
 
-        // Verificamos que la partida ya no está terminada
-        assertFalse(partidaLimitada.isTerminada(), "La partida debe dejar de estar terminada tras reiniciar.");
-        
-        // Verificamos que el jugador 1 ha vuelto exactamente a su posición inicial
+        // Verificamos que la partida sigue activa y el jugador 1 volvió a su posición inicial
+        assertFalse(partidaLimitada.isTerminada(),
+                "La partida debe estar en curso tras reiniciar.");
         Posicion posicionTrasReiniciar = partidaLimitada.getJugadores().get(0).getPosicionActual();
-        assertEquals(posicionInicialJugador1, posicionTrasReiniciar, "El peón del jugador debe volver a su posición de inicio tras el reinicio.");
+        assertEquals(posicionInicialJugador1, posicionTrasReiniciar,
+                "El peón del jugador debe volver a su posición de inicio tras el reinicio.");
 
         // Verificaciones de la vista
         verify(vistaMock, atLeastOnce()).actualizarTablero(any(), any());
         // times(2) ya que se ejecuta limpiarMensajes en onCasillaClic y al reiniciar
         verify(vistaMock, times(2)).limpiarMensajes();
     }
-    
+
     /**
      * Prueba de Caja Blanca / Integración con Mock:
-     * Verifica que onBotonReiniciar reactive la partida,
-     * devuelva los muros a sus contadores iniciales y limpie el tablero y la vista.
+     * Verifica que onBotonReiniciar elimine los muros colocados del tablero
+     * y restablezca el contador de muros restantes en el modelo y en la vista.
      */
     @Test
-    @DisplayName("onBotonReiniciar reactiva la partida terminada y resetea los muros colocados")
+    @DisplayName("onBotonReiniciar resetea los muros colocados y los contadores de muros restantes")
     void testOnBotonReiniciarReseteaMuros() {
-        // Iniciamos partida y realizamos acciones (movemos y colocamos un muro)
+        // Iniciamos partida y colocamos un muro para modificar el estado del tablero
         controlador.iniciarJuego();
-        
-        // Colocamos un muro para modificar el estado del tablero
         controlador.onInterseccionClic(2, 2, Orientacion.HORIZONTAL);
-        
-        // Verificamos que el muro se colocó (ahora hay 1 en el tablero)
+
         assertEquals(1, modelo.getMurosColocados().size());
 
         // Invocamos el reinicio
         controlador.onBotonReiniciar();
 
         // Comprobaciones del modelo tras el reinicio
-        assertFalse(modelo.isTerminada(), "La partida debe dejar de estar terminada tras reiniciar.");
+        assertFalse(modelo.isTerminada(), "La partida debe estar activa tras reiniciar.");
+        assertTrue(modelo.getMurosColocados().isEmpty(),
+                "El tablero debe quedarse sin muros colocados tras reiniciar.");
+        assertEquals(10, modelo.getMurosRestantesPorJugador().get(Color.ROJO));
+        assertEquals(10, modelo.getMurosRestantesPorJugador().get(Color.AZUL));
 
-        // Comprobar que los muros colocados en el tablero vuelven a 0
-        assertTrue(modelo.getMurosColocados().isEmpty(), "El tablero debe quedarse sin muros colocados tras reiniciar.");
+        // 1 en iniciarJuego + 1 en onInterseccionClic + 1 en onBotonReiniciar
+        verify(vistaMock, times(3)).actualizarMurosRestantes(any());
+        verify(vistaMock, times(3)).mostrarTurno(any(), any());
+        verify(vistaMock, times(3)).limpiarMensajes();
+    }
+
+    /**
+     * Prueba de Caja Blanca / Camino de Reinicio Post-Victoria:
+     * Verifica que tras finalizar una partida por victoria (isTerminada == true),
+     * pulsar onBotonReiniciar la reactive (isTerminada == false) y sincronice toda la vista.
+     */
+    @Test
+    @DisplayName("onBotonReiniciar reactiva una partida terminada tras victoria y reinicia la vista")
+    void testOnBotonReiniciarTrasVictoriaReactivaPartida() {
+        ISorteadorTurno sorteadorMock = mock(ISorteadorTurno.class);
+        when(sorteadorMock.sortear(any())).thenReturn(0);
+
+        Partida partidaVictoria = new Partida(new Tablero(), sorteadorMock);
+        Jugador j1 = new Jugador("Ganador", Color.ROJO, new Posicion(4, 7), 8, 10);
+        Jugador j2 = new Jugador("Otro", Color.AZUL, new Posicion(0, 0), 0, 10);
+        partidaVictoria.configurarPartida(List.of(j1, j2));
+        partidaVictoria.iniciarPartida();
+
+        QuoridorControlador ctrlVictoria = new QuoridorControlador(partidaVictoria, vistaMock);
+        ctrlVictoria.onCasillaClic(4, 8);
+        assertTrue(partidaVictoria.isTerminada(), "La partida debe estar terminada tras la victoria.");
+
+        ctrlVictoria.onBotonReiniciar();
+
+        assertFalse(partidaVictoria.isTerminada(),
+                "La partida debe reactivarse (isTerminada == false) tras reiniciar.");
+        assertEquals(2, partidaVictoria.getJugadores().size());
+        assertTrue(partidaVictoria.getMurosColocados().isEmpty());
+        assertEquals(10, partidaVictoria.getMurosRestantesPorJugador().get(Color.ROJO));
+        assertEquals(10, partidaVictoria.getMurosRestantesPorJugador().get(Color.AZUL));
+
+        verify(vistaMock, times(2)).actualizarTablero(any(), any());
+        verify(vistaMock, times(1)).actualizarMurosRestantes(any());
+        verify(vistaMock, times(1)).mostrarTurno(any(), any());
+        verify(vistaMock, times(2)).limpiarMensajes();
     }
 }
