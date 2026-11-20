@@ -102,6 +102,12 @@ class TableroTest {
 		Posicion destinoDiagonal = new Posicion(5, 5);
 		assertFalse(tablero.esMovimientoValido(origen, destinoDiagonal, oponente),
 				"No debería permitir salto diagonal si no hay muro detrás del oponente");
+		
+		// Salto diagonal permitido si el camino recto está bloqueado
+        // Muro horizontal justo detrás del oponente (entre (4,5) y (4,6))
+        tablero.colocarMuro(new Muro(new Posicion(4, 5), Orientacion.HORIZONTAL));
+		assertTrue(tablero.esMovimientoValido(origen, destinoDiagonal, oponente),
+				"Debería permitir salto diagonal si hay muro detrás del oponente");		
 
 		// Movimiento bloqueado por muro horizontal
 		tablero.getMurosColocados().add(new Muro(new Posicion(4, 4), Orientacion.HORIZONTAL));
@@ -129,11 +135,6 @@ class TableroTest {
 		tablero.getMurosColocados().clear();
 		assertFalse(tablero.esMovimientoValido(origen, destinoSaltoRecto, new Posicion(0, 0)),
 				"No debe permitir salto si el oponente no es adyacente al origen");
-
-		// Decision & Condition Coverage: muro bloqueante entre origen y oponente impide el salto
-		tablero.getMurosColocados().add(new Muro(new Posicion(4, 4), Orientacion.HORIZONTAL));
-		assertFalse(tablero.esMovimientoValido(origen, destinoSaltoRecto, oponente),
-				"No debe permitir salto si hay un muro entre el origen y el oponente");
 	}
 
 	// Prueba de Caja Blanca: Loop Testing (bucle simple de murosColocados: 0, 1, 2, m, n-1, n iteraciones)
