@@ -10,19 +10,31 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import java.util.*;
 
-//Mock manual para controlar exactamente quién empieza en los tests
+// Mock manual con verificación de llamadas para controlar exactamente quién empieza en los tests
 class SorteadorTurnoFijoMock implements ISorteadorTurno {
-	private int indiceFijo;
-	
-	public SorteadorTurnoFijoMock(int indiceFijo) 
-	{
+	private final int indiceFijo;
+	private int vecesLlamado;
+	private List<Jugador> ultimaListaJugadores;
+
+	public SorteadorTurnoFijoMock(int indiceFijo) {
 		this.indiceFijo = indiceFijo;
+		this.vecesLlamado = 0;
 	}
+
 	@Override
-	public int sortear(List<Jugador> jugadores) 
-	{
+	public int sortear(List<Jugador> jugadores) {
+		this.vecesLlamado++;
+		this.ultimaListaJugadores = (jugadores != null) ? new ArrayList<>(jugadores) : null;
 		return indiceFijo; // Devuelve siempre el índice preconfigurado
- 	}
+	}
+
+	public int getVecesLlamado() {
+		return this.vecesLlamado;
+	}
+
+	public List<Jugador> getUltimaListaJugadores() {
+		return this.ultimaListaJugadores;
+	}
 }
 
 class PartidaTest {
@@ -83,119 +95,155 @@ class PartidaTest {
 
 	@Test
 	void testIniciarPartida() {
-		// Caso J1 empieza
-        partida.iniciarPartida();
-        assertFalse(partida.isTerminada(), "La partida no debe estar terminada al iniciar.");
-        assertEquals("J1", partida.getJugadorActual().getNombre(), "Debe empezar el Jugador 1 según el sorteador fijo.");
-        
-        // Caso J2 empieza
-        sorteadorMock = new SorteadorTurnoFijoMock(1);
-        partida = new Partida(tableroMock, sorteadorMock);
-        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
-        partida.iniciarPartida();
-        assertFalse(partida.isTerminada(), "La partida no debe estar terminada al iniciar.");
-        assertEquals("J2", partida.getJugadorActual().getNombre(), "Debe empezar el Jugador 2 según el sorteador fijo.");
-        
-        // Caso inicializar sorteador fuera de rango superior
-        sorteadorMock = new SorteadorTurnoFijoMock(2);
-        partida = new Partida(tableroMock, sorteadorMock);
-        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
-        assertThrows(AssertionError.class, () -> partida.iniciarPartida(),
-                "Debe lanzar AssertionError si el índice sorteado supera el rango.");
-        
-        // Caso inicializar sorteador fuera de rango inferior
-        sorteadorMock = new SorteadorTurnoFijoMock(-1);
-        partida = new Partida(tableroMock, sorteadorMock);
-        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
-        assertThrows(AssertionError.class, () -> partida.iniciarPartida(),
-                "Debe lanzar AssertionError si el índice sorteado es negativo.");
-        
-        
-    }
+		// Caso J1 empieza (sorteoAleatorio == true por defecto)
+		SorteadorTurnoFijoMock sorteadorJ1 = (SorteadorTurnoFijoMock) sorteadorMock;
+		partida.iniciarPartida();
+		assertFalse(partida.isTerminada(), "La partida no debe estar terminada al iniciar.");
+		assertEquals("J1", partida.getJugadorActual().getNombre(),
+				"Debe empezar el Jugador 1 según el sorteador fijo.");
+		assertEquals(1, sorteadorJ1.getVecesLlamado(),
+				"Con sorteoAleatorio == true debe invocar al sorteador exactamente una vez.");
+		assertEquals(List.of(jugador1Mock, jugador2Mock), sorteadorJ1.getUltimaListaJugadores(),
+				"El sorteador debe recibir la lista completa de jugadores configurados.");
+
+		// Caso J2 empieza (sorteoAleatorio == true)
+		SorteadorTurnoFijoMock sorteadorJ2 = new SorteadorTurnoFijoMock(1);
+		partida = new Partida(tableroMock, sorteadorJ2);
+		partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+		partida.iniciarPartida();
+		assertFalse(partida.isTerminada(), "La partida no debe estar terminada al iniciar.");
+		assertEquals("J2", partida.getJugadorActual().getNombre(),
+				"Debe empezar el Jugador 2 según el sorteador fijo.");
+		assertEquals(1, sorteadorJ2.getVecesLlamado(),
+				"Con sorteoAleatorio == true debe invocar al sorteador exactamente una vez.");
+		assertEquals(List.of(jugador1Mock, jugador2Mock), sorteadorJ2.getUltimaListaJugadores());
+
+		// Caso sorteoAleatorio == true con configuración estándar
+		SorteadorTurnoFijoMock sorteadorActivo = new SorteadorTurnoFijoMock(1);
+		Partida partidaConSorteo = new Partida(new Tablero(), sorteadorActivo);
+		partidaConSorteo.configurarPartida(2, 9, 10, true);
+		partidaConSorteo.iniciarPartida();
+		assertEquals(1, sorteadorActivo.getVecesLlamado(),
+				"Debe invocar al sorteador 1 vez cuando sorteoAleatorio es true.");
+		assertEquals(2, sorteadorActivo.getUltimaListaJugadores().size());
+		assertEquals(Color.AZUL, partidaConSorteo.getJugadorActual().getColor());
+
+		// Caso sorteoAleatorio == false: no debe invocar al sorteador y empieza el primer jugador
+		SorteadorTurnoFijoMock sorteadorSinUso = new SorteadorTurnoFijoMock(1);
+		Partida partidaSinSorteo = new Partida(new Tablero(), sorteadorSinUso);
+		partidaSinSorteo.configurarPartida(2, 9, 10, false);
+		partidaSinSorteo.iniciarPartida();
+		assertFalse(partidaSinSorteo.isTerminada());
+		assertEquals(0, sorteadorSinUso.getVecesLlamado(),
+				"Con sorteoAleatorio == false no debe invocar al sorteador.");
+		assertNull(sorteadorSinUso.getUltimaListaJugadores(),
+				"Sin sorteo no debe registrarse ninguna invocación.");
+		assertEquals(Color.ROJO, partidaSinSorteo.getJugadorActual().getColor(),
+				"Sin sorteo debe comenzar siempre el primer jugador.");
+
+		// Caso inicializar sorteador fuera de rango superior
+		sorteadorMock = new SorteadorTurnoFijoMock(2);
+		partida = new Partida(tableroMock, sorteadorMock);
+		partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+		assertThrows(AssertionError.class, () -> partida.iniciarPartida(),
+				"Debe lanzar AssertionError si el índice sorteado supera el rango.");
+
+		// Caso inicializar sorteador fuera de rango inferior
+		sorteadorMock = new SorteadorTurnoFijoMock(-1);
+		partida = new Partida(tableroMock, sorteadorMock);
+		partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+		assertThrows(AssertionError.class, () -> partida.iniciarPartida(),
+				"Debe lanzar AssertionError si el índice sorteado es negativo.");
+	}
 
 	@Test
 	void testRealizarMovimiento() {
 		// Caso J1 se mueve y cambia de turno
-        partida.iniciarPartida();
-        Posicion destinoValido = new Posicion(4, 1);
-        // Simulamos que el Tablero aprueba el movimiento
-        when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoValido), any(Posicion.class)))
-            .thenReturn(true);
-        
-        boolean resultado = partida.realizarMovimiento(destinoValido);
-        
-        assertTrue(resultado, "El movimiento debería realizarse con éxito.");
-        // Verificamos que el turno avanzó automáticamente a J2
-        assertEquals("J2", partida.getJugadorActual().getNombre(), "El turno debe cambiar al siguiente jugador.");
-        
-        
-        // Caso J2 se mueve y cambia de turno
-        sorteadorMock = new SorteadorTurnoFijoMock(1);
-        partida = new Partida(tableroMock, sorteadorMock);
-        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
-        partida.iniciarPartida();
-        
-        destinoValido = new Posicion(4, 7);
-        // Simulamos que el Tablero aprueba el movimiento
-        when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoValido), any(Posicion.class)))
-            .thenReturn(true);
-        
-        resultado = partida.realizarMovimiento(destinoValido);
-        
-        assertTrue(resultado, "El movimiento debería realizarse con éxito.");
-        // Verificamos que el turno avanzó automáticamente a J1
-        assertEquals("J1", partida.getJugadorActual().getNombre(), "El turno debe cambiar al siguiente jugador.");
-        
-        
-        // Caso movimiento invalido
-        sorteadorMock = new SorteadorTurnoFijoMock(0);
-        partida = new Partida(tableroMock, sorteadorMock);
-        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
-        partida.iniciarPartida(); // Turno actual: Jugador 1
-        Posicion destinoInvalido = new Posicion(0, 0); // Lejos o bloqueado
+		partida.iniciarPartida();
+		Posicion destinoValido = new Posicion(4, 1);
+		// Simulamos que el Tablero aprueba el movimiento
+		when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoValido), any(Posicion.class)))
+				.thenReturn(true);
 
-        // Simulamos que el Tablero rechaza el movimiento
-        when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoInvalido), any(Posicion.class)))
-            .thenReturn(false);
+		boolean resultado = partida.realizarMovimiento(destinoValido);
 
-        resultado = partida.realizarMovimiento(destinoInvalido);
-        assertFalse(resultado, "El movimiento inválido debe ser rechazado.");
-        // Verificamos que el turno NO avanzó (sigue siendo el Jugador 1)
-        assertEquals("J1", partida.getJugadorActual().getNombre(), "El turno no debe cambiar si el movimiento falla.");
-        
-        
-        // Caso se llega a la victoria
-        partida.iniciarPartida(); // Turno del Jugador 1
-        // Para el Jugador 1 (abajo), su fila objetivo (meta) es 8.
-        Posicion destinoMeta = new Posicion(3, 8);
-        
-        // Simulamos que el Tablero aprueba el movimiento
-        when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoMeta), any(Posicion.class)))
-            .thenReturn(true);
-        
-        // Simulamos que jugador 1 llega a la meta
-        when(jugador1Mock.haLlegadoAMeta()).thenReturn(true);
-        resultado = partida.realizarMovimiento(destinoMeta);
+		assertTrue(resultado, "El movimiento debería realizarse con éxito.");
+		verify(jugador1Mock, times(1)).moverA(destinoValido);
+		verify(tableroMock, times(1)).setPosicionJugador(Color.ROJO, destinoValido);
+		// Verificamos que el turno avanzó automáticamente a J2
+		assertEquals("J2", partida.getJugadorActual().getNombre(), "El turno debe cambiar al siguiente jugador.");
 
-        assertTrue(resultado);
-        // Verificamos que la partida se marcó como terminada al llegar a la meta
-        assertTrue(partida.isTerminada(), "La partida debería terminar cuando el jugador alcanza su fila objetivo.");
-        
-        
-        // Caso destino null
-        partida.iniciarPartida();
-        assertThrows(AssertionError.class, () -> partida.realizarMovimiento(null),
-                "Debe lanzar AssertionError si el destino es null.");
-        
-        
-        // Caso partida sin inicializar o ya terminada
-        sorteadorMock = new SorteadorTurnoFijoMock(0);
-        partida = new Partida(tableroMock, sorteadorMock);
-        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
-        Posicion destinoCualquiera = new Posicion(4, 7);
-        resultado = partida.realizarMovimiento(destinoCualquiera);
+		// Caso J2 se mueve y cambia de turno
+		sorteadorMock = new SorteadorTurnoFijoMock(1);
+		partida = new Partida(tableroMock, sorteadorMock);
+		partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+		partida.iniciarPartida();
 
-        assertFalse(resultado, "No se puede mover si la partida está terminada.");
+		destinoValido = new Posicion(4, 7);
+		// Simulamos que el Tablero aprueba el movimiento
+		when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoValido), any(Posicion.class)))
+				.thenReturn(true);
+
+		resultado = partida.realizarMovimiento(destinoValido);
+
+		assertTrue(resultado, "El movimiento debería realizarse con éxito.");
+		verify(jugador2Mock, times(1)).moverA(destinoValido);
+		verify(tableroMock, times(1)).setPosicionJugador(Color.AZUL, destinoValido);
+		// Verificamos que el turno avanzó automáticamente a J1
+		assertEquals("J1", partida.getJugadorActual().getNombre(), "El turno debe cambiar al siguiente jugador.");
+
+		// Caso movimiento invalido
+		sorteadorMock = new SorteadorTurnoFijoMock(0);
+		partida = new Partida(tableroMock, sorteadorMock);
+		partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+		partida.iniciarPartida(); // Turno actual: Jugador 1
+		Posicion destinoInvalido = new Posicion(0, 0); // Lejos o bloqueado
+
+		// Simulamos que el Tablero rechaza el movimiento
+		when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoInvalido), any(Posicion.class)))
+				.thenReturn(false);
+
+		resultado = partida.realizarMovimiento(destinoInvalido);
+		assertFalse(resultado, "El movimiento inválido debe ser rechazado.");
+		verify(jugador1Mock, never()).moverA(destinoInvalido);
+		verify(tableroMock, never()).setPosicionJugador(Color.ROJO, destinoInvalido);
+		// Verificamos que el turno NO avanzó (sigue siendo el Jugador 1)
+		assertEquals("J1", partida.getJugadorActual().getNombre(),
+				"El turno no debe cambiar si el movimiento falla.");
+
+		// Caso se llega a la victoria
+		partida.iniciarPartida(); // Turno del Jugador 1
+		// Para el Jugador 1 (abajo), su fila objetivo (meta) es 8.
+		Posicion destinoMeta = new Posicion(3, 8);
+
+		// Simulamos que el Tablero aprueba el movimiento
+		when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoMeta), any(Posicion.class)))
+				.thenReturn(true);
+
+		// Simulamos que jugador 1 llega a la meta
+		when(jugador1Mock.haLlegadoAMeta()).thenReturn(true);
+		resultado = partida.realizarMovimiento(destinoMeta);
+
+		assertTrue(resultado);
+		verify(jugador1Mock, times(1)).moverA(destinoMeta);
+		verify(tableroMock, times(1)).setPosicionJugador(Color.ROJO, destinoMeta);
+		// Verificamos que la partida se marcó como terminada al llegar a la meta
+		assertTrue(partida.isTerminada(),
+				"La partida debería terminar cuando el jugador alcanza su fila objetivo.");
+
+		// Caso destino null
+		partida.iniciarPartida();
+		assertThrows(AssertionError.class, () -> partida.realizarMovimiento(null),
+				"Debe lanzar AssertionError si el destino es null.");
+
+		// Caso partida sin inicializar o ya terminada
+		sorteadorMock = new SorteadorTurnoFijoMock(0);
+		partida = new Partida(tableroMock, sorteadorMock);
+		partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+		Posicion destinoCualquiera = new Posicion(4, 7);
+		resultado = partida.realizarMovimiento(destinoCualquiera);
+
+		assertFalse(resultado, "No se puede mover si la partida está terminada.");
 	}
 
 	@Test

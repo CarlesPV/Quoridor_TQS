@@ -250,7 +250,10 @@ class JugadorTest {
 		// Precondiciones de moverA
 		jugador = new Jugador("J1", Color.ROJO, posValida, 8, 0);
 		assertThrows(AssertionError.class, () -> jugador.moverA(null));
+		assertThrows(AssertionError.class, () -> jugador.moverA(new Posicion(-1, 0)));
+		assertThrows(AssertionError.class, () -> jugador.moverA(new Posicion(0, -1)));
 		assertThrows(AssertionError.class, () -> jugador.moverA(new Posicion(9, 0)));
+		assertThrows(AssertionError.class, () -> jugador.moverA(new Posicion(0, 9)));
 
 		// Precondición de consumirMuro sin muros
 		assertThrows(AssertionError.class, () -> jugador.consumirMuro());
@@ -258,6 +261,7 @@ class JugadorTest {
 		// Precondiciones de reiniciarEstado
 		assertThrows(AssertionError.class, () -> jugador.reiniciarEstado(null, 5));
 		assertThrows(AssertionError.class, () -> jugador.reiniciarEstado(posInvalida, 5));
+		assertThrows(AssertionError.class, () -> jugador.reiniciarEstado(new Posicion(9, 0), 5));
 		assertThrows(AssertionError.class, () -> jugador.reiniciarEstado(posValida, -1));
 
 		// Invariante con jugador sin inicializar (posicionActual == null)

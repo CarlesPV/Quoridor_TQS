@@ -40,47 +40,67 @@ class MuroTest {
 	/// 
 	@Test
 	void testEsPosicionValida() {
-		// Casos validos de [0, 7]
-		Muro murosValidos[] = {
-				new Muro (new Posicion(0,0),Orientacion.VERTICAL),
-				new Muro (new Posicion(0,0),Orientacion.HORIZONTAL),
-				new Muro (new Posicion(1,1),Orientacion.VERTICAL),
-				new Muro (new Posicion(1,1),Orientacion.HORIZONTAL),
-				new Muro (new Posicion(6,6),Orientacion.VERTICAL),
-				new Muro (new Posicion(6,6),Orientacion.HORIZONTAL),
-				new Muro (new Posicion(7,7),Orientacion.VERTICAL),
-				new Muro (new Posicion(7,7),Orientacion.HORIZONTAL),
-				new Muro (new Posicion(0,7),Orientacion.VERTICAL),
-				new Muro (new Posicion(0,7),Orientacion.HORIZONTAL)
-				};
-		
-		for(int i=0; i < murosValidos.length;i++) {
+		// Casos validos de [0, 7] en tablero 9x9
+		Muro[] murosValidos = {
+				new Muro(new Posicion(0, 0), Orientacion.VERTICAL),
+				new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(1, 1), Orientacion.VERTICAL),
+				new Muro(new Posicion(1, 1), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(6, 6), Orientacion.VERTICAL),
+				new Muro(new Posicion(6, 6), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(7, 7), Orientacion.VERTICAL),
+				new Muro(new Posicion(7, 7), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(0, 7), Orientacion.VERTICAL),
+				new Muro(new Posicion(0, 7), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(7, 0), Orientacion.VERTICAL),
+				new Muro(new Posicion(7, 0), Orientacion.HORIZONTAL)
+		};
+
+		for (int i = 0; i < murosValidos.length; i++) {
 			assertTrue(murosValidos[i].esPosicionValida(LIMITE_TABLERO));
 		}
-		
-		// Casos no validos <0 y >7
-		Muro murosNoValidos[] = {
-				new Muro (new Posicion(-1,-1),Orientacion.VERTICAL),
-				new Muro (new Posicion(-1,-1),Orientacion.HORIZONTAL),
-				new Muro (new Posicion(8,8),Orientacion.VERTICAL),
-				new Muro (new Posicion(8,8),Orientacion.HORIZONTAL),
-				new Muro (new Posicion(9,9),Orientacion.VERTICAL),
-				new Muro (new Posicion(9,9),Orientacion.HORIZONTAL),
-				new Muro (new Posicion(0,-1),Orientacion.VERTICAL),
-				new Muro (new Posicion(0,-1),Orientacion.HORIZONTAL),
-				new Muro (new Posicion(8,7),Orientacion.VERTICAL),
-				new Muro (new Posicion(8,7),Orientacion.HORIZONTAL),
-				new Muro (new Posicion(0,8),Orientacion.VERTICAL),
-				new Muro (new Posicion(0,8),Orientacion.HORIZONTAL),
-				new Muro (new Posicion(7,8),Orientacion.HORIZONTAL),
-				new Muro (new Posicion(8,0),Orientacion.VERTICAL)
-				};
-		
-		for(int i=0; i < murosNoValidos.length;i++) {
+
+		// Casos no validos <0 y >7 en tablero 9x9
+		Muro[] murosNoValidos = {
+				new Muro(new Posicion(-1, -1), Orientacion.VERTICAL),
+				new Muro(new Posicion(-1, -1), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(8, 8), Orientacion.VERTICAL),
+				new Muro(new Posicion(8, 8), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(9, 9), Orientacion.VERTICAL),
+				new Muro(new Posicion(9, 9), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(0, -1), Orientacion.VERTICAL),
+				new Muro(new Posicion(0, -1), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(-1, 0), Orientacion.VERTICAL),
+				new Muro(new Posicion(-1, 0), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(7, -1), Orientacion.VERTICAL),
+				new Muro(new Posicion(7, -1), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(-1, 7), Orientacion.VERTICAL),
+				new Muro(new Posicion(-1, 7), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(8, 7), Orientacion.VERTICAL),
+				new Muro(new Posicion(8, 7), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(0, 8), Orientacion.VERTICAL),
+				new Muro(new Posicion(0, 8), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(7, 8), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(8, 0), Orientacion.VERTICAL)
+		};
+
+		for (int i = 0; i < murosNoValidos.length; i++) {
 			assertFalse(murosNoValidos[i].esPosicionValida(LIMITE_TABLERO));
 		}
+
+		// Límite mínimo de contrato (limiteTablero = 2): únicamente (0,0) es válido
+		assertTrue(new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL).esPosicionValida(2));
+		assertTrue(new Muro(new Posicion(0, 0), Orientacion.VERTICAL).esPosicionValida(2));
+		assertFalse(new Muro(new Posicion(1, 0), Orientacion.HORIZONTAL).esPosicionValida(2));
+		assertFalse(new Muro(new Posicion(0, 1), Orientacion.VERTICAL).esPosicionValida(2));
+
+		// Tablero 7x7: límite válido en (5,5) y frontera inválida en (6,5) / (5,6)
+		assertTrue(new Muro(new Posicion(5, 5), Orientacion.HORIZONTAL).esPosicionValida(7));
+		assertTrue(new Muro(new Posicion(5, 5), Orientacion.VERTICAL).esPosicionValida(7));
+		assertFalse(new Muro(new Posicion(6, 5), Orientacion.HORIZONTAL).esPosicionValida(7));
+		assertFalse(new Muro(new Posicion(5, 6), Orientacion.VERTICAL).esPosicionValida(7));
 	}
-	
+
 	@Test
 	void testColisionaCon() {
 		// 1. Mismo origen: solapamiento total y cruce en cruz
@@ -88,23 +108,41 @@ class MuroTest {
 		Muro cruceCruz = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
 		Muro solapadoTotal = new Muro(new Posicion(2, 2), Orientacion.VERTICAL);
 
-		assertTrue(baseVert.colisionaCon(cruceCruz), "Debe colisionar si se cruzan en el mismo origen");
-		assertTrue(baseVert.colisionaCon(solapadoTotal), "Debe colisionar si coinciden exactamente en origen y orientación");
+		assertTrue(baseVert.colisionaCon(cruceCruz),
+				"Debe colisionar si se cruzan en el mismo origen");
+		assertTrue(baseVert.colisionaCon(solapadoTotal),
+				"Debe colisionar si coinciden exactamente en origen y orientación");
 
-		// 2. Misma orientación: solapamiento parcial en el mismo eje (distancia = 1)
+		// 2. Misma orientación: solapamiento parcial en sentido positivo y negativo (distancia = 1)
 		Muro solapadoParcialVert = new Muro(new Posicion(2, 3), Orientacion.VERTICAL);
+		Muro solapadoParcialVertNeg = new Muro(new Posicion(2, 1), Orientacion.VERTICAL);
 		Muro baseHoriz = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
 		Muro solapadoParcialHoriz = new Muro(new Posicion(3, 2), Orientacion.HORIZONTAL);
+		Muro solapadoParcialHorizNeg = new Muro(new Posicion(1, 2), Orientacion.HORIZONTAL);
 
-		assertTrue(baseVert.colisionaCon(solapadoParcialVert), "Debe colisionar por solapamiento parcial vertical");
-		assertTrue(baseHoriz.colisionaCon(solapadoParcialHoriz), "Debe colisionar por solapamiento parcial horizontal");
+		assertTrue(baseVert.colisionaCon(solapadoParcialVert),
+				"Debe colisionar por solapamiento parcial vertical positivo");
+		assertTrue(baseVert.colisionaCon(solapadoParcialVertNeg),
+				"Debe colisionar por solapamiento parcial vertical negativo");
+		assertTrue(baseHoriz.colisionaCon(solapadoParcialHoriz),
+				"Debe colisionar por solapamiento parcial horizontal positivo");
+		assertTrue(baseHoriz.colisionaCon(solapadoParcialHorizNeg),
+				"Debe colisionar por solapamiento parcial horizontal negativo");
 
-		// 3. Casos frontera: muros consecutivos/adyacentes en el mismo eje (distancia = 2, no colisionan)
+		// 3. Casos frontera: muros contiguos en sentido positivo y negativo (distancia = 2, no colisionan)
 		Muro contiguoVert = new Muro(new Posicion(2, 4), Orientacion.VERTICAL);
+		Muro contiguoVertNeg = new Muro(new Posicion(2, 0), Orientacion.VERTICAL);
 		Muro contiguoHoriz = new Muro(new Posicion(4, 2), Orientacion.HORIZONTAL);
+		Muro contiguoHorizNeg = new Muro(new Posicion(0, 2), Orientacion.HORIZONTAL);
 
-		assertFalse(baseVert.colisionaCon(contiguoVert), "Muros contiguos verticales a distancia 2 no deben colisionar");
-		assertFalse(baseHoriz.colisionaCon(contiguoHoriz), "Muros contiguos horizontales a distancia 2 no deben colisionar");
+		assertFalse(baseVert.colisionaCon(contiguoVert),
+				"Muros contiguos verticales positivos a distancia 2 no deben colisionar");
+		assertFalse(baseVert.colisionaCon(contiguoVertNeg),
+				"Muros contiguos verticales negativos a distancia 2 no deben colisionar");
+		assertFalse(baseHoriz.colisionaCon(contiguoHoriz),
+				"Muros contiguos horizontales positivos a distancia 2 no deben colisionar");
+		assertFalse(baseHoriz.colisionaCon(contiguoHorizNeg),
+				"Muros contiguos horizontales negativos a distancia 2 no deben colisionar");
 
 		// 4. Muros paralelos sin solapamiento (desplazados lateralmente)
 		Muro paraleloVert = new Muro(new Posicion(3, 2), Orientacion.VERTICAL);
@@ -113,7 +151,19 @@ class MuroTest {
 		assertFalse(baseVert.colisionaCon(paraleloVert), "Muros verticales paralelos no deben colisionar");
 		assertFalse(baseHoriz.colisionaCon(paraleloHoriz), "Muros horizontales paralelos no deben colisionar");
 
-		// 5. Muro lejano / disjunto
+		// 5. Muros perpendiculares que no comparten origen (cruces en T y L válidos sin colisión)
+		Muro cruceTFin = new Muro(new Posicion(3, 2), Orientacion.VERTICAL);
+		Muro cruceLInf = new Muro(new Posicion(2, 3), Orientacion.VERTICAL);
+		Muro cruceTSup = new Muro(new Posicion(2, 1), Orientacion.VERTICAL);
+
+		assertFalse(baseHoriz.colisionaCon(cruceTFin),
+				"Cruce en T/L (2,2)H con (3,2)V no debe colisionar");
+		assertFalse(baseHoriz.colisionaCon(cruceLInf),
+				"Cruce en T/L (2,2)H con (2,3)V no debe colisionar");
+		assertFalse(baseHoriz.colisionaCon(cruceTSup),
+				"Cruce en T (2,2)H con (2,1)V no debe colisionar");
+
+		// 6. Muro lejano / disjunto
 		Muro lejano = new Muro(new Posicion(7, 7), Orientacion.VERTICAL);
 		assertFalse(baseVert.colisionaCon(lejano), "Muros completamente separados no deben colisionar");
 	}

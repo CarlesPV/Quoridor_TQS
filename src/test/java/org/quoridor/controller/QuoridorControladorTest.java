@@ -5,11 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.atLeastOnce;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,6 +95,8 @@ class QuoridorControladorTest {
         verify(vistaMock).mostrarTurno(actual.getNombre(), actual.getColor());
         verify(vistaMock).actualizarMurosRestantes(modelo.getMurosRestantesPorJugador());
         verify(vistaMock).limpiarMensajes();
+        verify(vistaMock, never()).mostrarError(any());
+        verify(vistaMock, never()).mostrarVictoria(any());
 
         assertEquals(10, modelo.getMurosRestantesPorJugador().get(Color.ROJO));
         assertEquals(10, modelo.getMurosRestantesPorJugador().get(Color.AZUL));
@@ -121,6 +124,8 @@ class QuoridorControladorTest {
                 "El peón debe actualizar su posición en el modelo tras un movimiento válido.");
         verify(vistaMock, times(2)).actualizarTablero(any(), any());
         verify(vistaMock, times(2)).limpiarMensajes();
+        verify(vistaMock, never()).mostrarError(any());
+        verify(vistaMock, never()).mostrarVictoria(any());
     }
 
     /**
@@ -141,6 +146,7 @@ class QuoridorControladorTest {
         verify(vistaMock, times(4)).mostrarError("Casilla fuera del tablero.");
         // Solo la llamada inicial de iniciarJuego
         verify(vistaMock, times(1)).actualizarTablero(any(), any());
+        verify(vistaMock, never()).mostrarVictoria(any());
     }
 
     /**
@@ -160,6 +166,10 @@ class QuoridorControladorTest {
         ctrl7x7.onCasillaClic(3, 7);
 
         verify(vistaMock, times(2)).mostrarError("Casilla fuera del tablero.");
+        verify(vistaMock, never()).actualizarTablero(any(), any());
+        verify(vistaMock, never()).mostrarTurno(any(), any());
+        verify(vistaMock, never()).mostrarVictoria(any());
+        verify(vistaMock, never()).limpiarMensajes();
     }
 
     /**
@@ -175,6 +185,8 @@ class QuoridorControladorTest {
         // (0, 4) no es adyacente a la casilla de inicio (4, 0) o (4, 8)
         controlador.onCasillaClic(0, 4);
         verify(vistaMock).mostrarError("Movimiento no válido.");
+        verify(vistaMock, times(1)).actualizarTablero(any(), any());
+        verify(vistaMock, never()).mostrarVictoria(any());
     }
 
     /**
@@ -190,6 +202,9 @@ class QuoridorControladorTest {
 
         controlador.onCasillaClic(4, 1);
         verify(vistaMock).mostrarError("La partida ya ha terminado. Pulsa Reiniciar.");
+        verify(vistaMock, never()).actualizarTablero(any(), any());
+        verify(vistaMock, never()).mostrarTurno(any(), any());
+        verify(vistaMock, never()).mostrarVictoria(any());
     }
 
     /**
@@ -214,6 +229,8 @@ class QuoridorControladorTest {
 
         assertTrue(partidaVictoria.isTerminada(), "La partida debe finalizar tras alcanzar la meta.");
         verify(vistaMock).mostrarVictoria("Ganador");
+        verify(vistaMock, never()).mostrarTurno(any(), any());
+        verify(vistaMock, never()).mostrarError(any());
     }
 
     /**
@@ -237,6 +254,8 @@ class QuoridorControladorTest {
         verify(vistaMock, times(2)).actualizarTablero(any(), any());
         verify(vistaMock, times(2)).actualizarMurosRestantes(any());
         verify(vistaMock, times(2)).mostrarTurno(any(), any());
+        verify(vistaMock, never()).mostrarError(any());
+        verify(vistaMock, never()).mostrarVictoria(any());
     }
 
     /**
@@ -252,6 +271,9 @@ class QuoridorControladorTest {
 
         controlador.onInterseccionClic(2, 2, Orientacion.HORIZONTAL);
         verify(vistaMock).mostrarError("La partida ya ha terminado. Pulsa Reiniciar.");
+        verify(vistaMock, never()).actualizarTablero(any(), any());
+        verify(vistaMock, never()).actualizarMurosRestantes(any());
+        verify(vistaMock, never()).mostrarTurno(any(), any());
     }
 
     /**
@@ -267,6 +289,8 @@ class QuoridorControladorTest {
         controlador.onInterseccionClic(3, 3, null);
         verify(vistaMock).mostrarError(
                 "No se puede colocar el muro en esa posición o no te quedan muros.");
+        verify(vistaMock, times(1)).actualizarTablero(any(), any());
+        verify(vistaMock, never()).mostrarVictoria(any());
     }
 
     /**
@@ -288,6 +312,9 @@ class QuoridorControladorTest {
 
         verify(vistaMock, times(4)).mostrarError(
                 "No se puede colocar el muro en esa posición o no te quedan muros.");
+        verify(vistaMock, times(1)).actualizarTablero(any(), any());
+        verify(vistaMock, times(1)).actualizarMurosRestantes(any());
+        verify(vistaMock, never()).mostrarVictoria(any());
         assertTrue(modelo.getMurosColocados().isEmpty());
     }
 
