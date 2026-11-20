@@ -32,15 +32,23 @@ public class VentanaPrincipalJavaFX implements IQuoridorVista {
     private static final double ESPACIADO_ITEM_MUROS = 8.0;
 
     private static final String CLASE_CASILLA = "casilla";
+    private static final String CLASE_CASILLA_META_AZUL = "casilla-meta-azul";
+    private static final String CLASE_CASILLA_META_ROJO = "casilla-meta-rojo";
     private static final String CLASE_RANURA = "ranura-muro";
+    private static final String CLASE_RANURA_PREVIEW = "ranura-preview";
     private static final String CLASE_INTERSECCION = "interseccion-muro";
     private static final String CLASE_MURO_COLOCADO = "muro-colocado";
     private static final String CLASE_PEON = "peon";
     private static final String CLASE_MENSAJE_ERROR = "mensaje-error";
     private static final String CLASE_MENSAJE_VICTORIA = "mensaje-victoria";
+    private static final String CLASE_STATUS_BAR_VICTORIA = "status-bar-victoria";
+    private static final String CLASE_TURN_BADGE_VICTORIA = "turn-badge-victoria";
 
     @FXML
     private GridPane tableroGrid;
+
+    @FXML
+    private HBox turnBadge;
 
     @FXML
     private Label lblTurno;
@@ -50,6 +58,9 @@ public class VentanaPrincipalJavaFX implements IQuoridorVista {
 
     @FXML
     private VBox panelMurosRestantes;
+
+    @FXML
+    private HBox statusBar;
 
     @FXML
     private Label lblMensaje;
@@ -99,6 +110,11 @@ public class VentanaPrincipalJavaFX implements IQuoridorVista {
         casilla.setMinSize(TAMANO_CASILLA, TAMANO_CASILLA);
         casilla.setMaxSize(TAMANO_CASILLA, TAMANO_CASILLA);
         casilla.getStyleClass().add(CLASE_CASILLA);
+        if (y == 0) {
+            casilla.getStyleClass().add(CLASE_CASILLA_META_AZUL);
+        } else if (y == TAMANO_TABLERO - 1) {
+            casilla.getStyleClass().add(CLASE_CASILLA_META_ROJO);
+        }
         casilla.setOnMouseClicked(event -> {
             if (controlador != null) {
                 controlador.onCasillaClic(x, y);
@@ -110,9 +126,12 @@ public class VentanaPrincipalJavaFX implements IQuoridorVista {
 
     private void agregarRanuraHorizontal(int x, int y) {
         Region ranura = crearRegion(TAMANO_CASILLA, GROSOR_RANURA, CLASE_RANURA);
+        int origenX = Math.min(x, TAMANO_TABLERO - 2);
+        ranura.setOnMouseEntered(event -> alternarPreviewMuro(origenX, y, Orientacion.HORIZONTAL, true));
+        ranura.setOnMouseExited(event -> alternarPreviewMuro(origenX, y, Orientacion.HORIZONTAL, false));
         ranura.setOnMouseClicked(event -> {
             if (controlador != null) {
-                controlador.onInterseccionClic(x, y, Orientacion.HORIZONTAL);
+                controlador.onInterseccionClic(origenX, y, Orientacion.HORIZONTAL);
             }
         });
         ranurasHorizontales[x][y] = ranura;
@@ -121,13 +140,41 @@ public class VentanaPrincipalJavaFX implements IQuoridorVista {
 
     private void agregarRanuraVertical(int x, int y) {
         Region ranura = crearRegion(GROSOR_RANURA, TAMANO_CASILLA, CLASE_RANURA);
+        int origenY = Math.min(y, TAMANO_TABLERO - 2);
+        ranura.setOnMouseEntered(event -> alternarPreviewMuro(x, origenY, Orientacion.VERTICAL, true));
+        ranura.setOnMouseExited(event -> alternarPreviewMuro(x, origenY, Orientacion.VERTICAL, false));
         ranura.setOnMouseClicked(event -> {
             if (controlador != null) {
-                controlador.onInterseccionClic(x, y, Orientacion.VERTICAL);
+                controlador.onInterseccionClic(x, origenY, Orientacion.VERTICAL);
             }
         });
         ranurasVerticales[x][y] = ranura;
         tableroGrid.add(ranura, x * 2 + 1, y * 2);
+    }
+
+    private void alternarPreviewMuro(int origenX, int origenY, Orientacion orientacion, boolean activar) {
+        if (orientacion == Orientacion.HORIZONTAL) {
+            actualizarClasePreview(ranurasHorizontales[origenX][origenY], activar);
+            actualizarClasePreview(ranurasHorizontales[origenX + 1][origenY], activar);
+        } else {
+            actualizarClasePreview(ranurasVerticales[origenX][origenY], activar);
+            actualizarClasePreview(ranurasVerticales[origenX][origenY + 1], activar);
+        }
+        actualizarClasePreview(intersecciones[origenX][origenY], activar);
+    }
+
+    private void actualizarClasePreview(Region region, boolean activar) {
+        if (region == null) {
+            return;
+        }
+        if (activar) {
+            if (!region.getStyleClass().contains(CLASE_MURO_COLOCADO)
+                    && !region.getStyleClass().contains(CLASE_RANURA_PREVIEW)) {
+                region.getStyleClass().add(CLASE_RANURA_PREVIEW);
+            }
+        } else {
+            region.getStyleClass().remove(CLASE_RANURA_PREVIEW);
+        }
     }
 
     private void agregarInterseccion(int x, int y) {
@@ -179,13 +226,13 @@ public class VentanaPrincipalJavaFX implements IQuoridorVista {
                     casillas[x][y].getChildren().clear();
                 }
                 if (x < TAMANO_TABLERO - 1 && ranurasVerticales[x][y] != null) {
-                    ranurasVerticales[x][y].getStyleClass().remove(CLASE_MURO_COLOCADO);
+                    ranurasVerticales[x][y].getStyleClass().removeAll(CLASE_MURO_COLOCADO, CLASE_RANURA_PREVIEW);
                 }
                 if (y < TAMANO_TABLERO - 1 && ranurasHorizontales[x][y] != null) {
-                    ranurasHorizontales[x][y].getStyleClass().remove(CLASE_MURO_COLOCADO);
+                    ranurasHorizontales[x][y].getStyleClass().removeAll(CLASE_MURO_COLOCADO, CLASE_RANURA_PREVIEW);
                 }
                 if (x < TAMANO_TABLERO - 1 && y < TAMANO_TABLERO - 1 && intersecciones[x][y] != null) {
-                    intersecciones[x][y].getStyleClass().remove(CLASE_MURO_COLOCADO);
+                    intersecciones[x][y].getStyleClass().removeAll(CLASE_MURO_COLOCADO, CLASE_RANURA_PREVIEW);
                 }
             }
         }
@@ -232,6 +279,9 @@ public class VentanaPrincipalJavaFX implements IQuoridorVista {
 
     @Override
     public void mostrarTurno(String nombreJugador, Color colorJugador) {
+        if (turnBadge != null) {
+            turnBadge.getStyleClass().remove(CLASE_TURN_BADGE_VICTORIA);
+        }
         if (lblTurno != null) {
             String nombre = (nombreJugador != null) ? nombreJugador : "-";
             lblTurno.setText("Turno: " + nombre);
@@ -257,9 +307,10 @@ public class VentanaPrincipalJavaFX implements IQuoridorVista {
             Circle iconoColor = new Circle(RADIO_ICONO_PANEL);
             aplicarClaseColorPeon(iconoColor, entrada.getKey());
 
-            String nombreColor = (entrada.getKey() != null) ? entrada.getKey().name() : "JUGADOR";
+            String nombreJugador = formatearNombreJugador(entrada.getKey());
             int cantidad = (entrada.getValue() != null) ? entrada.getValue() : 0;
-            Label etiqueta = new Label(nombreColor + ": " + cantidad + " muros");
+            String unidad = (cantidad == 1) ? " muro" : " muros";
+            Label etiqueta = new Label(nombreJugador + ": " + cantidad + unidad);
             etiqueta.getStyleClass().add("muro-item-label");
 
             fila.getChildren().addAll(iconoColor, etiqueta);
@@ -267,8 +318,23 @@ public class VentanaPrincipalJavaFX implements IQuoridorVista {
         }
     }
 
+    private String formatearNombreJugador(Color color) {
+        if (color == null) {
+            return "Jugador";
+        }
+        return switch (color) {
+            case ROJO -> "Jugador 1 (ROJO)";
+            case AZUL -> "Jugador 2 (AZUL)";
+            case VERDE -> "Jugador 3 (VERDE)";
+            case AMARILLO -> "Jugador 4 (AMARILLO)";
+        };
+    }
+
     @Override
     public void mostrarError(String mensaje) {
+        if (statusBar != null) {
+            statusBar.getStyleClass().remove(CLASE_STATUS_BAR_VICTORIA);
+        }
         if (lblMensaje == null) {
             return;
         }
@@ -281,19 +347,33 @@ public class VentanaPrincipalJavaFX implements IQuoridorVista {
 
     @Override
     public void mostrarVictoria(String nombreGanador) {
-        if (lblMensaje == null) {
-            return;
-        }
-        lblMensaje.getStyleClass().remove(CLASE_MENSAJE_ERROR);
-        if (!lblMensaje.getStyleClass().contains(CLASE_MENSAJE_VICTORIA)) {
-            lblMensaje.getStyleClass().add(CLASE_MENSAJE_VICTORIA);
-        }
         String ganador = (nombreGanador != null) ? nombreGanador : "Jugador";
-        lblMensaje.setText("¡Victoria para " + ganador + "!");
+        if (statusBar != null && !statusBar.getStyleClass().contains(CLASE_STATUS_BAR_VICTORIA)) {
+            statusBar.getStyleClass().add(CLASE_STATUS_BAR_VICTORIA);
+        }
+        if (turnBadge != null && !turnBadge.getStyleClass().contains(CLASE_TURN_BADGE_VICTORIA)) {
+            turnBadge.getStyleClass().add(CLASE_TURN_BADGE_VICTORIA);
+        }
+        if (lblTurno != null) {
+            lblTurno.setText("Partida finalizada — Ganador: " + ganador);
+        }
+        if (lblMensaje != null) {
+            lblMensaje.getStyleClass().remove(CLASE_MENSAJE_ERROR);
+            if (!lblMensaje.getStyleClass().contains(CLASE_MENSAJE_VICTORIA)) {
+                lblMensaje.getStyleClass().add(CLASE_MENSAJE_VICTORIA);
+            }
+            lblMensaje.setText("¡Victoria para " + ganador + "! Pulsa Reiniciar Partida para volver a jugar.");
+        }
     }
 
     @Override
     public void limpiarMensajes() {
+        if (statusBar != null) {
+            statusBar.getStyleClass().remove(CLASE_STATUS_BAR_VICTORIA);
+        }
+        if (turnBadge != null) {
+            turnBadge.getStyleClass().remove(CLASE_TURN_BADGE_VICTORIA);
+        }
         if (lblMensaje == null) {
             return;
         }

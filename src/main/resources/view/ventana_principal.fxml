@@ -25,7 +25,7 @@
             </padding>
             <Label text="QUORIDOR" styleClass="app-title"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <HBox alignment="CENTER" spacing="10.0" styleClass="turn-badge">
+            <HBox fx:id="turnBadge" alignment="CENTER" spacing="10.0" styleClass="turn-badge">
                 <Circle fx:id="indicadorTurno" radius="9.0" styleClass="indicador-turno"/>
                 <Label fx:id="lblTurno" text="Turno: -" styleClass="turn-label"/>
             </HBox>
@@ -35,14 +35,22 @@
     <center>
         <StackPane styleClass="board-container">
             <padding>
-                <Insets top="16.0" right="16.0" bottom="16.0" left="20.0"/>
+                <Insets top="10.0" right="16.0" bottom="10.0" left="20.0"/>
             </padding>
-            <GridPane fx:id="tableroGrid" alignment="CENTER" styleClass="tablero-grid"/>
+            <VBox alignment="CENTER" spacing="6.0">
+                <HBox alignment="CENTER" styleClass="meta-banner, meta-banner-azul">
+                    <Label text="▲ META JUGADOR 2 (AZUL) ▲" styleClass="meta-banner-label, meta-label-azul"/>
+                </HBox>
+                <GridPane fx:id="tableroGrid" alignment="CENTER" styleClass="tablero-grid"/>
+                <HBox alignment="CENTER" styleClass="meta-banner, meta-banner-rojo">
+                    <Label text="▼ META JUGADOR 1 (ROJO) ▼" styleClass="meta-banner-label, meta-label-rojo"/>
+                </HBox>
+            </VBox>
         </StackPane>
     </center>
 
     <right>
-        <VBox spacing="16.0" prefWidth="250.0" styleClass="info-panel">
+        <VBox spacing="14.0" prefWidth="260.0" styleClass="info-panel">
             <padding>
                 <Insets top="20.0" right="20.0" bottom="20.0" left="16.0"/>
             </padding>
@@ -54,8 +62,14 @@
             <VBox spacing="6.0" styleClass="legend-box">
                 <Label text="Controles" styleClass="section-title"/>
                 <Label text="• Clic en casilla: mover peón" wrapText="true" styleClass="legend-text"/>
-                <Label text="• Clic en ranura horizontal o vertical: colocar muro" wrapText="true"
+                <Label text="• Clic en ranura horizontal o vertical: colocar muro (2 casillas)" wrapText="true"
                        styleClass="legend-text"/>
+            </VBox>
+            <Separator/>
+            <VBox spacing="6.0" styleClass="legend-box">
+                <Label text="Objetivos de victoria" styleClass="section-title"/>
+                <Label text="• Jugador 1 (ROJO): alcanzar la fila inferior" wrapText="true" styleClass="legend-text"/>
+                <Label text="• Jugador 2 (AZUL): alcanzar la fila superior" wrapText="true" styleClass="legend-text"/>
             </VBox>
             <Region VBox.vgrow="ALWAYS"/>
             <Button fx:id="btnReiniciar" text="Reiniciar Partida" maxWidth="Infinity"
@@ -64,7 +78,7 @@
     </right>
 
     <bottom>
-        <HBox alignment="CENTER_LEFT" styleClass="status-bar">
+        <HBox fx:id="statusBar" alignment="CENTER_LEFT" styleClass="status-bar">
             <padding>
                 <Insets top="10.0" right="20.0" bottom="10.0" left="20.0"/>
             </padding>
