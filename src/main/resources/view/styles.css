@@ -23,6 +23,11 @@
     -fx-border-radius: 20px;
 }
 
+.turn-badge-victoria {
+    -fx-background-color: #1c3326;
+    -fx-border-color: #51cf66;
+}
+
 .turn-label {
     -fx-text-fill: #e6ebf5;
     -fx-font-size: 14px;
@@ -37,6 +42,37 @@
 
 .board-container {
     -fx-background-color: #1e222b;
+}
+
+.meta-banner {
+    -fx-padding: 3px 14px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+}
+
+.meta-banner-azul {
+    -fx-background-color: rgba(58, 134, 255, 0.14);
+    -fx-border-color: rgba(58, 134, 255, 0.45);
+    -fx-border-width: 1px;
+}
+
+.meta-banner-rojo {
+    -fx-background-color: rgba(230, 57, 70, 0.14);
+    -fx-border-color: rgba(230, 57, 70, 0.45);
+    -fx-border-width: 1px;
+}
+
+.meta-banner-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.meta-label-azul {
+    -fx-text-fill: #7eb2ff;
+}
+
+.meta-label-rojo {
+    -fx-text-fill: #ff858e;
 }
 
 .tablero-grid {
@@ -54,6 +90,18 @@
     -fx-cursor: hand;
 }
 
+.casilla-meta-azul {
+    -fx-border-color: rgba(58, 134, 255, 0.75);
+    -fx-border-width: 2px 0 0 0;
+    -fx-border-radius: 4px;
+}
+
+.casilla-meta-rojo {
+    -fx-border-color: rgba(230, 57, 70, 0.75);
+    -fx-border-width: 0 0 2px 0;
+    -fx-border-radius: 4px;
+}
+
 .casilla:hover {
     -fx-background-color: #e6d5bc;
 }
@@ -64,19 +112,16 @@
     -fx-cursor: hand;
 }
 
-.ranura-muro:hover {
-    -fx-background-color: #c89f68;
-}
-
 .interseccion-muro {
     -fx-background-color: #3a2b20;
 }
 
-.muro-colocado {
-    -fx-background-color: #e09f3e;
+.ranura-preview {
+    -fx-background-color: #c89f68;
 }
 
-.muro-colocado:hover {
+.muro-colocado,
+.ranura-preview.muro-colocado {
     -fx-background-color: #e09f3e;
 }
 
@@ -153,6 +198,12 @@
     -fx-background-color: #20252f;
     -fx-border-color: #343b4a;
     -fx-border-width: 1 0 0 0;
+}
+
+.status-bar-victoria {
+    -fx-background-color: #193224;
+    -fx-border-color: #51cf66;
+    -fx-border-width: 2 0 0 0;
 }
 
 .status-message {
