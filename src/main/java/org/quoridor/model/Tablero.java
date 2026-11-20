@@ -110,12 +110,27 @@ public class Tablero {
 
 		// Salto sobre oponente
 		if (oponente != null && origen.esAdyacente(oponente)) {
-			if (!hayMuroBloqueante(origen, oponente)) {
-				int dx = oponente.getX() - origen.getX();
-				int dy = oponente.getY() - origen.getY();
-				Posicion saltoRecto = new Posicion(oponente.getX() + dx, oponente.getY() + dy);
-				if (destino.equals(saltoRecto) && !hayMuroBloqueante(oponente, saltoRecto)) {
-					return true;
+			int dx = oponente.getX() - origen.getX();
+			int dy = oponente.getY() - origen.getY();
+			Posicion saltoRecto = new Posicion(oponente.getX() + dx, oponente.getY() + dy);
+
+			// Si el salto recto es posible, solo se permite saltar recto
+			if (saltoRecto.esValida(this.tamanoTablero) && !hayMuroBloqueante(oponente, saltoRecto)) {
+				return destino.equals(saltoRecto);
+			}
+
+			// Si el salto recto está bloqueado por borde o muro detrás del oponente, se permiten diagonales perpendiculares
+			if (dx != 0) {
+				Posicion diagArriba = new Posicion(oponente.getX(), oponente.getY() - 1);
+				Posicion diagAbajo = new Posicion(oponente.getX(), oponente.getY() + 1);
+				if (destino.equals(diagArriba) || destino.equals(diagAbajo)) {
+					return destino.esValida(this.tamanoTablero) && !hayMuroBloqueante(oponente, destino);
+				}
+			} else if (dy != 0) {
+				Posicion diagIzquierda = new Posicion(oponente.getX() - 1, oponente.getY());
+				Posicion diagDerecha = new Posicion(oponente.getX() + 1, oponente.getY());
+				if (destino.equals(diagIzquierda) || destino.equals(diagDerecha)) {
+					return destino.esValida(this.tamanoTablero) && !hayMuroBloqueante(oponente, destino);
 				}
 			}
 		}
