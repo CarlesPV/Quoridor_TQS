@@ -34,11 +34,11 @@ class TableroTest {
 	// Prueba de Caja Negra: Partición Equivalente y valores límite / frontera válidos
 	@Test
 	void testConstructorConParametros() {
-		IValidadorCaminos mockValidador = new ValidadorCaminos();
-		Tablero tableroInyectado = new Tablero(mockValidador);
+		IValidadorCaminos validadorReal = new ValidadorCaminos();
+		Tablero tableroInyectado = new Tablero(validadorReal);
 		assertNotNull(tableroInyectado.getMurosColocados());
 		assertTrue(tableroInyectado.getMurosColocados().isEmpty());
-		assertEquals(mockValidador, tableroInyectado.getValidadorCaminos(), "Debe usar el validador inyectado");
+		assertEquals(validadorReal, tableroInyectado.getValidadorCaminos(), "Debe usar el validador inyectado");
 
 		assertThrows(AssertionError.class, () -> new Tablero(null),
 				"Debe lanzar AssertionError si el validador es nulo");
@@ -268,34 +268,89 @@ class TableroTest {
 		tableroConMock.getPosicionesJugadores().put(Color.ROJO, new Posicion(4, 0));
 		tableroConMock.getPosicionesJugadores().put(Color.AZUL, new Posicion(4, 8));
 
-		// Caso validador retorna true: camino disponible para todos
+		// Caso validador retorna true: verifica que invoca al validador 1 vez por jugador con muro candidato
 		mockValidador.setCaminoDisponible(true);
 		assertTrue(tableroConMock.esColocacionMuroValida(muroValido),
 				"Debe permitir colocar muro si el validador confirma camino disponible");
+		assertEquals(2, mockValidador.getVecesInvocado(),
+				"Debe invocar al validador exactamente una vez por cada jugador");
+		assertNotNull(mockValidador.getUltimosMurosRecibidos());
+		assertEquals(1, mockValidador.getUltimosMurosRecibidos().size(),
+				"La lista simulada debe contener únicamente el muro candidato");
+		assertTrue(mockValidador.getUltimosMurosRecibidos().contains(muroValido),
+				"murosSimulados debe incluir el muro candidato");
+		assertTrue(mockValidador.getUltimaFilaObjetivo() == 0 || mockValidador.getUltimaFilaObjetivo() == 8,
+				"La fila objetivo pasada debe corresponder a alguno de los jugadores");
 
-		// Caso validador retorna false: el muro encierra a algún jugador
+		// Caso validador retorna false: se detiene en el primer jugador encerrado
+		mockValidador.reiniciarRegistro();
 		mockValidador.setCaminoDisponible(false);
 		assertFalse(tableroConMock.esColocacionMuroValida(muroValido),
 				"No debe permitir colocar muro si el validador indica que bloquea el camino");
+		assertEquals(1, mockValidador.getVecesInvocado(),
+				"Debe detener la comprobación en cuanto un jugador no tiene camino");
+
+		// Verificación exacta de filaObjetivo y acumulación en murosSimulados sin mutar muros reales
+		mockValidador.reiniciarRegistro();
+		mockValidador.setCaminoDisponible(true);
+		Tablero tableroConMuroPrevio = new Tablero(mockValidador);
+		Muro muroExistente = new Muro(new Posicion(0, 0), Orientacion.VERTICAL);
+		tableroConMuroPrevio.colocarMuro(muroExistente);
+		tableroConMuroPrevio.getPosicionesJugadores().put(Color.ROJO, new Posicion(4, 0));
+		tableroConMuroPrevio.setFilaObjetivo(Color.ROJO, 8);
+
+		assertTrue(tableroConMuroPrevio.esColocacionMuroValida(muroValido));
+		assertEquals(1, mockValidador.getVecesInvocado());
+		assertEquals(8, mockValidador.getUltimaFilaObjetivo());
+		assertEquals(List.of(muroExistente, muroValido), mockValidador.getUltimosMurosRecibidos());
+		assertEquals(1, tableroConMuroPrevio.getMurosColocados().size(),
+				"La validación simulada no debe modificar los muros colocados reales");
 	}
 
-	// Mock Manual de IValidadorCaminos
+	// Mock Manual de IValidadorCaminos con verificación de invocaciones y argumentos recibidos
 	private static class MockValidadorCaminos implements IValidadorCaminos {
 		private boolean caminoDisponible = true;
+		private int vecesInvocado = 0;
+		private int ultimaFilaObjetivo = -1;
+		private List<Muro> ultimosMurosRecibidos;
 
 		public void setCaminoDisponible(boolean caminoDisponible) {
 			this.caminoDisponible = caminoDisponible;
 		}
 
+		public void reiniciarRegistro() {
+			this.vecesInvocado = 0;
+			this.ultimaFilaObjetivo = -1;
+			this.ultimosMurosRecibidos = null;
+		}
+
+		public int getVecesInvocado() {
+			return this.vecesInvocado;
+		}
+
+		public int getUltimaFilaObjetivo() {
+			return this.ultimaFilaObjetivo;
+		}
+
+		public List<Muro> getUltimosMurosRecibidos() {
+			return this.ultimosMurosRecibidos;
+		}
+
 		@Override
 		public boolean hayCaminoDisponible(Posicion inicio, int filaObjetivo,
 				List<Muro> muros, int tamanoTablero) {
+			this.vecesInvocado++;
+			this.ultimaFilaObjetivo = filaObjetivo;
+			this.ultimosMurosRecibidos = (muros != null) ? new ArrayList<>(muros) : null;
 			return this.caminoDisponible;
 		}
 
 		@Override
 		public int calcularDistanciaMinima(Posicion inicio, int filaObjetivo,
 				List<Muro> muros, int tamanoTablero) {
+			this.vecesInvocado++;
+			this.ultimaFilaObjetivo = filaObjetivo;
+			this.ultimosMurosRecibidos = (muros != null) ? new ArrayList<>(muros) : null;
 			return this.caminoDisponible ? 5 : -1;
 		}
 	}
