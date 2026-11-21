@@ -128,6 +128,7 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	{
 		assert(origen != null) : "La posicion origen es null";
 		assert(destino != null) : "La posicion destino es null";
+		assert muros != null : "La lista de muros es null";
 		
 		for (Muro muro : muros) 
 		{
