@@ -99,6 +99,9 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	List<Posicion> obtenerVecinosValidos(Posicion actual, List<Muro> muros, int tamanoTablero)
 	{
 		assert(actual != null) : "La posicion actual es null";
+		assert muros != null : "La lista de muros es null";
+		assert tamanoTablero > 0 : "El tamaño del tablero es 0 o negativo";
+		assert actual.esValida(tamanoTablero) : "La posicion actual no es valida";
 		
 		List<Posicion> vecinos = new ArrayList<>();
         
