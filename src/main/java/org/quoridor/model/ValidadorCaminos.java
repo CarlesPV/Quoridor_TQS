@@ -77,6 +77,8 @@ public class ValidadorCaminos implements IValidadorCaminos {
             // ¿Llegamos a la fila objetivo?
             if (actual.getY() == filaObjetivo) 
             {
+            	// Post-condicion
+            	assert distanciaActual >= 0 : "La distancia no puede ser menor que 0";
                 return distanciaActual;
             }
             
@@ -90,7 +92,7 @@ public class ValidadorCaminos implements IValidadorCaminos {
                 }
             }
         }
-        
+
         // Si no existe camino
         return -1;
 	}
