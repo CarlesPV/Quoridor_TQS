@@ -124,18 +124,21 @@ public class Tablero {
 				return destino.equals(saltoRecto);
 			}
 
-			// Si el salto recto está bloqueado por borde o muro detrás del oponente, se permiten diagonales perpendiculares
+			// Si el salto recto está bloqueado por borde 
+			// o muro detrás del oponente, se permiten diagonales perpendiculares
 			if (dx != 0) {
 				Posicion diagArriba = new Posicion(oponente.getX(), oponente.getY() - 1);
 				Posicion diagAbajo = new Posicion(oponente.getX(), oponente.getY() + 1);
 				if (destino.equals(diagArriba) || destino.equals(diagAbajo)) {
-					return destino.esValida(this.tamanoTablero) && !hayMuroBloqueante(oponente, destino);
+					return destino.esValida(this.tamanoTablero) 
+							&& !hayMuroBloqueante(oponente, destino);
 				}
 			} else if (dy != 0) {
 				Posicion diagIzquierda = new Posicion(oponente.getX() - 1, oponente.getY());
 				Posicion diagDerecha = new Posicion(oponente.getX() + 1, oponente.getY());
 				if (destino.equals(diagIzquierda) || destino.equals(diagDerecha)) {
-					return destino.esValida(this.tamanoTablero) && !hayMuroBloqueante(oponente, destino);
+					return destino.esValida(this.tamanoTablero) 
+							&& !hayMuroBloqueante(oponente, destino);
 				}
 			}
 		}
