@@ -256,6 +256,8 @@ public class Partida {
             }
         }
         
+        // Post-condicion
+        assert(!this.terminada) : "La partida debe continuar al no haber un ganador";
         return null; // Nadie ha ganado todavía
 	}
 	
