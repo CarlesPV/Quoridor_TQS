@@ -90,6 +90,8 @@ public class Tablero {
 	}
 
 	public boolean esMovimientoValido(Posicion origen, Posicion destino, Posicion oponente) {
+		assert verificarInvariante() : "Invariante de Tablero violada";
+		
 		if (origen == null || destino == null) {
 			return false;
 		}
