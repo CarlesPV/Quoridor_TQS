@@ -7,6 +7,9 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	{
 		assert(inicio != null) : "La posicion inicial es null";
 		assert(filaObjetivo >= 0 && filaObjetivo < tamanoTablero) : "filaObjetivo fuera del rango del tablero";
+		assert muros != null : "La lista de muros es null";
+		assert tamanoTablero > 0 : "El tamaño del tablero es 0 o negativo";
+		assert inicio.esValida(tamanoTablero) : "La posicion inicial no es valida";
 		
 		// Si ya estamos en la filaObjetivo
         if (inicio.getY() == filaObjetivo) 
@@ -50,6 +53,9 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	{
 		assert(inicio != null) : "La posicion inicial es null";
 		assert(filaObjetivo >= 0 && filaObjetivo < tamanoTablero) : "filaObjetivo fuera del rango del tablero";
+		assert muros != null : "La lista de muros es null";
+		assert tamanoTablero > 0 : "El tamaño del tablero es 0 o negativo";
+		assert inicio.esValida(tamanoTablero) : "La posicion inicial no es valida";
 		
 		// Si ya estamos en la filaObjetivo
 		if (inicio.getY() == filaObjetivo) 
@@ -71,6 +77,8 @@ public class ValidadorCaminos implements IValidadorCaminos {
             // ¿Llegamos a la fila objetivo?
             if (actual.getY() == filaObjetivo) 
             {
+            	// Post-condicion
+            	assert distanciaActual >= 0 : "La distancia no puede ser menor que 0";
                 return distanciaActual;
             }
             
@@ -84,7 +92,7 @@ public class ValidadorCaminos implements IValidadorCaminos {
                 }
             }
         }
-        
+
         // Si no existe camino
         return -1;
 	}
@@ -93,6 +101,9 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	List<Posicion> obtenerVecinosValidos(Posicion actual, List<Muro> muros, int tamanoTablero)
 	{
 		assert(actual != null) : "La posicion actual es null";
+		assert muros != null : "La lista de muros es null";
+		assert tamanoTablero > 0 : "El tamaño del tablero es 0 o negativo";
+		assert actual.esValida(tamanoTablero) : "La posicion actual no es valida";
 		
 		List<Posicion> vecinos = new ArrayList<>();
         
@@ -119,6 +130,7 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	{
 		assert(origen != null) : "La posicion origen es null";
 		assert(destino != null) : "La posicion destino es null";
+		assert muros != null : "La lista de muros es null";
 		
 		for (Muro muro : muros) 
 		{

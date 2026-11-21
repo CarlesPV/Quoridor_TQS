@@ -8,6 +8,9 @@ public class SorteadorTurno implements ISorteadorTurno {
 		assert(jugadores != null && !jugadores.isEmpty()) : "La lista de jugadores no puede estar vacía o null";
 		
         Random random = new Random();
-        return random.nextInt(jugadores.size());
+        int indice = random.nextInt(jugadores.size());
+        
+        assert indice >= 0 && indice < jugadores.size() : "Indice fuera de rango de jugadores";
+        return indice;
     }
 }

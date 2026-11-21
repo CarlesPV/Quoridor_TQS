@@ -48,8 +48,13 @@ public class Partida {
 	public void configurarPartida(List<Jugador> jugadoresPersonalizados) {
 		// Pre-condiciones e invariante
 		assert jugadoresPersonalizados != null : "La lista de jugadores no puede ser null";
+		for (Jugador j : jugadores) {
+			assert j != null : "Un jugador no puede ser null";
+		}
 		assert !jugadoresPersonalizados.isEmpty() : "La lista de jugadores no puede estar vacía";
 		assert verificarInvariante() : "Invariante de Partida violada al inicio de configurarPartida";
+		
+		this.tablero.reiniciar();
 
 		this.jugadores = new ArrayList<>(jugadoresPersonalizados);
 		this.indiceJugadorActual = 0;
@@ -59,6 +64,8 @@ public class Partida {
 			this.tablero.setPosicionJugador(j.getColor(), j.getPosicionActual());
 			this.tablero.setFilaObjetivo(j.getColor(), j.getFilaObjetivo());
 		}
+		
+		this.terminada = true;
 
 		// Post-condiciones e invariante
 		assert !jugadores.isEmpty() : "La lista de jugadores no debe estar vacía";
@@ -249,6 +256,8 @@ public class Partida {
             }
         }
         
+        // Post-condicion
+        // assert(!this.terminada) : "La partida debe continuar al no haber un ganador";
         return null; // Nadie ha ganado todavía
 	}
 	
