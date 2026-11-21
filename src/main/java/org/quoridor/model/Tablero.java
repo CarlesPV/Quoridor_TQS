@@ -82,6 +82,7 @@ public class Tablero {
 	}
 
 	public Posicion getPosicionJugador(Color color) {
+		assert color != null : "El color no puede ser nulo";
 		return this.posicionesJugadores.get(color);
 	}
 
