@@ -53,6 +53,9 @@ public class ValidadorCaminos implements IValidadorCaminos {
 	{
 		assert(inicio != null) : "La posicion inicial es null";
 		assert(filaObjetivo >= 0 && filaObjetivo < tamanoTablero) : "filaObjetivo fuera del rango del tablero";
+		assert muros != null : "La lista de muros es null";
+		assert tamanoTablero > 0 : "El tamaño del tablero es 0 o negativo";
+		assert inicio.esValida(tamanoTablero) : "La posicion inicial no es valida";
 		
 		// Si ya estamos en la filaObjetivo
 		if (inicio.getY() == filaObjetivo) 
