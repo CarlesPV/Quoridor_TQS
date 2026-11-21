@@ -87,6 +87,8 @@ public class Tablero {
 	}
 
 	public void setPosicionJugador(Color color, Posicion posicion) {
+		assert color != null : "El color no puede ser nulo";
+		assert posicion != null : "La posicion no puede ser nula";
 		this.posicionesJugadores.put(color, posicion);
 	}
 
