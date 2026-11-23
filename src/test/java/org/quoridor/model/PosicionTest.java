@@ -123,18 +123,18 @@ class PosicionTest {
 	@Test
 	void testEsAdyacente() {
 		p2 = new Posicion(0,1);
-		assertTrue(p1.esAdyacente(p2)); // caso adyacencia derecha
+		assertTrue(p1.esAdyacente(p2)); // caso adyacencia abajo
 		
 		p2 = new Posicion(1,0);
-		assertTrue(p1.esAdyacente(p2)); // caso adyacencia abajo
+		assertTrue(p1.esAdyacente(p2)); // caso adyacencia derecha
 		
 		p2 = new Posicion(1,1);
 		
 		p1 = new Posicion(0,1);
-		assertTrue(p2.esAdyacente(p1)); // caso adyacencia arriba
+		assertTrue(p2.esAdyacente(p1)); // caso adyacencia izquierda
 		
 		p1 = new Posicion(1,0);
-		assertTrue(p2.esAdyacente(p1)); // caso adyacencia izquierda
+		assertTrue(p2.esAdyacente(p1)); // caso adyacencia arriba
 		
 		p1 = new Posicion(0,0);
 		assertFalse(p1.esAdyacente(p2)); // caso límite no adyacente
