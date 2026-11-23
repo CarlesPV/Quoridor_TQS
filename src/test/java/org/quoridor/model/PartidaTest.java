@@ -244,6 +244,21 @@ class PartidaTest {
 		resultado = partida.realizarMovimiento(destinoCualquiera);
 
 		assertFalse(resultado, "No se puede mover si la partida está terminada.");
+		
+		// Caso oponente con posicionActual == null (cubre ramas posOtro != null == false)
+		when(jugador2Mock.getPosicionActual()).thenReturn(null);
+		sorteadorMock = new SorteadorTurnoFijoMock(0);
+		partida = new Partida(tableroMock, sorteadorMock);
+		partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+		partida.iniciarPartida();
+		Posicion destinoConOponenteSinPos = new Posicion(4, 1);
+		when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoConOponenteSinPos), isNull()))
+				.thenReturn(true);
+
+		assertTrue(partida.realizarMovimiento(destinoConOponenteSinPos),
+				"Debe permitir el movimiento cuando el oponente tiene posición null y el tablero lo aprueba.");
+		// times(2) ya que antes de este caso se llama 1 vez
+		verify(jugador1Mock, times(2)).moverA(destinoConOponenteSinPos);
 	}
 
 	@Test
