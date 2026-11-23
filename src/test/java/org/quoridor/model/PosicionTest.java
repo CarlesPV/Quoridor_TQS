@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.api.DisplayName;
 
 import java.util.*;
 class PosicionTest {
@@ -248,8 +249,10 @@ class PosicionTest {
 		assertFalse(p1.equals((Object) new Posicion(0, 1)));
 	}
 
-	@ParameterizedTest
+	
+	@ParameterizedTest(name = "[{index}] ({0},{1}) adyacente a ({2},{3})? esperado={4}")
 	@CsvFileSource(resources = "/data/movimientos_test.csv", numLinesToSkip = 1)
+	@DisplayName("Data-Driven: Verificación de adyacencia ortogonal desde CSV")
 	void testEsAdyacenteDataDriven(int oX, int oY, int dX, int dY, boolean esperado) {
 		Posicion origen = new Posicion(oX, oY);
 		Posicion destino = new Posicion(dX, dY);
