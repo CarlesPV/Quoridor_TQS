@@ -607,5 +607,30 @@ class TableroTest {
 				"Salto diagonal bloqueado por muro lateral");
 		assertTrue(tablero.esMovimientoValido(origen, new Posicion(3, 5), oponente),
 				"Salto diagonal sin muro lateral debe ser válido");
+
+		// 4. Muro intermedio entre origen y oponente: impide salto recto y saltos diagonales
+		tablero.reiniciar();
+		tablero.colocarMuro(new Muro(new Posicion(4, 4), Orientacion.HORIZONTAL));
+		assertFalse(tablero.esMovimientoValido(origen, new Posicion(4, 6), oponente),
+				"No debe permitir salto recto si hay un muro entre origen y oponente");
+
+		// Aunque también exista un muro detrás del oponente, tampoco debe permitir saltos diagonales
+		tablero.colocarMuro(new Muro(new Posicion(4, 5), Orientacion.HORIZONTAL));
+		assertFalse(tablero.esMovimientoValido(origen, new Posicion(3, 5), oponente),
+				"No debe permitir salto diagonal izquierdo si hay muro entre origen y oponente");
+		assertFalse(tablero.esMovimientoValido(origen, new Posicion(5, 5), oponente),
+				"No debe permitir salto diagonal derecho si hay muro entre origen y oponente");
+
+		// Muro vertical intermedio entre origen y oponente en eje horizontal
+		tablero.reiniciar();
+		Posicion oponenteHorizontal = new Posicion(5, 4);
+		tablero.colocarMuro(new Muro(new Posicion(4, 4), Orientacion.VERTICAL));
+		assertFalse(tablero.esMovimientoValido(origen, new Posicion(6, 4), oponenteHorizontal),
+				"No debe permitir salto recto horizontal si hay un muro vertical entre origen y oponente");
+		tablero.colocarMuro(new Muro(new Posicion(5, 4), Orientacion.VERTICAL));
+		assertFalse(tablero.esMovimientoValido(origen, new Posicion(5, 3), oponenteHorizontal),
+				"No debe permitir salto diagonal superior si hay muro vertical entre origen y oponente");
+		assertFalse(tablero.esMovimientoValido(origen, new Posicion(5, 5), oponenteHorizontal),
+				"No debe permitir salto diagonal inferior si hay muro vertical entre origen y oponente");
 	}
 }
