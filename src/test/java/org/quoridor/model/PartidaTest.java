@@ -244,144 +244,122 @@ class PartidaTest {
 		resultado = partida.realizarMovimiento(destinoCualquiera);
 
 		assertFalse(resultado, "No se puede mover si la partida está terminada.");
+		
+		// Caso oponente con posicionActual == null (cubre ramas posOtro != null == false)
+		when(jugador2Mock.getPosicionActual()).thenReturn(null);
+		sorteadorMock = new SorteadorTurnoFijoMock(0);
+		partida = new Partida(tableroMock, sorteadorMock);
+		partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+		partida.iniciarPartida();
+		Posicion destinoConOponenteSinPos = new Posicion(4, 1);
+		when(tableroMock.esMovimientoValido(any(Posicion.class), eq(destinoConOponenteSinPos), isNull()))
+				.thenReturn(true);
+
+		assertTrue(partida.realizarMovimiento(destinoConOponenteSinPos),
+				"Debe permitir el movimiento cuando el oponente tiene posición null y el tablero lo aprueba.");
+		// times(2) ya que antes de este caso se llama 1 vez
+		verify(jugador1Mock, times(2)).moverA(destinoConOponenteSinPos);
 	}
 
 	@Test
 	void testColocarMuro() {
+		// Camino 1 (Path Coverage): m == null -> lanza AssertionError
+		partida.iniciarPartida();
+		assertThrows(AssertionError.class, () -> partida.colocarMuro(null),
+				"Camino 1: Debe lanzar AssertionError si el muro es null.");
+
+		// Camino 2 (Path Coverage): terminada == true -> retorna false
+		sorteadorMock = new SorteadorTurnoFijoMock(0);
+		partida = new Partida(tableroMock, sorteadorMock);
+		partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
+		Muro muroPrueba = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
+		boolean colocado = partida.colocarMuro(muroPrueba);
+		assertFalse(colocado, "Camino 2: No se puede colocar muros si la partida está terminada.");
+
+		// Camino 3 (Path Coverage): !hasMurosRestantes -> retorna false
+		partida.iniciarPartida();
+		when(jugador1Mock.hasMurosRestantes()).thenReturn(false);
+		colocado = partida.colocarMuro(muroPrueba);
+		assertFalse(colocado, "Camino 3: No se puede colocar muro si el jugador no tiene restantes.");
+		verify(jugador1Mock, never()).consumirMuro();
+		verify(tableroMock, never()).esColocacionMuroValida(any());
+
+		// Camino 4 (Path Coverage): !esColocacionMuroValida -> retorna false
+		partida.iniciarPartida();
+		when(jugador1Mock.hasMurosRestantes()).thenReturn(true);
+		when(tableroMock.esColocacionMuroValida(any(Muro.class))).thenReturn(false);
+		colocado = partida.colocarMuro(muroPrueba);
+		assertFalse(colocado, "Camino 4: Posición del muro inválida según el tablero.");
+		verify(tableroMock, times(1)).esColocacionMuroValida(any());
+		verify(jugador1Mock, never()).consumirMuro();
+
+		// Camino 5 (Path Coverage): Colocación exitosa -> coloca muro, consume 1 y cambia de turno
 		int[] murosJ = {10};
 		int[] murosT = {0};
-		
-		// Caso jugador 1 coloca muro
-		partida.iniciarPartida(); // Turno del Jugador 1
+		partida.iniciarPartida();
 
-        Muro muroPrueba = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
-        
-        // El jugador mock tiene muros disponibles
-        when(jugador1Mock.hasMurosRestantes()).thenReturn(true);
-        // Se tiene que decrementar en uno cada vez que se consume un muro
-        when(jugador1Mock.getMurosRestantes()).thenAnswer(inv -> murosJ[0]);
-        doAnswer(inv -> {
-            murosJ[0]--;
-            return null;
-        }).when(jugador1Mock).consumirMuro();
-        
-        // El tablero acepta el muro
-        when(tableroMock.esColocacionMuroValida(eq(muroPrueba))).thenReturn(true);
-        // Mockeamos getMurosColocados() para que devuelva una lista 
-        // cuyo tamaño dependa de nuestra variable 'murosT[0]'
-        when(tableroMock.getMurosColocados()).thenAnswer(inv -> {
-            List<Muro> listaSimulada = new ArrayList<>();
-            // Añadimos tantos elementos falsos como indique murosT[0]
-            for (int i = 0; i < murosT[0]; i++) 
-            {
-                listaSimulada.add(new Muro(new Posicion(0, i), Orientacion.HORIZONTAL));
-            }
-            return listaSimulada;
-        });
+		when(jugador1Mock.hasMurosRestantes()).thenReturn(true);
+		when(jugador1Mock.getMurosRestantes()).thenAnswer(inv -> murosJ[0]);
+		doAnswer(inv -> {
+			murosJ[0]--;
+			return null;
+		}).when(jugador1Mock).consumirMuro();
 
-        // Cuando se ejecute tableroMock.colocarMuro(...), incrementamos el contador
-        doAnswer(inv -> {
-            murosT[0]++;
-            return null;
-        }).when(tableroMock).colocarMuro(any(Muro.class));
-        
-        
-        boolean colocado = partida.colocarMuro(muroPrueba);
-        assertTrue(colocado, "El muro debería colocarse con éxito.");
-        
-        // Verificamos que se ejecutó el método consumirMuro() en el mock del jugador
-        verify(jugador1Mock, times(1)).consumirMuro();
-        
-        // Verificamos que se colocó en el tablero y cambió el turno
-        verify(tableroMock, times(1)).colocarMuro(eq(muroPrueba));
-        assertEquals("J2", partida.getJugadorActual().getNombre(), "El turno debe cambiar al siguiente jugador.");
-        
-        
-        // Caso jugador 1 sin muros
-        partida.iniciarPartida();
+		when(tableroMock.esColocacionMuroValida(eq(muroPrueba))).thenReturn(true);
+		when(tableroMock.getMurosColocados()).thenAnswer(inv -> {
+			List<Muro> listaSimulada = new ArrayList<>();
+			for (int i = 0; i < murosT[0]; i++) {
+				listaSimulada.add(new Muro(new Posicion(0, i), Orientacion.HORIZONTAL));
+			}
+			return listaSimulada;
+		});
+		doAnswer(inv -> {
+			murosT[0]++;
+			return null;
+		}).when(tableroMock).colocarMuro(any(Muro.class));
 
-        // Configuramos el mock para que devuelva false en muros restantes
-        when(jugador1Mock.hasMurosRestantes()).thenReturn(false);
-
-        muroPrueba = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
-
-        colocado = partida.colocarMuro(muroPrueba);
-
-        assertFalse(colocado, "No se puede colocar muro si el jugador no tiene.");
-        
-        // Verificamos que nunca se intentó consumir muro ni validar en el tablero
-        // times(1) ya que viene del anterior test
-        verify(jugador1Mock, times(1)).consumirMuro();
-        verify(tableroMock, times(1)).esColocacionMuroValida(any());
-        
-        
-        // Caso muro no válido 
-        partida.iniciarPartida();
-        
-        // El jugador sí tiene muros, pero el tablero rechaza la posición
-        when(jugador1Mock.hasMurosRestantes()).thenReturn(true);
-        when(tableroMock.esColocacionMuroValida(any(Muro.class))).thenReturn(false);
-
-        muroPrueba = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
-        
-        colocado = partida.colocarMuro(muroPrueba);
-        
-        assertFalse(colocado, "Posicion del muro inválido.");
-        // Verificamos que sí se consultó al tablero y no se consumió muro
-        verify(tableroMock, times(2)).esColocacionMuroValida(any());
-        verify(jugador1Mock, times(1)).consumirMuro();
-        
-        // Caso partida sin inicializar o ya terminada
-        sorteadorMock = new SorteadorTurnoFijoMock(0);
-        partida = new Partida(tableroMock, sorteadorMock);
-        partida.configurarPartida(List.of(jugador1Mock, jugador2Mock));
-        muroPrueba = new Muro(new Posicion(2, 2), Orientacion.HORIZONTAL);
-        colocado = partida.colocarMuro(muroPrueba);
-
-        assertFalse(colocado, "No se puede colocar muros si la partida está terminada.");
-        
-        
-        // Caso muro null
-        partida.iniciarPartida();
-        assertThrows(AssertionError.class, () -> partida.colocarMuro(null),
-                "Debe lanzar AssertionError si el muro es null.");
+		colocado = partida.colocarMuro(muroPrueba);
+		assertTrue(colocado, "Camino 5: El muro debería colocarse con éxito.");
+		verify(jugador1Mock, times(1)).consumirMuro();
+		verify(tableroMock, times(1)).colocarMuro(eq(muroPrueba));
+		assertEquals("J2", partida.getJugadorActual().getNombre(),
+				"Camino 5: El turno debe cambiar al siguiente jugador.");
 	}
 
 	@Test
-	void testComprobarVictoria() {
-		// Caso jugador 1 gana
-		partida.iniciarPartida();
-		
-        // Simulamos que al mover a la meta, el jugador mock cumple la condición de victoria
-        when(jugador1Mock.haLlegadoAMeta()).thenReturn(true);
-        
-        // Comprobamos que comprobarVictoria() identifica correctamente al ganador
-        Jugador ganador = partida.comprobarVictoria();
-        assertNotNull(ganador, "Debe haber un ganador.");
-        assertEquals("J1", ganador.getNombre(), "El ganador debe ser el Jugador 1.");
-        assertTrue(partida.isTerminada(), "La partida debe marcarse como terminada tras la victoria.");
+	void testComprobarVictoria() {      
+        // Camino 1 (Path Coverage): Lista vacía de jugadores -> bucle no ejecuta -> retorna null
+     	Partida partidaSinJugadores = new Partida(tableroMock, sorteadorMock);
+     	assertNull(partidaSinJugadores.comprobarVictoria(),
+     			"Camino 1: Con lista vacía de jugadores debe retornar null.");
 
-        // Caso jugador 2 gana
-        partida.iniciarPartida();
-        when(jugador1Mock.haLlegadoAMeta()).thenReturn(false);
-        when(jugador2Mock.haLlegadoAMeta()).thenReturn(true);
+     	// Camino 2 (Path Coverage): Gana J1 en la 1ª iteración -> marca terminada y retorna J1
+     	partida.iniciarPartida();
+     	when(jugador1Mock.haLlegadoAMeta()).thenReturn(true);
 
-        ganador = partida.comprobarVictoria();
-        assertNotNull(ganador, "Debe haber un ganador.");
-        assertEquals("J2", ganador.getNombre(), "El ganador debe ser el Jugador 2.");
-        assertTrue(partida.isTerminada(), "La partida debe marcarse como terminada tras la victoria.");
-        
-        
-        // Caso seguir partida 
-        partida.iniciarPartida();
-        // Simulamos que al mover, el jugador mock no cumple la condición de victoria
-        when(jugador1Mock.haLlegadoAMeta()).thenReturn(false);
-        when(jugador2Mock.haLlegadoAMeta()).thenReturn(false);
-        
-        // Comprobamos que comprobarVictoria() devuelve null al no haber ganador
-        ganador = partida.comprobarVictoria();
-        assertNull(ganador, "No debe de haber ganador.");
-        assertFalse(partida.isTerminada(), "La partida no debe terminar si nadie ha ganado.");
+     	Jugador ganador = partida.comprobarVictoria();
+     	assertNotNull(ganador, "Camino 2: Debe haber un ganador.");
+     	assertEquals("J1", ganador.getNombre(), "Camino 2: El ganador debe ser J1 en la 1ª iteración.");
+     	assertTrue(partida.isTerminada(), "Camino 2: La partida debe marcarse como terminada tras la victoria.");
+
+     	// Camino 3 (Path Coverage): J1 no gana (1ª iteración) y gana J2 en la 2ª iteración -> retorna J2
+     	partida.iniciarPartida();
+     	when(jugador1Mock.haLlegadoAMeta()).thenReturn(false);
+     	when(jugador2Mock.haLlegadoAMeta()).thenReturn(true);
+
+     	ganador = partida.comprobarVictoria();
+     	assertNotNull(ganador, "Camino 3: Debe haber un ganador.");
+     	assertEquals("J2", ganador.getNombre(), "Camino 3: El ganador debe ser J2 en la 2ª iteración.");
+     	assertTrue(partida.isTerminada(), "Camino 3: La partida debe marcarse como terminada tras la victoria.");
+
+     	// Camino 4 (Path Coverage): Ningún jugador ha llegado a meta -> retorna null y sigue en curso
+     	partida.iniciarPartida();
+     	when(jugador1Mock.haLlegadoAMeta()).thenReturn(false);
+     	when(jugador2Mock.haLlegadoAMeta()).thenReturn(false);
+
+     	ganador = partida.comprobarVictoria();
+     	assertNull(ganador, "Camino 4: No debe haber ganador.");
+     	assertFalse(partida.isTerminada(), "Camino 4: La partida no debe terminar si nadie ha ganado.");
 	}
 
 	// Prueba de Caja Negra y Contrato:
@@ -425,7 +403,8 @@ class PartidaTest {
 		"4, 7, 10, false",
 		"4, 9, 5,  true",
 		"2, 7, 10, true",
-		"4, 9, 10, false"
+		"4, 9, 10, false",
+		"2, 9, 5,  false"
 	})
 	@DisplayName("Pairwise Testing: Configuración de partida (2/4 jugadores, tablero 7/9, muros 5/10, sorteo)")
 	void testConfigurarPartidaPairwise(int numJugadores, int tamanoTablero,
@@ -433,6 +412,7 @@ class PartidaTest {
 		Partida partidaReal = new Partida();
 		partidaReal.configurarPartida(numJugadores, tamanoTablero, murosPorJugador, sorteoAleatorio);
 
+		
 		assertTrue(partidaReal.isTerminada(), "Antes de iniciarPartida la partida debe estar en pausa/terminada");
 		assertEquals(numJugadores, partidaReal.getJugadores().size());
 		assertEquals(tamanoTablero, partidaReal.getTablero().getTamanoTablero());
@@ -455,7 +435,15 @@ class PartidaTest {
 
 		partidaReal.iniciarPartida();
 		assertFalse(partidaReal.isTerminada());
-		if (!sorteoAleatorio) {
+		
+		// Mirar que jugador actual no sea nulo, 
+		// en caso que no sea sorteo aleatorio se mira que el jugador actual sea el rojo
+		if (sorteoAleatorio) {
+			Jugador jugadorActual = partidaReal.getJugadorActual();
+			assertNotNull(jugadorActual, "Con sorteo aleatorio debe haber un jugador actual asignado");
+			assertTrue(partidaReal.getJugadores().contains(jugadorActual),
+					"El jugador actual sorteado debe pertenecer a la lista de jugadores de la partida");
+		} else {
 			assertEquals(Color.ROJO, partidaReal.getJugadorActual().getColor(),
 					"Sin sorteo aleatorio debe comenzar siempre el primer jugador (ROJO)");
 		}
