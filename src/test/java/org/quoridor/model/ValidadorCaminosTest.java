@@ -115,12 +115,12 @@ class ValidadorCaminosTest {
         assertThrows(AssertionError.class,
                 () -> validador.hayCaminoDisponible(inicio, -1, muros, TAMANO_TABLERO));
         assertThrows(AssertionError.class,
-                () -> validador.calcularDistanciaMinima(inicio, 8, null, TAMANO_TABLERO));
+                () -> validador.hayCaminoDisponible(inicio, 8, null, TAMANO_TABLERO));
         assertThrows(AssertionError.class,
-                () -> validador.calcularDistanciaMinima(inicio, 8, muros, 0));
+                () -> validador.hayCaminoDisponible(inicio, 8, muros, 0));
         Posicion inicioFuera = new Posicion(-1, 0);
         assertThrows(AssertionError.class,
-                () -> validador.calcularDistanciaMinima(inicioFuera, 8, muros, TAMANO_TABLERO));
+                () -> validador.hayCaminoDisponible(inicioFuera, 8, muros, TAMANO_TABLERO));
     }
 
     /**
