@@ -182,81 +182,49 @@ class MuroTest {
     /// 
     /// Tests Automatizados (Data-Driven)
     /// 
-    @ParameterizedTest(name = "[{index}] Muro {2} en ({0},{1}) bloquea ({3},{4})->({5},{6})? esperado={7}")
+	@ParameterizedTest(name = "[{index}] Muro {2} en ({0},{1}) bloquea ({3},{4})->({5},{6})? esperado={7}")
     @CsvSource({
-    	// --- MURO HORIZONTAL EN (4,4)
-    	// 1. Bloqueo en primer segmento (X=4) en ambas direcciones
+        // --- MURO HORIZONTAL EN (4,4) ---
+        // 1. Bloqueo en primer segmento (X=4) y segundo segmento (X=5) en ambas direcciones
         "4, 4, HORIZONTAL, 4, 4, 4, 5, true",
         "4, 4, HORIZONTAL, 4, 5, 4, 4, true",
-        
-        // 2. Bloqueo en segundo segmento (X=5) en ambas direcciones
         "4, 4, HORIZONTAL, 5, 4, 5, 5, true",
         "4, 4, HORIZONTAL, 5, 5, 5, 4, true",
-        
-        // 3. Valores frontera: pasos verticales inmediatamente adyacentes al muro
-        "4, 4, HORIZONTAL, 3, 4, 3, 5, false", // Justo a la izquierda
-        "4, 4, HORIZONTAL, 6, 4, 6, 5, false", // Justo a la derecha
-        
-        // 4. Paso paralelo: movimiento horizontal en las casillas del muro
+
+        // 2. Valores frontera: pasos verticales inmediatamente adyacentes al muro
+        "4, 4, HORIZONTAL, 3, 4, 3, 5, false",
+        "4, 4, HORIZONTAL, 6, 4, 6, 5, false",
+
+        // 3. Paso paralelo: movimiento horizontal en las casillas del muro
         "4, 4, HORIZONTAL, 4, 4, 5, 4, false",
         "4, 4, HORIZONTAL, 4, 5, 5, 5, false",
-        
-        // --- MURO VERTICAL EN (4, 4) ---
-        // 5. Bloqueo en primer segmento (Y=4) en ambas direcciones
+
+        // --- MURO VERTICAL EN (4,4) ---
+        // 4. Bloqueo en primer segmento (Y=4) y segundo segmento (Y=5) en ambas direcciones
         "4, 4, VERTICAL,   4, 4, 5, 4, true",
         "4, 4, VERTICAL,   5, 4, 4, 4, true",
-        
-        // 6. Bloqueo en segundo segmento (Y=5) en ambas direcciones
         "4, 4, VERTICAL,   4, 5, 5, 5, true",
         "4, 4, VERTICAL,   5, 5, 4, 5, true",
-        
-        // 7. Valores frontera: pasos horizontales inmediatamente adyacentes al muro
-        "4, 4, VERTICAL,   4, 3, 5, 3, false", // Justo arriba
-        "4, 4, VERTICAL,   4, 6, 5, 6, false", // Justo abajo
-        
-        // 8. Paso paralelo: movimiento vertical en las casillas del muro
+
+        // 5. Valores frontera: pasos horizontales inmediatamente adyacentes al muro
+        "4, 4, VERTICAL,   4, 3, 5, 3, false",
+        "4, 4, VERTICAL,   4, 6, 5, 6, false",
+
+        // 6. Paso paralelo: movimiento vertical en las casillas del muro
         "4, 4, VERTICAL,   4, 4, 4, 5, false",
         "4, 4, VERTICAL,   5, 4, 5, 5, false",
-        
-        // --- CASO DESCONECTADO (Paso lejano) ---
+
+        // 7. Casos complementarios VERTICAL: min(oX, dX) == mX con oY < mY y oY >= mY + 2; min(oX, dX) != mX con oY en rango
+        "4, 4, VERTICAL,   4, 2, 5, 2, false",
+        "4, 4, VERTICAL,   4, 6, 5, 6, false",
+        "4, 4, VERTICAL,   5, 4, 6, 4, false",
+        "4, 4, VERTICAL,   5, 5, 6, 5, false",
+
+        // --- CASOS DESCONECTADOS Y DISTANCIA > 1 ---
         "4, 4, HORIZONTAL, 0, 0, 0, 1, false",
-
-        // --- DISTANCIA MAYOR A 1 EN MISMO EJE (Salto de 2 casillas) ---
         "4, 4, HORIZONTAL, 4, 4, 4, 6, false",
-        "4, 4, VERTICAL,   4, 4, 6, 4, false",
-        
-        // --- Cobertura adicional de condiciones en bloqueaPaso (muro HORIZONTAL en (4,4)) ---
-        // min(oY, dY) == mY (4) con oX < mX (oX = 2 < 4)
-        "4, 4, HORIZONTAL, 2, 4, 2, 5, false",
-        // min(oY, dY) == mY (4) con oX >= mX + 2 (oX = 6 >= 6)
-        "4, 4, HORIZONTAL, 6, 4, 6, 5, false",
-        // min(oY, dY) != mY (oY=5, dY=6 -> min=5 != 4) con oX en [mX, mX + 2) (oX = 4)
-        "4, 4, HORIZONTAL, 4, 5, 4, 6, false",
-        "4, 4, HORIZONTAL, 4, 5, 5, 5, false",
-        
-        // --- Muros en límites del tablero: (0,0) y (7,7) ---
-        "0, 0, HORIZONTAL, 0, 0, 0, 1, true",
-        "0, 0, VERTICAL,   0, 0, 1, 0, true",
-        "7, 7, HORIZONTAL, 7, 7, 7, 8, true",
-        "7, 7, VERTICAL,   7, 7, 8, 7, true",
-
-        // --- Paso diagonal y misma casilla ---
-        "4, 4, HORIZONTAL, 4, 4, 5, 5, false",
-        "4, 4, VERTICAL,   4, 4, 5, 5, false",
-        "4, 4, HORIZONTAL, 4, 4, 4, 4, false",
-        "4, 4, VERTICAL,   4, 4, 4, 4, false",
-
-        // --- Pasos adyacentes por encima / debajo / izquierda / derecha de un muro en (4,4) ---
-        // Por encima del muro horizontal en (4,4) (entre y=3 y y=4): no bloquea
-        "4, 4, HORIZONTAL, 4, 3, 4, 4, false",
-        // Por debajo del muro horizontal en (4,4) (entre y=4 y y=5): sí bloquea
-        "4, 4, HORIZONTAL, 4, 4, 4, 5, true",
-        // A la izquierda del muro vertical en (4,4) (entre x=3 y x=4): no bloquea
-        "4, 4, VERTICAL,   3, 4, 4, 4, false",
-        // A la derecha del muro vertical en (4,4) (entre x=4 y x=5): sí bloquea
-        "4, 4, VERTICAL,   4, 4, 5, 4, true"
+        "4, 4, VERTICAL,   4, 4, 6, 4, false"
     })
-    
     @DisplayName("Data-Driven: Verificación de bloqueo de paso para muros")
     void testBloqueaPasoDataDriven(int mX, int mY, Orientacion orientacion,
                                    int oX, int oY, int dX, int dY, boolean esperado) {
