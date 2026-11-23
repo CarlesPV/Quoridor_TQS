@@ -583,6 +583,8 @@ class TableroTest {
 				"Con oponente en borde derecho, debe permitir salto diagonal hacia (8, 3)");
 		assertTrue(tablero.esMovimientoValido(origenBorde, new Posicion(8, 5), oponenteBorde),
 				"Con oponente en borde derecho, debe permitir salto diagonal hacia (8, 5)");
+		assertFalse(tablero.esMovimientoValido(origenBorde, new Posicion(6, 3), oponenteBorde),
+				"En salto horizontal bloqueado (dx != 0), destino no diagonal debe ser inválido");
 
 		// 2. Oponente en esquina superior derecha (8, 0): diagonal hacia y = -1 está fuera de límites
 		Posicion origenEsquina = new Posicion(7, 0);
@@ -591,6 +593,17 @@ class TableroTest {
 				"No debe permitir salto diagonal hacia posición fuera del límite superior");
 		assertTrue(tablero.esMovimientoValido(origenEsquina, new Posicion(8, 1), oponenteEsquina),
 				"Debe permitir salto diagonal válido hacia (8, 1)");
+
+			// 2b. Oponente en esquina inferior izquierda (0, 8) con salto vertical (dy != 0):
+			// salto recto (0, 9) y diagonal izquierda (-1, 8) salen del tablero; diagonal derecha (1, 8) válida
+		Posicion origenBordeIzq = new Posicion(0, 7);
+		Posicion oponenteEsquinaInfIzq = new Posicion(0, 8);
+		assertFalse(tablero.esMovimientoValido(origenBordeIzq, new Posicion(0, 9), oponenteEsquinaInfIzq),
+				"En salto vertical, el salto recto fuera del tablero no debe ser válido");
+		assertFalse(tablero.esMovimientoValido(origenBordeIzq, new Posicion(-1, 8), oponenteEsquinaInfIzq),
+				"En salto vertical con borde izquierdo, diagonal hacia x = -1 debe ser inválida");
+		assertTrue(tablero.esMovimientoValido(origenBordeIzq, new Posicion(1, 8), oponenteEsquinaInfIzq),
+				"En salto vertical con borde izquierdo, diagonal hacia (1, 8) debe ser válida");
 
 		// 3. Muro detrás del oponente habilita diagonal; muro lateral bloquea una diagonal y deja libre la otra
 		tablero.reiniciar();
@@ -607,6 +620,25 @@ class TableroTest {
 				"Salto diagonal bloqueado por muro lateral");
 		assertTrue(tablero.esMovimientoValido(origen, new Posicion(3, 5), oponente),
 				"Salto diagonal sin muro lateral debe ser válido");
+		assertFalse(tablero.esMovimientoValido(origen, new Posicion(3, 6), oponente),
+				"En salto vertical bloqueado (dy != 0), destino no diagonal debe ser inválido");
+
+		// 3b. Salto horizontal (dx != 0) con muro detrás del oponente y muro lateral bloqueando una diagonal
+		tablero.reiniciar();
+		Posicion oponenteHoriz = new Posicion(5, 4);
+		// Muro vertical detrás del oponente (bloquea (5,4) -> (6,4))
+		tablero.colocarMuro(new Muro(new Posicion(5, 4), Orientacion.VERTICAL));
+		// Muro horizontal lateral bloqueando diagonal superior ((5,4) -> (5,3))
+		tablero.colocarMuro(new Muro(new Posicion(5, 3), Orientacion.HORIZONTAL));
+
+		assertFalse(tablero.esMovimientoValido(origen, new Posicion(6, 4), oponenteHoriz),
+				"Salto recto horizontal bloqueado por muro detrás del oponente");
+		assertFalse(tablero.esMovimientoValido(origen, new Posicion(5, 3), oponenteHoriz),
+				"Salto diagonal superior horizontal bloqueado por muro lateral");
+		assertTrue(tablero.esMovimientoValido(origen, new Posicion(5, 5), oponenteHoriz),
+				"Salto diagonal inferior horizontal sin muro lateral debe ser válido");
+		assertFalse(tablero.esMovimientoValido(origen, new Posicion(6, 3), oponenteHoriz),
+				"En salto horizontal bloqueado (dx != 0), destino fuera de diagonales válidas debe ser inválido");
 
 		// 4. Muro intermedio entre origen y oponente: impide salto recto y saltos diagonales
 		tablero.reiniciar();

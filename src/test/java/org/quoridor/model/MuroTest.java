@@ -144,12 +144,18 @@ class MuroTest {
 		assertFalse(baseHoriz.colisionaCon(contiguoHorizNeg),
 				"Muros contiguos horizontales negativos a distancia 2 no deben colisionar");
 
-		// 4. Muros paralelos sin solapamiento (desplazados lateralmente)
+		// 4. Muros paralelos sin solapamiento (desplazados lateralmente y en ambos ejes)
 		Muro paraleloVert = new Muro(new Posicion(3, 2), Orientacion.VERTICAL);
 		Muro paraleloHoriz = new Muro(new Posicion(2, 3), Orientacion.HORIZONTAL);
+		Muro desplazadoHoriz = new Muro(new Posicion(3, 3), Orientacion.HORIZONTAL);
+		Muro desplazadoVert = new Muro(new Posicion(3, 3), Orientacion.VERTICAL);
 
 		assertFalse(baseVert.colisionaCon(paraleloVert), "Muros verticales paralelos no deben colisionar");
 		assertFalse(baseHoriz.colisionaCon(paraleloHoriz), "Muros horizontales paralelos no deben colisionar");
+		assertFalse(baseHoriz.colisionaCon(desplazadoHoriz),
+				"Muros horizontales con distinta X e Y no deben colisionar");
+		assertFalse(baseVert.colisionaCon(desplazadoVert),
+				"Muros verticales con distinta X e Y no deben colisionar");
 
 		// 5. Muros perpendiculares que no comparten origen (cruces en T y L válidos sin colisión)
 		Muro cruceTFin = new Muro(new Posicion(3, 2), Orientacion.VERTICAL);
