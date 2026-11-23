@@ -234,12 +234,8 @@ class ValidadorCaminosTest {
 	    }
 		
 		// Caso posicion actual null
-		try
-		{
-			validador.obtenerVecinosValidos(null, muros, TAMANO_TABLERO);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
+		assertThrows(AssertionError.class,
+				() -> validador.obtenerVecinosValidos(null, muros, TAMANO_TABLERO));
 		
 	}
 
@@ -262,21 +258,16 @@ class ValidadorCaminosTest {
 		muros.add(m);
 		assertTrue(validador.estaBloqueadoPorMuro(oP, dP, muros));
 		
+		Posicion oP2 = new Posicion(4,0);
+		Posicion dP2 = new Posicion(4,1);
+		
 		// Caso posicion origen null
-		try
-		{
-			validador.estaBloqueadoPorMuro(null, dP, muros);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
+		assertThrows(AssertionError.class,
+				() -> validador.estaBloqueadoPorMuro(null, dP2, muros));
 		
 		// Caso posicion destino null
-		try
-		{
-			validador.estaBloqueadoPorMuro(oP, null, muros);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
+		assertThrows(AssertionError.class,
+				() -> validador.estaBloqueadoPorMuro(oP2, null, muros));
 	}
 
 }
