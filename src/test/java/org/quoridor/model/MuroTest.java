@@ -226,7 +226,29 @@ class MuroTest {
         "4, 4, HORIZONTAL, 6, 4, 6, 5, false",
         // min(oY, dY) != mY (oY=5, dY=6 -> min=5 != 4) con oX en [mX, mX + 2) (oX = 4)
         "4, 4, HORIZONTAL, 4, 5, 4, 6, false",
-        "4, 4, HORIZONTAL, 4, 5, 5, 5, false"
+        "4, 4, HORIZONTAL, 4, 5, 5, 5, false",
+        
+        // --- Muros en límites del tablero: (0,0) y (7,7) ---
+        "0, 0, HORIZONTAL, 0, 0, 0, 1, true",
+        "0, 0, VERTICAL,   0, 0, 1, 0, true",
+        "7, 7, HORIZONTAL, 7, 7, 7, 8, true",
+        "7, 7, VERTICAL,   7, 7, 8, 7, true",
+
+        // --- Paso diagonal y misma casilla ---
+        "4, 4, HORIZONTAL, 4, 4, 5, 5, false",
+        "4, 4, VERTICAL,   4, 4, 5, 5, false",
+        "4, 4, HORIZONTAL, 4, 4, 4, 4, false",
+        "4, 4, VERTICAL,   4, 4, 4, 4, false",
+
+        // --- Pasos adyacentes por encima / debajo / izquierda / derecha de un muro en (4,4) ---
+        // Por encima del muro horizontal en (4,4) (entre y=3 y y=4): no bloquea
+        "4, 4, HORIZONTAL, 4, 3, 4, 4, false",
+        // Por debajo del muro horizontal en (4,4) (entre y=4 y y=5): sí bloquea
+        "4, 4, HORIZONTAL, 4, 4, 4, 5, true",
+        // A la izquierda del muro vertical en (4,4) (entre x=3 y x=4): no bloquea
+        "4, 4, VERTICAL,   3, 4, 4, 4, false",
+        // A la derecha del muro vertical en (4,4) (entre x=4 y x=5): sí bloquea
+        "4, 4, VERTICAL,   4, 4, 5, 4, true"
     })
     
     @DisplayName("Data-Driven: Verificación de bloqueo de paso para muros")
