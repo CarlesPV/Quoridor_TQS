@@ -166,6 +166,11 @@ class MuroTest {
 		// 6. Muro lejano / disjunto
 		Muro lejano = new Muro(new Posicion(7, 7), Orientacion.VERTICAL);
 		assertFalse(baseVert.colisionaCon(lejano), "Muros completamente separados no deben colisionar");
+		
+		// 7. Orientaciones distintas con orígenes distintos (sin solapamiento ni cruce)
+		Muro distintaOrientacionDistintoOrigen = new Muro(new Posicion(3, 3), Orientacion.VERTICAL);
+		assertFalse(baseHoriz.colisionaCon(distintaOrientacionDistintoOrigen),
+				"Muros de distinta orientación y distinto origen no deben colisionar si no se interceptan");
 	}
 	
     /// 
