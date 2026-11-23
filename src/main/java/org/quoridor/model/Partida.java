@@ -154,7 +154,8 @@ public class Partida {
 
 		Jugador jugadorActual = getJugadorActual();
 		Posicion origen = jugadorActual.getPosicionActual();
-		Posicion oponentePos = null;
+		Posicion oponenteFallback = null;
+		List<Posicion> candidatosSalto = new ArrayList<>();
 
 		// Buscar si algún oponente ocupa el destino o es adyacente en línea hacia el destino (para saltos)
 		for (Jugador j : jugadores) {
@@ -164,16 +165,25 @@ public class Partida {
 					return false;
 				}
 				if (posOtro != null && origen.esAdyacente(posOtro) && posOtro.esAdyacente(p)) {
-					oponentePos = posOtro;
-					break;
+					candidatosSalto.add(posOtro);
 				}
-				if (oponentePos == null) {
-					oponentePos = posOtro;
+				if (oponenteFallback == null && posOtro != null) {
+					oponenteFallback = posOtro;
 				}
 			}
 		}
 
-		boolean movimientoValido = tablero.esMovimientoValido(origen, p, oponentePos);
+		boolean movimientoValido = false;
+		if (!candidatosSalto.isEmpty()) {
+			for (Posicion candidato : candidatosSalto) {
+				if (tablero.esMovimientoValido(origen, p, candidato)) {
+					movimientoValido = true;
+					break;
+				}
+			}
+		} else {
+			movimientoValido = tablero.esMovimientoValido(origen, p, oponenteFallback);
+		}
 
 		if (movimientoValido) {
 			int turnoAnterior = indiceJugadorActual;
