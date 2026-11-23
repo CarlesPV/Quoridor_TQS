@@ -111,6 +111,13 @@ class ValidadorCaminosTest {
 				() -> validador.hayCaminoDisponible(inicio, TAMANO_TABLERO, muros, TAMANO_TABLERO));
 		assertThrows(AssertionError.class,
 				() -> validador.hayCaminoDisponible(inicio, -1, muros, TAMANO_TABLERO));
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(inicio, 8, null, TAMANO_TABLERO));
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(inicio, 8, muros, 0));
+		Posicion inicioFuera = new Posicion(-1, 0);
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(inicioFuera, 8, muros, TAMANO_TABLERO));
 	}
 
 	/**
@@ -193,6 +200,13 @@ class ValidadorCaminosTest {
 				() -> validador.calcularDistanciaMinima(inicio, TAMANO_TABLERO, muros, TAMANO_TABLERO));
 		assertThrows(AssertionError.class,
 				() -> validador.calcularDistanciaMinima(inicio, -1, muros, TAMANO_TABLERO));
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(inicio, 8, null, TAMANO_TABLERO));
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(inicio, 8, muros, 0));
+		Posicion inicioFuera = new Posicion(-1, 0);
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(inicioFuera, 8, muros, TAMANO_TABLERO));
 	}
 
 	@Test
@@ -233,13 +247,17 @@ class ValidadorCaminosTest {
 	        assertEquals(esperados3[i].getY(), vecinos.get(i).getY());
 	    }
 		
-		// Caso posicion actual null
-		try
-		{
-			validador.obtenerVecinosValidos(null, muros, TAMANO_TABLERO);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
+		// --- Precondiciones DbC con assertThrows ---
+		Posicion actual = new Posicion(-1, 0);
+		assertThrows(AssertionError.class,
+				() -> validador.obtenerVecinosValidos(null, muros, TAMANO_TABLERO));
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(actual, 8, null, TAMANO_TABLERO));
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(actual, 8, muros, 0));
+		Posicion inicioFuera = new Posicion(-1, 0);
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(inicioFuera, 8, muros, TAMANO_TABLERO));
 		
 	}
 
@@ -262,21 +280,16 @@ class ValidadorCaminosTest {
 		muros.add(m);
 		assertTrue(validador.estaBloqueadoPorMuro(oP, dP, muros));
 		
-		// Caso posicion origen null
-		try
-		{
-			validador.estaBloqueadoPorMuro(null, dP, muros);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
+		Posicion oP2 = new Posicion(4,0);
+		Posicion dP2 = new Posicion(4,1);
 		
-		// Caso posicion destino null
-		try
-		{
-			validador.estaBloqueadoPorMuro(oP, null, muros);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
+		// --- Precondiciones DbC con assertThrows ---
+		assertThrows(AssertionError.class,
+				() -> validador.estaBloqueadoPorMuro(null, dP2, muros));
+		assertThrows(AssertionError.class,
+				() -> validador.estaBloqueadoPorMuro(oP2, null, muros));
+		assertThrows(AssertionError.class,
+				() -> validador.estaBloqueadoPorMuro(oP2, dP2, null));
 	}
 
 }
