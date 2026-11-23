@@ -91,6 +91,13 @@ class PartidaTest {
 				"Debe lanzar AssertionError si la lista de jugadores es null.");
 		assertThrows(AssertionError.class, () -> partida.configurarPartida(List.of()),
 				"Debe lanzar AssertionError si la lista de jugadores está vacía.");
+		assertThrows(AssertionError.class, () -> partida.configurarPartida(Arrays.asList(jugador1Mock, null)),
+				"Debe lanzar AssertionError si la lista de jugadores contiene algún null.");
+		assertThrows(AssertionError.class, () -> partida.configurarPartida(List.of(jugador1Mock)),
+				"Debe lanzar AssertionError si la lista tiene menos de 2 jugadores.");
+		assertThrows(AssertionError.class,
+				() -> partida.configurarPartida(List.of(jugador1Mock, jugador2Mock, mock(Jugador.class))),
+				"Debe lanzar AssertionError si el número de jugadores no es 2 ni 4.");
 	}
 
 	@Test
