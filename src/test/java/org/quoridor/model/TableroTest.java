@@ -312,6 +312,20 @@ class TableroTest {
 		assertEquals(List.of(muroExistente, muroValido), mockValidador.getUltimosMurosRecibidos());
 		assertEquals(1, tableroConMuroPrevio.getMurosColocados().size(),
 				"La validación simulada no debe modificar los muros colocados reales");
+		
+		// Caso real con 2 jugadores y validador real: J1 mantiene camino, J2 queda encerrado en esquina (0,8)
+		Tablero tableroDosJugadores = new Tablero(new ValidadorCaminos());
+		tableroDosJugadores.getPosicionesJugadores().put(Color.ROJO, new Posicion(4, 0));
+		tableroDosJugadores.setFilaObjetivo(Color.ROJO, 8);
+		tableroDosJugadores.getPosicionesJugadores().put(Color.AZUL, new Posicion(0, 8));
+		tableroDosJugadores.setFilaObjetivo(Color.AZUL, 0);
+
+		// Encerramos parcialmente a AZUL en (0,8): muro vertical en (0,7) y muro horizontal en (0,7)
+		tableroDosJugadores.colocarMuro(new Muro(new Posicion(0, 7), Orientacion.VERTICAL));
+		Muro muroCierreAzul = new Muro(new Posicion(0, 7), Orientacion.HORIZONTAL);
+
+		assertFalse(tableroDosJugadores.esColocacionMuroValida(muroCierreAzul),
+				"Debe rechazar el muro si el primer jugador tiene camino pero el segundo queda encerrado");
 	}
 
 	// Mock Manual de IValidadorCaminos con verificación de invocaciones y argumentos recibidos
