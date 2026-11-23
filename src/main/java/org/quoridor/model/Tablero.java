@@ -113,8 +113,8 @@ public class Tablero {
 			return !hayMuroBloqueante(origen, destino);
 		}
 
-		// Salto sobre oponente
-		if (oponente != null && origen.esAdyacente(oponente)) {
+		// Salto sobre oponente (solo si no existe un muro entre origen y oponente)
+		if (oponente != null && origen.esAdyacente(oponente) && !hayMuroBloqueante(origen, oponente)) {
 			int dx = oponente.getX() - origen.getX();
 			int dy = oponente.getY() - origen.getY();
 			Posicion saltoRecto = new Posicion(oponente.getX() + dx, oponente.getY() + dy);

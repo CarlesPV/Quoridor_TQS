@@ -48,10 +48,11 @@ public class Partida {
 	public void configurarPartida(List<Jugador> jugadoresPersonalizados) {
 		// Pre-condiciones e invariante
 		assert jugadoresPersonalizados != null : "La lista de jugadores no puede ser null";
-		for (Jugador j : jugadores) {
+		assert jugadoresPersonalizados.size() == 2 || jugadoresPersonalizados.size() == 4
+				: "La lista de jugadores debe tener 2 o 4 jugadores";
+		for (Jugador j : jugadoresPersonalizados) {
 			assert j != null : "Un jugador no puede ser null";
 		}
-		assert !jugadoresPersonalizados.isEmpty() : "La lista de jugadores no puede estar vacía";
 		assert verificarInvariante() : "Invariante de Partida violada al inicio de configurarPartida";
 		
 		this.tablero.reiniciar();
@@ -266,8 +267,7 @@ public class Partida {
             }
         }
         
-        // Post-condicion
-        // assert(!this.terminada) : "La partida debe continuar al no haber un ganador";
+        // Si ningún jugador ha alcanzado su meta, no se altera el estado terminada de la partida
         return null; // Nadie ha ganado todavía
 	}
 	
