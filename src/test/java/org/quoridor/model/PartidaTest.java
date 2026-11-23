@@ -425,7 +425,8 @@ class PartidaTest {
 		"4, 7, 10, false",
 		"4, 9, 5,  true",
 		"2, 7, 10, true",
-		"4, 9, 10, false"
+		"4, 9, 10, false",
+		"2, 9, 5,  false"
 	})
 	@DisplayName("Pairwise Testing: Configuración de partida (2/4 jugadores, tablero 7/9, muros 5/10, sorteo)")
 	void testConfigurarPartidaPairwise(int numJugadores, int tamanoTablero,
@@ -433,6 +434,7 @@ class PartidaTest {
 		Partida partidaReal = new Partida();
 		partidaReal.configurarPartida(numJugadores, tamanoTablero, murosPorJugador, sorteoAleatorio);
 
+		
 		assertTrue(partidaReal.isTerminada(), "Antes de iniciarPartida la partida debe estar en pausa/terminada");
 		assertEquals(numJugadores, partidaReal.getJugadores().size());
 		assertEquals(tamanoTablero, partidaReal.getTablero().getTamanoTablero());
@@ -455,7 +457,15 @@ class PartidaTest {
 
 		partidaReal.iniciarPartida();
 		assertFalse(partidaReal.isTerminada());
-		if (!sorteoAleatorio) {
+		
+		// Mirar que jugador actual no sea nulo, 
+		// en caso que no sea sorteo aleatorio se mira que el jugador actual sea el rojo
+		if (sorteoAleatorio) {
+			Jugador jugadorActual = partidaReal.getJugadorActual();
+			assertNotNull(jugadorActual, "Con sorteo aleatorio debe haber un jugador actual asignado");
+			assertTrue(partidaReal.getJugadores().contains(jugadorActual),
+					"El jugador actual sorteado debe pertenecer a la lista de jugadores de la partida");
+		} else {
 			assertEquals(Color.ROJO, partidaReal.getJugadorActual().getColor(),
 					"Sin sorteo aleatorio debe comenzar siempre el primer jugador (ROJO)");
 		}
