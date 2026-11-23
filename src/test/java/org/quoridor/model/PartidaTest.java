@@ -348,40 +348,39 @@ class PartidaTest {
 	}
 
 	@Test
-	void testComprobarVictoria() {
-		// Caso jugador 1 gana
-		partida.iniciarPartida();
-		
-        // Simulamos que al mover a la meta, el jugador mock cumple la condición de victoria
-        when(jugador1Mock.haLlegadoAMeta()).thenReturn(true);
-        
-        // Comprobamos que comprobarVictoria() identifica correctamente al ganador
-        Jugador ganador = partida.comprobarVictoria();
-        assertNotNull(ganador, "Debe haber un ganador.");
-        assertEquals("J1", ganador.getNombre(), "El ganador debe ser el Jugador 1.");
-        assertTrue(partida.isTerminada(), "La partida debe marcarse como terminada tras la victoria.");
+	void testComprobarVictoria() {      
+        // Camino 1 (Path Coverage): Lista vacía de jugadores -> bucle no ejecuta -> retorna null
+     	Partida partidaSinJugadores = new Partida(tableroMock, sorteadorMock);
+     	assertNull(partidaSinJugadores.comprobarVictoria(),
+     			"Camino 1: Con lista vacía de jugadores debe retornar null.");
 
-        // Caso jugador 2 gana
-        partida.iniciarPartida();
-        when(jugador1Mock.haLlegadoAMeta()).thenReturn(false);
-        when(jugador2Mock.haLlegadoAMeta()).thenReturn(true);
+     	// Camino 2 (Path Coverage): Gana J1 en la 1ª iteración -> marca terminada y retorna J1
+     	partida.iniciarPartida();
+     	when(jugador1Mock.haLlegadoAMeta()).thenReturn(true);
 
-        ganador = partida.comprobarVictoria();
-        assertNotNull(ganador, "Debe haber un ganador.");
-        assertEquals("J2", ganador.getNombre(), "El ganador debe ser el Jugador 2.");
-        assertTrue(partida.isTerminada(), "La partida debe marcarse como terminada tras la victoria.");
-        
-        
-        // Caso seguir partida 
-        partida.iniciarPartida();
-        // Simulamos que al mover, el jugador mock no cumple la condición de victoria
-        when(jugador1Mock.haLlegadoAMeta()).thenReturn(false);
-        when(jugador2Mock.haLlegadoAMeta()).thenReturn(false);
-        
-        // Comprobamos que comprobarVictoria() devuelve null al no haber ganador
-        ganador = partida.comprobarVictoria();
-        assertNull(ganador, "No debe de haber ganador.");
-        assertFalse(partida.isTerminada(), "La partida no debe terminar si nadie ha ganado.");
+     	Jugador ganador = partida.comprobarVictoria();
+     	assertNotNull(ganador, "Camino 2: Debe haber un ganador.");
+     	assertEquals("J1", ganador.getNombre(), "Camino 2: El ganador debe ser J1 en la 1ª iteración.");
+     	assertTrue(partida.isTerminada(), "Camino 2: La partida debe marcarse como terminada tras la victoria.");
+
+     	// Camino 3 (Path Coverage): J1 no gana (1ª iteración) y gana J2 en la 2ª iteración -> retorna J2
+     	partida.iniciarPartida();
+     	when(jugador1Mock.haLlegadoAMeta()).thenReturn(false);
+     	when(jugador2Mock.haLlegadoAMeta()).thenReturn(true);
+
+     	ganador = partida.comprobarVictoria();
+     	assertNotNull(ganador, "Camino 3: Debe haber un ganador.");
+     	assertEquals("J2", ganador.getNombre(), "Camino 3: El ganador debe ser J2 en la 2ª iteración.");
+     	assertTrue(partida.isTerminada(), "Camino 3: La partida debe marcarse como terminada tras la victoria.");
+
+     	// Camino 4 (Path Coverage): Ningún jugador ha llegado a meta -> retorna null y sigue en curso
+     	partida.iniciarPartida();
+     	when(jugador1Mock.haLlegadoAMeta()).thenReturn(false);
+     	when(jugador2Mock.haLlegadoAMeta()).thenReturn(false);
+
+     	ganador = partida.comprobarVictoria();
+     	assertNull(ganador, "Camino 4: No debe haber ganador.");
+     	assertFalse(partida.isTerminada(), "Camino 4: La partida no debe terminar si nadie ha ganado.");
 	}
 
 	// Prueba de Caja Negra y Contrato:
