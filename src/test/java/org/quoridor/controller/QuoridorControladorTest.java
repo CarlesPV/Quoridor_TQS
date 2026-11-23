@@ -31,12 +31,14 @@ import org.quoridor.view.IQuoridorVista;
 class QuoridorControladorTest {
 
     private Partida modelo;
+    // Mock 5 (Mockito - Vista/Controlador): Simula IQuoridorVista (Passive View)
     private IQuoridorVista vistaMock;
     private QuoridorControlador controlador;
 
     @BeforeEach
     void setUp() {
         modelo = new Partida();
+        // Mock 5 (Mockito - Vista/Controlador): Simula IQuoridorVista (Passive View)
         vistaMock = mock(IQuoridorVista.class);
         controlador = new QuoridorControlador(modelo, vistaMock);
     }
