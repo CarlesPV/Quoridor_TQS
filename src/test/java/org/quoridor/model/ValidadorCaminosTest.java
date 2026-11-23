@@ -113,54 +113,85 @@ class ValidadorCaminosTest {
 				() -> validador.hayCaminoDisponible(inicio, -1, muros, TAMANO_TABLERO));
 	}
 
+	/**
+	 * Loop Testing — Bucle Anidado 2 (ValidadorCaminos.calcularDistanciaMinima):
+	 * - 0 iteraciones (distancia == 0).
+	 * - 1 iteración (distancia == 1 o -1 en celda aislada).
+	 * - 2 iteraciones (distancia == 2 o -1 en bolsa cerrada de 2 casillas).
+	 * - m iteraciones (camino con rodeo).
+	 * - n-1 / n iteraciones (recorrido amplio del tablero).
+	 */
 	@Test
+	@DisplayName("Loop Testing anidado en calcularDistanciaMinima (cola BFS y vecinos válidos)")
 	void testCalcularDistanciaMinima() {
-		// Caso sin muros
 		Posicion inicio = new Posicion(4, 0);
-        int filaObjetivo = 8;
-        List<Muro> muros = new ArrayList<>();
-        int distancia = validador.calcularDistanciaMinima(inicio, filaObjetivo, muros, TAMANO_TABLERO);
-        assertEquals(8, distancia, "La distancia mínima en línea recta desde la fila 0 hasta la 8 debe ser 8.");
-        
-        // Caso muro en medio
-        muros.add(new Muro(new Posicion(3, 6), Orientacion.HORIZONTAL));
-        distancia = validador.calcularDistanciaMinima(inicio, filaObjetivo, muros, TAMANO_TABLERO); 
-        assertEquals(9, distancia, "La distancia mínima en línea recta desde la fila 0 hasta la 8 con una desviación debe ser 9.");
-        
-        // Caso distancia 0
-        distancia = validador.calcularDistanciaMinima(inicio, 0, muros, TAMANO_TABLERO); 
-        assertEquals(0, distancia, "La distancia mínima para llegar a la misma fila en la que comienza debe ser 0.");
-        
-        // Caso encerrar jugador
-        muros.add(new Muro(new Posicion(3, 0), Orientacion.VERTICAL));
-        muros.add(new Muro(new Posicion(4, 0), Orientacion.VERTICAL));
-        muros.add(new Muro(new Posicion(3, 1), Orientacion.HORIZONTAL));
-        distancia = validador.calcularDistanciaMinima(inicio, filaObjetivo, muros, TAMANO_TABLERO); 
-        assertEquals(-1, distancia, "La distancia mínima debe ser -1 ya que no existe el camino.");
-        
-		// Caso posicion inicial null
-		try
-		{
-			validador.calcularDistanciaMinima(null, filaObjetivo, muros, TAMANO_TABLERO);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
-		
-		// Caso filaObjetivo más grande que tamano_tablero
-		try
-		{
-			validador.calcularDistanciaMinima(inicio, 9, muros, TAMANO_TABLERO);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
-		
-		// Caso filaObjetivo más pequeño que 0
-		try
-		{
-			validador.calcularDistanciaMinima(inicio, -1, muros, TAMANO_TABLERO);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
+		List<Muro> muros = new ArrayList<>();
+
+		// --- Bucle externo: 0 iteraciones (distancia == 0) ---
+		assertEquals(0, validador.calcularDistanciaMinima(inicio, 0, muros, TAMANO_TABLERO),
+				"0 iteraciones: misma fila inicial debe retornar distancia 0.");
+
+		// --- Bucle interno: 0 vecinos válidos / 1 iteración (-1 en celda aislada) ---
+		List<Muro> murosAislado = List.of(
+				new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(0, 0), Orientacion.VERTICAL));
+		assertEquals(-1, validador.calcularDistanciaMinima(new Posicion(0, 0), 8, murosAislado, TAMANO_TABLERO),
+				"0 vecinos válidos / 1 iteración en celda aislada debe retornar -1.");
+
+		// --- Bucle interno: 1 vecino válido ---
+		// Desde (0,0) con HORIZONTAL en (0,0) (bloquea (0,0)->(0,1)) y VERTICAL en (0,0) (bloquea (0,0)->(1,0))
+		// no hay vecinos; si solo bloqueamos (0,0)->(0,1) con HORIZONTAL en (0,0), el único vecino es (1,0)
+		List<Muro> unVecinoMuros = List.of(new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL));
+		assertEquals(0, validador.calcularDistanciaMinima(new Posicion(0, 0), 0, unVecinoMuros, TAMANO_TABLERO),
+				"1 vecino válido: distancia 0 cuando ya está en fila objetivo.");
+
+		// --- Bucle interno: 2 vecinos válidos ---
+		// Esquina (8,8) sin muros tiene 2 vecinos válidos: (8,7) y (7,8); hacia fila 7 tarda 1 paso
+		assertEquals(1, validador.calcularDistanciaMinima(new Posicion(8, 8), 7, muros, TAMANO_TABLERO),
+				"2 vecinos válidos: desde esquina (8,8) hasta fila 7 debe retornar 1.");
+
+		// --- Bucle interno: 3 vecinos válidos ---
+		// Borde superior (4,0) sin muros tiene 3 vecinos válidos; hacia fila 1 tarda 1 paso
+		assertEquals(1, validador.calcularDistanciaMinima(new Posicion(4, 0), 1, muros, TAMANO_TABLERO),
+				"3 vecinos válidos: desde borde (4,0) hasta fila 1 debe retornar 1.");
+
+		// --- Bucle interno: 4 vecinos válidos ---
+		// Casilla central (4,4) sin muros tiene 4 vecinos válidos; hacia fila 5 tarda 1 paso
+		assertEquals(1, validador.calcularDistanciaMinima(new Posicion(4, 4), 5, muros, TAMANO_TABLERO),
+				"4 vecinos válidos: desde casilla central (4,4) hasta fila 5 debe retornar 1.");
+
+		// --- Bucle externo: 1 iteración (distancia == 1) ---
+		assertEquals(1, validador.calcularDistanciaMinima(new Posicion(4, 7), 8, muros, TAMANO_TABLERO),
+				"1 iteración: casilla adyacente a fila meta debe retornar distancia 1.");
+
+		// --- Bucle externo: 2 iteraciones (distancia == 2 y -1 en bolsa cerrada de 2 casillas) ---
+		assertEquals(2, validador.calcularDistanciaMinima(new Posicion(4, 6), 8, muros, TAMANO_TABLERO),
+				"2 iteraciones: distancia 2 hacia fila meta.");
+
+		List<Muro> murosBolsaDos = List.of(
+				new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(1, 0), Orientacion.VERTICAL));
+		assertEquals(-1, validador.calcularDistanciaMinima(new Posicion(0, 0), 8, murosBolsaDos, TAMANO_TABLERO),
+				"2 iteraciones en espacio cerrado de 2 casillas debe retornar -1.");
+
+		// --- Bucle externo: m iteraciones (camino con rodeo) ---
+		List<Muro> murosRodeo = new ArrayList<>();
+		murosRodeo.add(new Muro(new Posicion(3, 3), Orientacion.HORIZONTAL));
+		assertEquals(9, validador.calcularDistanciaMinima(inicio, 8, murosRodeo, TAMANO_TABLERO),
+				"m iteraciones: camino con rodeo debe incrementar la distancia mínima.");
+
+		// --- Bucle externo: n-1 / n iteraciones (recorrido amplio sin acceso a fila meta) ---
+		List<Muro> laberintoAmplio = construirLaberintoSinMeta(TAMANO_TABLERO);
+		assertEquals(-1, validador.calcularDistanciaMinima(inicio, 8, laberintoAmplio, TAMANO_TABLERO),
+				"n-1 / n iteraciones: recorrido amplio sin acceso a fila meta debe retornar -1.");
+
+		// --- Precondiciones DbC con assertThrows ---
+		assertThrows(AssertionError.class,
+				() -> validador.calcularDistanciaMinima(null, 8, muros, TAMANO_TABLERO));
+		assertThrows(AssertionError.class,
+				() -> validador.calcularDistanciaMinima(inicio, TAMANO_TABLERO, muros, TAMANO_TABLERO));
+		assertThrows(AssertionError.class,
+				() -> validador.calcularDistanciaMinima(inicio, -1, muros, TAMANO_TABLERO));
 	}
 
 	@Test
