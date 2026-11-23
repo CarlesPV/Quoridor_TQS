@@ -196,6 +196,17 @@ class JugadorTest {
 		assertTrue(jugadorMeta0Aux.haLlegadoAMeta());
 		jugadorMeta0Aux.moverA(new Posicion(8, 0));
 		assertTrue(jugadorMeta0Aux.haLlegadoAMeta());
+		
+		// Valores límites para filaObjetivo (filaObjetivo = 4)
+		// Frontera inferior: y = 3
+		Jugador jugadorLimite = new Jugador("Limite", Color.AZUL, new Posicion(4, 3), 4, 10);
+		assertFalse(jugadorLimite.haLlegadoAMeta());	
+		// Fila objetivo: y = 4
+		jugadorLimite.moverA(new Posicion(4, 4));
+		assertTrue(jugadorLimite.haLlegadoAMeta());
+		// Frontera superior: y = 5
+		jugadorLimite.moverA(new Posicion(4, 5));
+		assertFalse(jugadorLimite.haLlegadoAMeta());
 	}
 	
 	// Prueba de Caja Negra: Partición Equivalente y valores límite / frontera válidos
