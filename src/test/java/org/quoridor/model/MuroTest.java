@@ -217,7 +217,16 @@ class MuroTest {
 
         // --- DISTANCIA MAYOR A 1 EN MISMO EJE (Salto de 2 casillas) ---
         "4, 4, HORIZONTAL, 4, 4, 4, 6, false",
-        "4, 4, VERTICAL,   4, 4, 6, 4, false"
+        "4, 4, VERTICAL,   4, 4, 6, 4, false",
+        
+        // --- Cobertura adicional de condiciones en bloqueaPaso (muro HORIZONTAL en (4,4)) ---
+        // min(oY, dY) == mY (4) con oX < mX (oX = 2 < 4)
+        "4, 4, HORIZONTAL, 2, 4, 2, 5, false",
+        // min(oY, dY) == mY (4) con oX >= mX + 2 (oX = 6 >= 6)
+        "4, 4, HORIZONTAL, 6, 4, 6, 5, false",
+        // min(oY, dY) != mY (oY=5, dY=6 -> min=5 != 4) con oX en [mX, mX + 2) (oX = 4)
+        "4, 4, HORIZONTAL, 4, 5, 4, 6, false",
+        "4, 4, HORIZONTAL, 4, 5, 5, 5, false"
     })
     
     @DisplayName("Data-Driven: Verificación de bloqueo de paso para muros")
