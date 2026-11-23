@@ -102,7 +102,7 @@ Aplicar Programación por Contrato en al menos el **50% de las clases del Modelo
 ## 6. Pruebas de Caja Blanca
 
 ### 6.1 Statement Coverage (Todo el código)
-- [ ] Alcanzar y verificar mediante reporte JaCoCo actualizado (`mvn clean test`) el 100% de cobertura de sentencias (*Statement Coverage*) en todo el código del Modelo y Controlador.
+- [x] Alcanzar y verificar mediante reporte JaCoCo actualizado (`target/site/jacoco/index.html`) el 100% de cobertura de sentencias (*Statement Coverage*) en todo el código del Modelo y Controlador.
 
 ### 6.2 Decision Coverage y Condition Coverage (Mínimo 3 métodos con $\ge 2$ condicionales)
 - [x] **Método 1**: `Muro.colisionaCon(Muro otroMuro)` — cubiertas todas las decisiones y condiciones atómicas en `MuroTest.testColisionaCon`.
