@@ -52,12 +52,12 @@ class ValidadorCaminosTest {
 				"0 vecinos válidos / 1 iteración: esquina (0,0) cerrada debe retornar false.");
 
 		// --- Bucle interno: 1 vecino válido ---
-		// Desde (0,0) con HORIZONTAL en (0,0) (bloquea abajo) y VERTICAL en (0,0) (bloquea derecha):
-		// si quitamos VERTICAL en (0,0) y bloqueamos (0,0)->(0,1) con HORIZONTAL en (0,0),
-		// desde (0,0) solo puede ir a (1,0), y desde ahí alcanzar fila 0.
+		// Desde (0,0) con muro HORIZONTAL en (0,0), (0,0)->(0,1) está bloqueado y arriba/izquierda salen del tablero,
+		// por lo que el único vecino válido desde (0,0) es (1,0) (1 iteración en el bucle interno).
+		// Hacia filaObjetivo = 1, entra en el bucle while y rodea el muro: (0,0) -> (1,0) -> (2,0) -> (2,1).
 		List<Muro> unVecinoMuros = List.of(new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL));
-		assertTrue(validador.hayCaminoDisponible(new Posicion(0, 0), 0, unVecinoMuros, TAMANO_TABLERO),
-				"1 vecino válido: camino disponible desde (0,0) hacia fila 0.");
+		assertTrue(validador.hayCaminoDisponible(new Posicion(0, 0), 1, unVecinoMuros, TAMANO_TABLERO),
+				"1 vecino válido: camino disponible desde (0,0) hacia fila 1 rodeando muro horizontal.");
 
 		// --- Bucle interno: 2 vecinos válidos ---
 		// Esquina (8,8) sin muros tiene 2 vecinos válidos: (8,7) y (7,8)
@@ -139,11 +139,12 @@ class ValidadorCaminosTest {
 				"0 vecinos válidos / 1 iteración en celda aislada debe retornar -1.");
 
 		// --- Bucle interno: 1 vecino válido ---
-		// Desde (0,0) con HORIZONTAL en (0,0) (bloquea (0,0)->(0,1)) y VERTICAL en (0,0) (bloquea (0,0)->(1,0))
-		// no hay vecinos; si solo bloqueamos (0,0)->(0,1) con HORIZONTAL en (0,0), el único vecino es (1,0)
+		// Desde (0,0) con muro HORIZONTAL en (0,0), el único vecino válido es (1,0) (1 iteración en bucle interno).
+		// Hacia filaObjetivo = 1 entra al bucle while y rodea el muro de longitud 2:
+		// (0,0) -> (1,0) -> (2,0) -> (2,1), con distancia mínima esperada igual a 3.
 		List<Muro> unVecinoMuros = List.of(new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL));
-		assertEquals(0, validador.calcularDistanciaMinima(new Posicion(0, 0), 0, unVecinoMuros, TAMANO_TABLERO),
-				"1 vecino válido: distancia 0 cuando ya está en fila objetivo.");
+		assertEquals(3, validador.calcularDistanciaMinima(new Posicion(0, 0), 1, unVecinoMuros, TAMANO_TABLERO),
+				"1 vecino válido: desde (0,0) hasta fila 1 rodeando muro en (0,0) debe retornar distancia 3.");
 
 		// --- Bucle interno: 2 vecinos válidos ---
 		// Esquina (8,8) sin muros tiene 2 vecinos válidos: (8,7) y (7,8); hacia fila 7 tarda 1 paso
