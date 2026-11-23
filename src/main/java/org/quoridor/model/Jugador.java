@@ -8,9 +8,10 @@ public class Jugador {
 	private int filaObjetivo;
 	private int murosRestantes;
 	
-	private static final int TAMANO_TABLERO = 9;
-	
-	public Jugador() {
+	private static final int TAMANO_TABLERO = Tablero.TAMANO_TABLERO;
+
+	// Constructor de paquete reservado para pruebas de invariante DbC en el modelo
+	Jugador() {
 	}
 	
 	public Jugador(String nombre, Color color, Posicion posicionActual, int filaObjetivo, int murosRestantes) {

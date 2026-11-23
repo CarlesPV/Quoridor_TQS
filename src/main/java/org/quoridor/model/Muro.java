@@ -11,7 +11,8 @@ public class Muro {
 	private void setOrigen(Posicion origen) {this.origen = origen;}
 	private void setOrientacion(Orientacion orientacion) {this.orientacion = orientacion;}
 	
-	public Muro() {
+	// Constructor de paquete reservado para pruebas de invariante DbC en el modelo
+	Muro() {
 	}
     public Muro(Posicion origen, Orientacion orientacion) {
         // Pre-condiciones
