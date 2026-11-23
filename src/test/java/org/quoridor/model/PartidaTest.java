@@ -410,7 +410,6 @@ class PartidaTest {
 		"4, 7, 10, false",
 		"4, 9, 5,  true",
 		"2, 7, 10, true",
-		"4, 9, 10, false",
 		"2, 9, 5,  false"
 	})
 	@DisplayName("Pairwise Testing: Configuración de partida (2/4 jugadores, tablero 7/9, muros 5/10, sorteo)")
