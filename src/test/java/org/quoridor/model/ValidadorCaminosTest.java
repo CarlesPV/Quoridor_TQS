@@ -3,6 +3,7 @@ package org.quoridor.model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,58 +17,100 @@ class ValidadorCaminosTest {
 	void setUp() throws Exception {
 		validador = new ValidadorCaminos();
 	}
-
+	
+	private List<Muro> construirLaberintoSinMeta(int tamano) {
+		List<Muro> muros = new ArrayList<>();
+		int filaBloqueo = tamano - 2;
+		for (int x = 0; x < tamano - 1; x += 2) {
+			muros.add(new Muro(new Posicion(x, filaBloqueo), Orientacion.HORIZONTAL));
+		}
+		// Asegura cubrir también la última columna (tamano - 1) si tamano es impar (ej. x = 7 en 9x9)
+		muros.add(new Muro(new Posicion(tamano - 2, filaBloqueo), Orientacion.HORIZONTAL));
+		return muros;
+	}
+	
+	/**
+	 * Loop Testing — Bucle Anidado 1 (ValidadorCaminos.hayCaminoDisponible):
+	 * - Bucle interno (vecinos válidos / muros): 0, 1, 2, 3 y 4 vecinos válidos.
+	 * - Bucle externo (cola BFS): 0, 1, 2, m, n-1 y n iteraciones / recorrido amplio del tablero.
+	 */
 	@Test
+	@DisplayName("Loop Testing anidado en hayCaminoDisponible (cola BFS y vecinos válidos)")
 	void testHayCaminoDisponible() {
-		// Caso sin muros
+		// --- Bucle externo: 0 iteraciones (inicio.getY() == filaObjetivo) ---
 		Posicion inicio = new Posicion(4, 0);
-        int filaObjetivo = 8;
-        List<Muro> muros = new ArrayList<>();
-        boolean resultado = validador.hayCaminoDisponible(inicio, filaObjetivo, muros, TAMANO_TABLERO);
-        assertTrue(resultado, "Debería haber camino libre si no hay muros.");
-        
-        // Caso casi encerrado
-        muros.add(new Muro(new Posicion(0, 6), Orientacion.HORIZONTAL));
-        muros.add(new Muro(new Posicion(2, 6), Orientacion.HORIZONTAL));
-        muros.add(new Muro(new Posicion(4, 6), Orientacion.HORIZONTAL));
-        muros.add(new Muro(new Posicion(6, 6), Orientacion.HORIZONTAL));
-        resultado = validador.hayCaminoDisponible(inicio, filaObjetivo, muros, TAMANO_TABLERO); 
-        assertTrue(resultado, "Debería haber camino libre por 8,6.");        
-        
-        // Caso ya esta en filaObjetivo
-        resultado = validador.hayCaminoDisponible(inicio, 0, muros, TAMANO_TABLERO); 
-        assertTrue(resultado, "Debería devolver instantaneamente true.");
-        
-        // Caso encerrado
-        muros.add(new Muro(new Posicion(3, 0), Orientacion.VERTICAL));
-        muros.add(new Muro(new Posicion(4, 0), Orientacion.VERTICAL));
-        muros.add(new Muro(new Posicion(3, 1), Orientacion.HORIZONTAL));
-        resultado = validador.hayCaminoDisponible(inicio, filaObjetivo, muros, TAMANO_TABLERO); 
-        assertFalse(resultado, "Debería devolver false al estar encerrado.");
-        
-		// Caso posicion inicial null
-		try
-		{
-			validador.hayCaminoDisponible(null, filaObjetivo, muros, TAMANO_TABLERO);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
-		
-		// Caso filaObjetivo más grande que tamano_tablero
-		try
-		{
-			validador.hayCaminoDisponible(inicio, 9, muros, TAMANO_TABLERO);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
-		
-		// Caso filaObjetivo más pequeño que 0
-		try
-		{
-			validador.hayCaminoDisponible(inicio, -1, muros, TAMANO_TABLERO);
-			assertTrue(false);
-		}
-		catch (AssertionError e) {}
+		List<Muro> muros = new ArrayList<>();
+		assertTrue(validador.hayCaminoDisponible(inicio, 0, muros, TAMANO_TABLERO),
+				"0 iteraciones: ya está en la fila objetivo.");
+
+		// --- Bucle interno: 0 vecinos válidos (esquina (0,0) cerrada por abajo y derecha) ---
+		// y Bucle externo: 1 iteración (extrae (0,0), sin vecinos válidos, cola vacía -> false)
+		List<Muro> murosEsquinaCerrada = List.of(
+				new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(0, 0), Orientacion.VERTICAL));
+		assertFalse(validador.hayCaminoDisponible(new Posicion(0, 0), 8, murosEsquinaCerrada, TAMANO_TABLERO),
+				"0 vecinos válidos / 1 iteración: esquina (0,0) cerrada debe retornar false.");
+
+		// --- Bucle interno: 1 vecino válido ---
+		// Desde (0,0) con HORIZONTAL en (0,0) (bloquea abajo) y VERTICAL en (0,0) (bloquea derecha):
+		// si quitamos VERTICAL en (0,0) y bloqueamos (0,0)->(0,1) con HORIZONTAL en (0,0),
+		// desde (0,0) solo puede ir a (1,0), y desde ahí alcanzar fila 0.
+		List<Muro> unVecinoMuros = List.of(new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL));
+		assertTrue(validador.hayCaminoDisponible(new Posicion(0, 0), 0, unVecinoMuros, TAMANO_TABLERO),
+				"1 vecino válido: camino disponible desde (0,0) hacia fila 0.");
+
+		// --- Bucle interno: 2 vecinos válidos ---
+		// Esquina (8,8) sin muros tiene 2 vecinos válidos: (8,7) y (7,8)
+		assertTrue(validador.hayCaminoDisponible(new Posicion(8, 8), 7, muros, TAMANO_TABLERO),
+				"2 vecinos válidos: desde esquina (8,8) hacia fila 7.");
+
+		// --- Bucle interno: 3 vecinos válidos ---
+		// Borde superior (4,0) sin muros tiene 3 vecinos válidos: (4,1), (3,0), (5,0)
+		assertTrue(validador.hayCaminoDisponible(new Posicion(4, 0), 1, muros, TAMANO_TABLERO),
+				"3 vecinos válidos: desde borde (4,0) hacia fila 1.");
+
+		// --- Bucle interno: 4 vecinos válidos ---
+		// Casilla central (4,4) sin muros tiene 4 vecinos válidos: arriba, abajo, izquierda, derecha
+		assertTrue(validador.hayCaminoDisponible(new Posicion(4, 4), 5, muros, TAMANO_TABLERO),
+				"4 vecinos válidos: desde casilla central (4,4) hacia fila 5.");
+
+		// --- Bucle externo: 1 iteración con meta a 1 paso ---
+		assertTrue(validador.hayCaminoDisponible(new Posicion(4, 7), 8, muros, TAMANO_TABLERO),
+				"1 iteración: meta a 1 paso desde (4,7) hasta fila 8.");
+
+		// --- Bucle externo: 2 iteraciones (meta a 2 pasos / espacio reducido de 2 casillas) ---
+		assertTrue(validador.hayCaminoDisponible(new Posicion(4, 6), 8, muros, TAMANO_TABLERO),
+				"2 iteraciones: meta a 2 pasos desde (4,6) hasta fila 8.");
+
+		// Espacio aislado de 2 casillas ((0,0) y (1,0)):
+		// - Arriba e izquierda: bordes del tablero (y=0, x=0)
+		// - Abajo de (0,0) y (1,0): HORIZONTAL en (0,0)
+		// - Derecha de (1,0): VERTICAL en (1,0)
+		List<Muro> espacioDosCasillas = List.of(
+				new Muro(new Posicion(0, 0), Orientacion.HORIZONTAL),
+				new Muro(new Posicion(1, 0), Orientacion.VERTICAL));
+		assertFalse(validador.hayCaminoDisponible(new Posicion(0, 0), 8, espacioDosCasillas, TAMANO_TABLERO),
+				"2 iteraciones en bolsa cerrada de 2 casillas: debe retornar false.");
+
+		// --- Bucle externo: m iteraciones (desvío intermedio por muros) ---
+		List<Muro> murosDesvio = new ArrayList<>();
+		murosDesvio.add(new Muro(new Posicion(3, 4), Orientacion.HORIZONTAL));
+		murosDesvio.add(new Muro(new Posicion(5, 4), Orientacion.HORIZONTAL));
+		assertTrue(validador.hayCaminoDisponible(new Posicion(4, 0), 8, murosDesvio, TAMANO_TABLERO),
+				"m iteraciones: debe rodear muros intermedios y alcanzar fila 8.");
+
+		// --- Bucle externo: n-1 / n iteraciones (recorrido amplio sin acceso a fila meta) ---
+		List<Muro> laberintoAmplio = construirLaberintoSinMeta(TAMANO_TABLERO);
+		assertFalse(validador.hayCaminoDisponible(new Posicion(4, 0), 8, laberintoAmplio, TAMANO_TABLERO),
+				"n-1 / n iteraciones: recorrido amplio sin acceso a fila meta debe retornar false.");
+
+		// --- Precondiciones DbC con assertThrows ---
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(null, 8, muros, TAMANO_TABLERO));
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(inicio, TAMANO_TABLERO, muros, TAMANO_TABLERO));
+		assertThrows(AssertionError.class,
+				() -> validador.hayCaminoDisponible(inicio, -1, muros, TAMANO_TABLERO));
 	}
 
 	@Test
