@@ -110,8 +110,8 @@ Aplicar Programación por Contrato en al menos el **50% de las clases del Modelo
 - [x] **Método 3**: `Tablero.esColocacionMuroValida(Muro muro)` — cubiertas todas las decisiones y condiciones atómicas en `TableroTest.testEsColocacionMuroValida` y `TableroTest.testRamasNulasPrecondicionesEInvariante`.
 
 ### 6.3 Path Coverage (Mínimo 2 métodos + Diagramas de Actividades UML)
-- [x] **Método 1**: `Partida.comprobarVictoria()` — tests de los 4 caminos independientes en `PartidaTest.testComprobarVictoria` (diagrama de actividades UML pendiente para el informe en la sección 9).
-- [x] **Método 2**: `Partida.colocarMuro(Muro m)` — tests de los 5 caminos independientes en `PartidaTest.testColocarMuro` (diagrama de actividades UML pendiente para el informe en la sección 9).
+- [x] **Método 1**: `Partida.comprobarVictoria()` — tests de los 4 caminos independientes en `PartidaTest.testComprobarVictoria` (diagrama de actividades UML incluido en el informe en la sección 9).
+- [x] **Método 2**: `Partida.colocarMuro(Muro m)` — tests de los 5 caminos independientes en `PartidaTest.testColocarMuro` (diagrama de actividades UML incluido en el informe en la sección 9).
 
 ### 6.4 Loop Testing (Mínimo 2 bucles simples y 2 bucles anidados)
 - [x] **Bucle Simple 1**: `Tablero.colisionaConMurosExistentes(Muro nuevoMuro)` (casos de `0, 1, 2, m, n-1, n` iteraciones en `TableroTest.testColisionaConMurosExistentes`).
@@ -142,11 +142,11 @@ Implementar pruebas *Data-Driven* (`@ParameterizedTest` con `@CsvFileSource` / `
 
 ## 9. Documentación de Entrega (Campus Virtual)
 
-- [ ] **Informe de Prácticas**:
-  - [ ] Explicación detallada de todos los tipos de test realizados (TDD, Caja Negra, Programación por Contrato, Caja Blanca, Data-Driven, Pairwise y Mocks).
-  - [ ] Capturas de pantalla con el porcentaje de *Statement Coverage* de cada uno de los métodos.
-  - [ ] Capturas de pantalla en color (plugin EclEmma de Eclipse o reporte JaCoCo) de cada método o bucle analizado en *Decision Coverage*, *Condition Coverage*, *Path Coverage* y *Loop Testing*.
-  - [ ] Diagramas de flujo (diagramas de actividades en UML) de cada uno de los métodos analizados en *Path Coverage*.
+- [x] **Informe de Prácticas** ([Informe_Practica_1_TQS.pdf](Informe_Practica_1_TQS.pdf)):
+  - [x] Explicación detallada de todos los tipos de test realizados (TDD, Caja Negra, Programación por Contrato, Caja Blanca, Data-Driven, Pairwise y Mocks).
+  - [x] Capturas de pantalla con el porcentaje de *Statement Coverage* de cada uno de los métodos.
+  - [x] Capturas de pantalla en color (plugin EclEmma de Eclipse o reporte JaCoCo) de cada método o bucle analizado en *Decision Coverage*, *Condition Coverage*, *Path Coverage* y *Loop Testing*.
+  - [x] Diagramas de flujo (diagramas de actividades en UML) de cada uno de los métodos analizados en *Path Coverage*.
 - [ ] **Hoja de Autoevaluación**:
   - [ ] Completar con los nombres de los integrantes del grupo (máximo 2 estudiantes), la propuesta de calificación y el enlace al repositorio privado de GitHub.
   - [ ] Realizar una única entrega por grupo antes del **30 de noviembre de 2026 a las 8:30**.
