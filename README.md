@@ -56,4 +56,5 @@ En la carpeta `docs` encontrarás toda la documentación técnica y de seguimien
 - [04. Guía de Pruebas y TDD](docs/04_Guia_Pruebas_TDD.md)
 - [05. Flujo de Trabajo Git, TDD y CI](docs/05_Flujo_Git_CI.md)
 - [06. Checklist de Seguimiento del Proyecto](docs/06_Checklist_Proyecto.md)
+- [Informe Práctica 1 TQS](docs/Informe_Practica_1_TQS.pdf)
 
